@@ -52,14 +52,26 @@
                                     <option value="nf">Não informar</option>
                                 </select>
                             </div>
-                            <p>Você é bolsista?</p>
+                            <p>Exames socilicitados</p>
                             <div class="form-chek">
-                                <input type="radio" name="Bolsista" id="bolsista" value="Sim">
-                                <label for="bolsista" class="form=check-label">Sim</label>
+                                <input type="checkbox" name="ExameSolicitado[]" id="Microbiologia" value="Microbiologia">
+                                <label for="Microbiologia" class="form=check-label">Microbiologia</label>
                             </div>
                             <div class="form-chek">
-                                <input type="radio" name="Bolsista" id="bolsista" value="Não" checked> <!--checked deixa um selecionado-->
-                                <label for="bolsista" class="form=check-label">Não<br></label>
+                                <input type="checkbox" name="ExameSolicitado[]" id="Parasitologia" value="Parasitologia">
+                                <label for="Parasitologia" class="form=check-label">Parasitologia</label>
+                            </div>
+                            <div class="form-chek">
+                                <input type="checkbox" name="ExameSolicitado[]" id="Hematologia" value="Hematologia">
+                                <label for="Hematologia" class="form=check-label">Hematologia</label>
+                            </div>
+                            <div class="form-chek">
+                                <input type="checkbox" name="ExameSolicitado[]" id="Bioquímica" value="Bioquímica">
+                                <label for="Bioquímica" class="form=check-label">Bioquímica</label>
+                            </div>
+                            <div class="form-chek">
+                                <input type="checkbox" name="ExameSolicitado[]" id="Urinálise" value="Urinálise">
+                                <label for="Urinálise" class="form=check-label">Urinálise</label>
                             </div>
                             <button type="submit" class="btn btn-dark">Enviar</button>
                         </form>

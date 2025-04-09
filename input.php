@@ -5,17 +5,20 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(!empty($_POST['nome'])){
         echo "<p> Olá ". $_POST['nome']. "!! <br>";    
     }
+
+
     foreach($_POST as $chave => $exec3){
         echo $chave . ": " . $exec3 . "<br>";
     }
+
+
 }elseif($_SERVER["REQUEST_METHOD"] == "GET"){
     echo "Solicitação via GET! <br>";
 }
+
+$teste1 = $_POST["ExameSolicitado[]"];
     
+    echo "nome: " . $teste1;
+   
     
-    $nome = $_POST["nome"];
-    $genero = $_POST["genero"];
-    if($idade > 25){
-        echo "Olá ". $nome;
-    }
 ?>
