@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <title>Cadastro de Exames Bioquímicos</title>
+    <title>Exames Bioquímicos</title>
     <style>
     td {
         vertical-align: middle;
@@ -18,7 +18,7 @@
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-10 border bg-white p-5 shadow rounded">
-                <h2 class="mb-4 text-center">Cadastro de Exames Bioquímicos</h2>
+                <h2 class="mb-4 text-center">Questionário de resultado de exame</h2>
 
                 <form action="salvar_exame.php" method="POST">
                     <!-- Informações principais -->
