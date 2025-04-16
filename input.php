@@ -4,14 +4,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     if(!empty($_POST['nome'])){
         echo "<p> Olá ". $_POST['nome']. "!! <br>";    
     }
-    if(!empty($_POST['categorias'])){
-        foreach($_POST['categorias'] as $item){ //gpt me ajudou! aprendi usar o htmlspecialchars que proteje o codigo de caracteres especiais
-            echo "" .htmlspecialchars($item). "<br>"; // porem preciso entender melhor como ele funciona 
-        }
-        
-    }else {
-        echo "<p>Nenhuma opção selecionada.</p>";
-    }
+    
 
     foreach($_POST as $nomeCampo => $valor){
         if(is_array($valor)){//estou verificando se estou recebendo um array
