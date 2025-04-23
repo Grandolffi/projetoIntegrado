@@ -8,8 +8,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 
     foreach($_POST as $nomeCampo => $valor){
         if(is_array($valor)){//estou verificando se estou recebendo um array
-            echo $nomeCampo . ":<br>"; //imprimo o nome do arrayList
-            
+            echo $nomeCampo . ":<br>"; //imprimo o nome do arrayList 
             foreach($valor as $itens){
                 echo "" .htmlspecialchars($itens). "<br>"; //o "." concatena   !!HOJE É 13/04/25 SÃO 08 DA MANHA DE UM DOMINGO E ESTOU COM DOR DE CABEÇA POR CODAR FRONT!!
             }
