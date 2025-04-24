@@ -18,7 +18,7 @@
     <div class="container py-5">
         <div class="row justify-content-center">
             <div class="col-lg-10 border bg-white p-5 shadow rounded">
-                <h2 class="mb-4 text-center">Questionário de resultado de exame</h2>
+                <h2 class="mb-4 text-center">Resultado de exame</h2>
 
                 <form action="salvar_exame.php" method="POST">
                     <!-- Informações principais -->
@@ -27,10 +27,6 @@
                             <label for="numero_registro" class="form-label">Nº do Registro</label>
                             <input type="text" class="form-control" name="numero_registro" id="numero_registro"
                                 required>
-                        </div>
-                        <div class="col-md-4">
-                            <label for="nome_paciente" class="form-label">Nome do Paciente</label>
-                            <input type="text" class="form-control" name="nome_paciente" id="nome_paciente">
                         </div>
                         <div class="col-md-4">
                             <label for="data_laudo" class="form-label">Data prevista para entrega do laudo</label>

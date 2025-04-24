@@ -117,8 +117,6 @@
                         </div>
                     </div>
 
-
-
                     <!-- check parasitologia -->
                     <div class="form-check">
                         <input type="checkbox" name="laboratorioSolicitado[]" id="Parasitologia" value="Parasitologia"
@@ -139,9 +137,6 @@
                             <label class="form-check-label" for="sangueOculto">Sangue oculto</label>
                         </div>
                     </div>
-
-
-
 
                     <!-- check hematologia -->
                     <div class="form-check">

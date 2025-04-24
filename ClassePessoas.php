@@ -56,9 +56,6 @@ class Pessoa{
         numero Telefone: {$this->numTel}, genero: {$this->genero}";
     }
     
-
-
-
 }
 
 ?>
