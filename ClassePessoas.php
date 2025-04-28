@@ -55,12 +55,7 @@ class Pessoa{
         return "Pessoa - nome: {$this->nomeCompleto}, cpf: {$this->cpf}, data Nascimento: {$this->datNasc}, 
         numero Telefone: {$this->numTel}, genero: {$this->genero}";
     }
-<<<<<<< Updated upstream
     
-=======
-
-
->>>>>>> Stashed changes
 }
 
 ?>
