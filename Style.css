@@ -1,0 +1,30 @@
+
+.sidebar {
+    height: 150vh;
+    background-color: #007bff; /* azul bootstrap */
+    padding-top: 20px;
+    color: white;
+    text-align: center;
+  }
+  
+  .sidebar .logo {
+    font-size: 2rem;
+    margin-bottom: 30px;
+    color: white;
+  }
+  
+  .sidebar .nav-link {
+    color: white;
+    padding: 15px 10px;
+    font-weight: 500;
+  }
+  
+  .sidebar .nav-link:hover {
+    background-color: #0056b3; /* azul mais escuro */
+    color: white;
+  }
+  
+  .sidebar .nav-link.active {
+    background-color: #0056b3;
+  }
+  
