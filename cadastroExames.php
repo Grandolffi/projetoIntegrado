@@ -20,7 +20,7 @@
             <div class="col-lg-10 border bg-white p-5 shadow rounded">
                 <h2 class="mb-4 text-center">Resultado de exame</h2>
 
-                <form action="salvar_exame.php" method="POST">
+                <form action="input.php" method="POST">
                     <!-- Informações principais -->
                     <div class="row mb-4">
                         <div class="col-md-4">
@@ -94,12 +94,25 @@
                                 id="preceptor_responsavel">
                         </div>
                     </div>
-
                     <button type="submit" class="btn btn-success w-100">Salvar Exames</button>
                 </form>
             </div>
         </div>
     </div>
 </body>
-
 </html>
+
+<?php
+// Verifica se o formulário foi enviado via POST
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Função para salvar o exame
+    function salvarExame($dados) {
+        // Lógica para salvar os dados do exame (aqui você pode conectar ao banco de dados, por exemplo)
+        echo "Exame salvo com sucesso!<br>";
+        var_dump($dados);
+    }
+
+    // Chama a função salvarExame com os dados do POST
+    salvarExame($_POST);
+}
+?>
