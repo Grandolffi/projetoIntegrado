@@ -24,6 +24,12 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
 }elseif($_SERVER["REQUEST_METHOD"] == "GET"){
     echo "Solicitação via GET! <br>";
 }
+
+
+
+
+
+
 // validando cadastroExames
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     // Verificar se os campos necessários estão presentes
