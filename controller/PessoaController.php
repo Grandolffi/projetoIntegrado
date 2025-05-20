@@ -1,12 +1,10 @@
 <?php
 include '../dao/ConnectionFactory.php';
 include '../dao/PessoaDao.php';
-echo "<pre>";
-print_r($_POST);
-echo "</pre>";
+
 
 echo "Controller foi chamado";
-    
+
 
 include '../model/ClassePessoas.php';
 
@@ -24,6 +22,6 @@ include '../model/ClassePessoas.php';
         $Pessoa->setGenero($_POST['genero']);
         $PessoaDao->inserir($Pessoa);
         
-        //header("location: ../CadastroPaciente.php");
+        header("location: ../CadastroPaciente.php");
     }
 ?>

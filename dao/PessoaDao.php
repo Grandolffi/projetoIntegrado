@@ -16,7 +16,7 @@ class PessoaDao{
          echo "<p> Pessoa cadastrado com sucesso";
             return $con_sql->execute();   
         }catch(PDOException $ex){
-            echo "<p> Erro ao insetir Fabricante no banco de dados $ex" ;
+            echo "<p> Erro ao insetir Pessoa no banco de dados $ex" ;
             return null;
         }
     }
