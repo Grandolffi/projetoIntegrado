@@ -4,6 +4,8 @@ class Pessoa{
     private $nomeCompleto;
     private $cpf;
     private $datNasc;
+    private $email;
+    private $nomeMae;
     private $numTel;
     private $genero;
 
@@ -33,6 +35,21 @@ class Pessoa{
         $this->datNasc = $datNasc;
     }
 
+    public function getEmail(){
+        return $this->email;
+    }
+
+    public function setEmail($email){
+        $this->email = $email;
+    }
+
+    public function getNomeMae(){
+        return $this->nomeMae;
+    }
+
+    public function setNomeMae($nomeMae){
+        $this->nomeMae = $nomeMae;
+    }
 
     public function getNumTel(){
         return $this->numTel;
