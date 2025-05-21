@@ -2,6 +2,7 @@
 class ConnectionFactory
 {
     static $connection;
+    
     public static function getConnection()
     {
         if (!isset(self::$connection)) {
@@ -16,9 +17,6 @@ class ConnectionFactory
                 self::$connection = new PDO("mysql:host=$host;dbname=$dbName;port=$port", $userDb, $pass); //CLASE PRA ACESSAR BANCO DE DADOS (PADRÃO PHP);
                 //(New pdo é uma classe para conectar com o banco) conection é obj da classe pdo que recebe por parametro em ordem a string de conexão, usuario e senha.
             echo "Conectado com sucesso!<br>";
-            // Teste: imprimir qual banco está sendo usado
-            $result = self::$connection->query("SELECT DATABASE()")->fetchColumn();
-            echo "Banco conectado: $result<br>";
             } catch (PDOException $ex) {
                  echo "<strong>Erro de conexão com o banco:</strong> " . $ex->getMessage();
                 return null;

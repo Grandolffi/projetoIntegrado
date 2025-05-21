@@ -1,21 +1,29 @@
 <?php
 
 class Pessoa{
-    private $nomeCompleto;
+    private $id;
+    private $nome;
     private $cpf;
-    private $datNasc;
+    private $dataNasc;
     private $email;
     private $nomeMae;
-    private $numTel;
+    private $numCelular;
     private $genero;
 
-
-    public function getNomeCompleto(){
-        return $this->nomeCompleto;
+    public function getId(){
+        return $this->id;
     }
 
-    public function setNomeCompleto($nomeCompleto){
-        $this->nomeCompleto = $nomeCompleto;
+    public function setId($id){
+        $this->id = $id;
+    }
+
+    public function getnome(){
+        return $this->nome;
+    }
+
+    public function setnome($nome){
+        $this->nome = $nome;
     }
 
     public function getCpf(){
@@ -27,12 +35,12 @@ class Pessoa{
     }
 
 
-    public function getDatNasc(){
-        return $this->datNasc;
+    public function getDataNasc(){
+        return $this->dataNasc;
     }
 
-    public function setDatNasc($datNasc){
-        $this->datNasc = $datNasc;
+    public function setDataNasc($dataNasc){
+        $this->dataNasc = $dataNasc;
     }
 
     public function getEmail(){
@@ -51,12 +59,12 @@ class Pessoa{
         $this->nomeMae = $nomeMae;
     }
 
-    public function getNumTel(){
-        return $this->numTel;
+    public function getnumCelular(){
+        return $this->numCelular;
     }
 
-    public function setNumTel($numTel){
-        $this->numTel = $numTel;
+    public function setnumCelular($numCelular){
+        $this->numCelular = $numCelular;
     }
 
 
@@ -69,8 +77,8 @@ class Pessoa{
     }
 
     public function __toString(){
-        return "Pessoa - nome: {$this->nomeCompleto}, cpf: {$this->cpf}, data Nascimento: {$this->datNasc}, 
-        numero Telefone: {$this->numTel}, genero: {$this->genero}";
+        return "Pessoa - nome: {$this->nome}, cpf: {$this->cpf}, data Nascimento: {$this->dataNasc}, 
+        numero Telefone: {$this->numCelular}, genero: {$this->genero}";
     }
     
 }
