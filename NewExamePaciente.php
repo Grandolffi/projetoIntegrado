@@ -7,53 +7,104 @@
     <title>Cadastro de Paciente</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-        <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style.css">
     <style>
-    body {
-        background-color: white;
-    }
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+            overflow-x: hidden;
+            /*Evita rolagem horizontal indesejada*/
+            height: 100%;
+        }
 
-    .form-container {
-        background-color: white;
-        padding: 30px;
-        margin-top: 60px;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-    }
+        body {
+            background-color: white;
+        }
 
-    input::placeholder {
-        color: #555;
-        opacity: 1;
-        font-size: 14px;
-    }
+        .sidebar {
+            background-color: #007bff;
+            color: white;
+            padding: 20px;
+            min-height: 100vh; /* Garante que a sidebar ocupe toda a altura da viewport */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border-radius: 0 10px 10px 0; /* Bordas arredondadas na direita */
+        }
 
-    label {
-        margin-top: 10px;
-    }
+        .sidebar .logo {
+            font-size: 3rem; /* Tamanho grande para o ícone */
+            margin-bottom: 30px;
+            padding: 10px;
+            background-color: rgba(255, 255, 255, 0.2); /* Fundo semi-transparente para o logo */
+            border-radius: 10px;
+        }
+
+        .sidebar .nav-link {
+            color: white;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            width: 100%;
+            text-align: center;
+            border-radius: 8px; /* Bordas arredondadas para os links */
+            transition: background-color 0.3s ease;
+        }
+
+        .sidebar .nav-link:hover,
+        .sidebar .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.3); /* Fundo mais claro ao passar o mouse ou ativo */
+            color: white;
+        }
+
+        .form-container {
+            background-color: white;
+            padding: 30px;
+            margin-top: 60px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        input::placeholder {
+            color: #555;
+            opacity: 1;
+            font-size: 14px;
+        }
+
+        label {
+            margin-top: 10px;
+        }
 
 
-    .form-check-input {
-        vertical-align: middle;
-        margin-top: 0.9em;
-    }
+        .form-check-input {
+            vertical-align: middle;
+            margin-top: 0.9em;
+        }
+
+        .sub-opcoes {
+            margin-left: 20px;  
+            display: none;
+        }
     </style>
 </head>
 
 <body>
-    <div class="container">
+    <div class="container-fluid">
         <div class="row">
-            <div class="col-2 sidebar">
+            <div class="col-12 col-md-2 sidebar">
                 <div class="logo">🧪</div>
-            <nav class="nav flex-column">
-                <a class="nav-link active" aria-current="page" href="#">Dashboard</a>
-                <a class="nav-link" href="#">Exames</a>
-                <a class="nav-link" href="#">Usuario</a>
-                <a class="nav-link disabled" aria-disabled="true">Estoque</a>
-            </nav>
+                <nav class="nav flex-column">
+                    <a class="nav-link active" aria-current="page" href="#">Dashboard</a>
+                    <a class="nav-link" href="#">Exames</a>
+                    <a class="nav-link" href="#">Usuario</a>
+                    <a class="nav-link disabled" aria-disabled="true">Estoque</a>
+                </nav>
             </div>
-            <div class="col-9 form-container">
+            <div class="col-12 col-md-10 form-container">
                 <h1 class="text-center mb-4">Novo exame</h1>
 
                 <form action="input.php" method="POST">
+
                     <div class="mb-3">
                         <label for="nome" class="form-label">NomePaciente</label>
                         <input type="text" name="nome" class="form-control" required>
@@ -66,13 +117,38 @@
 
                     <p>Exames solicitados</p>
 
+                    <div class="d-flex flex-wrap gap-3 mb-3">
+                        <!-- check microbiologia -->
+                        <div class="form-check">
+                            <input type="checkbox" name="laboratorioSolicitado[]" id="Microbiologia" value="Microbiologia"
+                                class="form-check-input" onchange="toggleSubOptions('opcoesMicrobiologia')">
+                            <!-- aqui chamo a função toggle que serve pra ativar/desativar a visibilidade de um elemento html* -->
+                            <label for="Microbiologia" class="form-check-label">Microbiologia</label>
+                        </div>
 
-                    <!-- check microbiologia -->
-                    <div class="form-check">
-                        <input type="checkbox" name="laboratorioSolicitado[]" id="Microbiologia" value="Microbiologia"
-                            class="form-check-input" onchange="toggleSubOptions('opcoesMicrobiologia')">
-                        <!-- aqui chamo a função toggle que serve pra ativar/desativar a visibilidade de um elemento html* -->
-                        <label for="Microbiologia" class="form-check-label">Microbiologia</label>
+                        <div class="form-check">
+                            <input type="checkbox" name="laboratorioSolicitado[]" id="Parasitologia" value="Parasitologia"
+                                class="form-check-input" onchange="toggleSubOptions('opcoesParasitologia')">
+                            <label for="Parasitologia" class="form-check-label">Parasitologia</label>
+                        </div>
+
+                        <div class="form-check">
+                            <input type="checkbox" name="laboratorioSolicitado[]" id="Hematologia" value="Hematologia"
+                                class="form-check-input" onchange="toggleSubOptions('opcoesHematologia')">
+                            <label for="Hematologia" class="form-check-label">Hematologia</label>
+                        </div>
+
+                        <div class="form-check">
+                            <input type="checkbox" name="laboratorioSolicitado[]" id="Bioquimica" value="Bioquimica"
+                                class="form-check-input" onchange="toggleSubOptions('opcoesBioquimica')">
+                            <label for="Bioquimica" class="form-check-label">Bioquímica</label>
+                        </div>
+
+                        <div class="form-check">
+                            <input type="checkbox" name="laboratorioSolicitado[]" id="Urinalise" value="Urinálise"
+                                class="form-check-input" onchange="toggleSubOptions('opcoesUrinalise')">
+                            <label for="Urinalise" class="form-check-label">Urinálise</label>
+                        </div>
                     </div>
 
                     <!-- Submenu está agora DENTRO do mesmo bloco da checkbox -->
@@ -95,12 +171,9 @@
                         </div>
                     </div>
 
+
+
                     <!-- check parasitologia -->
-                    <div class="form-check">
-                        <input type="checkbox" name="laboratorioSolicitado[]" id="Parasitologia" value="Parasitologia"
-                            class="form-check-input" onchange="toggleSubOptions('opcoesParasitologia')">
-                        <label for="Parasitologia" class="form-check-label">Parasitologia</label>
-                    </div>
 
                     <!-- Submenu parasitologia -->
                     <div id="opcoesParasitologia" class="sub-opcoes">
@@ -117,11 +190,7 @@
                     </div>
 
                     <!-- check hematologia -->
-                    <div class="form-check">
-                        <input type="checkbox" name="laboratorioSolicitado[]" id="Hematologia" value="Hematologia"
-                            class="form-check-input" onchange="toggleSubOptions('opcoesHematologia')">
-                        <label for="Hematologia" class="form-check-label">Hematologia</label>
-                    </div>
+
 
                     <!-- Submenu hematologia -->
 
@@ -135,11 +204,6 @@
                     </div>
 
                     <!-- check bioquimica -->
-                    <div class="form-check">
-                        <input type="checkbox" name="laboratorioSolicitado[]" id="Bioquimica" value="Bioquimica"
-                            class="form-check-input" onchange="toggleSubOptions('opcoesBioquimica')">
-                        <label for="Bioquimica" class="form-check-label">Bioquímica</label>
-                    </div>
 
                     <!-- Submenu bioquimica -->
 
@@ -243,12 +307,6 @@
 
                     <!-- check Urinalise -->
 
-                    <div class="form-check">
-                        <input type="checkbox" name="laboratorioSolicitado[]" id="Urinalise" value="Urinálise"
-                            class="form-check-input" onchange="toggleSubOptions('opcoesUrinalise')">
-                        <label for="Urinalise" class="form-check-label">Urinálise</label>
-                    </div>
-
                     <!-- Submenu bioquimica -->
 
                     <div id="opcoesUrinalise" class="sub-opcoes">
@@ -260,16 +318,18 @@
                     </div>
 
 
+
                     <div class="text-center mt-4">
                         <button type="submit" class="btn btn-dark">Enviar</button>
                     </div>
 
+
                     <style>
-                    .sub-opcoes {
-                        margin-left: 20px;
-                        display: none;
-                        /* Escondido inicialmente */
-                    }
+                        .sub-opcoes {
+                            margin-left: 20px;
+                            display: none;
+                            /* Escondido inicialmente */
+                        }
                     </style>
                 </form>
             </div>
