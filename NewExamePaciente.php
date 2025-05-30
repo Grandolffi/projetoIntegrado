@@ -85,6 +85,7 @@
             margin-left: 20px;  
             display: none;
         }
+
     </style>
 </head>
 
@@ -103,7 +104,7 @@
             <div class="col-12 col-md-10 form-container">
                 <h1 class="text-center mb-4">Novo exame</h1>
 
-                <form action="input.php" method="POST">
+                <form action="controller/ExameController.php" method="POST">
 
                     <div class="mb-3">
                         <label for="nome" class="form-label">NomePaciente</label>
@@ -171,10 +172,6 @@
                         </div>
                     </div>
 
-
-
-                    <!-- check parasitologia -->
-
                     <!-- Submenu parasitologia -->
                     <div id="opcoesParasitologia" class="sub-opcoes">
                         <div class="form-check">
@@ -189,9 +186,6 @@
                         </div>
                     </div>
 
-                    <!-- check hematologia -->
-
-
                     <!-- Submenu hematologia -->
 
                     <div id="opcoesHematologia" class="sub-opcoes">
@@ -202,8 +196,6 @@
                         </div>
 
                     </div>
-
-                    <!-- check bioquimica -->
 
                     <!-- Submenu bioquimica -->
 
@@ -305,8 +297,6 @@
                         </div>
                     </div>
 
-                    <!-- check Urinalise -->
-
                     <!-- Submenu bioquimica -->
 
                     <div id="opcoesUrinalise" class="sub-opcoes">
@@ -322,15 +312,6 @@
                     <div class="text-center mt-4">
                         <button type="submit" class="btn btn-dark">Enviar</button>
                     </div>
-
-
-                    <style>
-                        .sub-opcoes {
-                            margin-left: 20px;
-                            display: none;
-                            /* Escondido inicialmente */
-                        }
-                    </style>
                 </form>
             </div>
         </div>

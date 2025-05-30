@@ -20,4 +20,4 @@ include '../model/ClassePessoas.php';
         
         header("location: ../CadastroPaciente.php");
     }
-?>
+?>  

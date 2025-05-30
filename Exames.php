@@ -13,7 +13,7 @@ class Exames{
     }
 
     public function setNomeExame($nomeExame){
-        $this->omeExame = $nomeExame;
+        $this->nomeExame = $nomeExame;
     }
 
     public function getTipoExame(){
