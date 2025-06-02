@@ -25,7 +25,7 @@
     </div>
             <div class="col-10 form-container"> <h2 class="mb-4 text-center">Resultado de exame</h2>
 
-                <form action="input.php" method="POST">
+                <form action="controller/ExameController.php" method="POST">
                     <div class="row mb-4">
                         <div class="col-md-4">
                             <label for="numero_registro" class="form-label">Nº do Registro</label>
@@ -103,8 +103,8 @@
     </div>
 </body>
 </html>
+
 <?php
-// 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     function salvarExame($dados) {
         echo "Exame salvo com sucesso!<br>";

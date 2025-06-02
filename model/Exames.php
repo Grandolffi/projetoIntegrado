@@ -1,6 +1,7 @@
 <?php
 
 class Exames{
+    private $idExame;
     private $nomeExame;
     private $tipoExame;
     private $valorAbsoluto;
@@ -8,8 +9,16 @@ class Exames{
     private $paciente;
     private $dataHora;
 
+    public function getIdExame(){
+        return $this->idExame;
+    }
+
+    public function setIdExame($idExame){
+        $this->idExame = $idExame;
+    }
+
     public function getNomeExame(){
-        return $this->getNomeExame;
+        return $this->nomeExame;
     }
 
     public function setNomeExame($nomeExame){
@@ -17,7 +26,7 @@ class Exames{
     }
 
     public function getTipoExame(){
-        return $this->getTipoExame;
+        return $this->tipoExame;
     }
 
     public function setTipoExame($tipoExame){
@@ -25,7 +34,7 @@ class Exames{
     }
 
     public function getValorAbsoluto(){
-        return $this->getValorAbsoluto;
+        return $this->valorAbsoluto;
     }
 
     public function setValorAbsoluto($valorAbsoluto){
@@ -33,7 +42,7 @@ class Exames{
     }
 
     public function getPaciente(){
-        return $this->getPaciente;
+        return $this->paciente;
     }
 
     public function setPaciente($paciente){
@@ -41,13 +50,23 @@ class Exames{
     }
 
     public function getDataHora(){
-        return $this->getDataHora;
+        return $this->dataHora;
     }
 
     public function setDataHora($dataHora){
         $this->dataHora= $dataHora;
     }
 
+    public function getValorReferencia() {
+        return $this->valorReferencia;
+    }
+
+    public function setValorReferencia($valorReferencia) {
+        $this->valorReferencia = $valorReferencia;
+    }
+
+
+    // perguntar para a professora se o idExame precisa estar no toString
     public function __toString(){
         return "Exame - Nome: {$this->nomeExaame}, tipo de exame: {$this->tipoExame}, Valor Absoluto: {$this->valorAbsoluto}, 
         Valor de referência: {$this->valorReferencia}, Paciente: {$this->paciente}, Data e hora{$this->DataHora}";
