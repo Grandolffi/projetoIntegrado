@@ -1,30 +1,67 @@
+/* codigo atualizado daqui pra baixo */
 
-.sidebar {
-    height: 150vh;
+  .sidebar {
+    min-height: 100vh; 
+    /* height: 150vh; (o 150 deixa o menu pela metade)*/
     background-color: #007bff; /* azul bootstrap */
     padding-top: 20px;
     color: white;
     text-align: center;
-  }
-  
-  .sidebar .logo {
+}
+
+.sidebar .logo {
     font-size: 2rem;
     margin-bottom: 30px;
     color: white;
-  }
-  
-  .sidebar .nav-link {
+}
+
+.sidebar .nav-link {
     color: white;
     padding: 15px 10px;
     font-weight: 500;
-  }
-  
-  .sidebar .nav-link:hover {
+}
+
+.sidebar .nav-link:hover {
     background-color: #0056b3; /* azul mais escuro */
     color: white;
-  }
-  
-  .sidebar .nav-link.active {
+}
+
+.sidebar .nav-link.active {
     background-color: #0056b3;
-  }
-  
+}
+
+/* Estilos movidos do CadastroPaciente.php */
+body { /* Este estilo para o body pode ser global ou específico. 
+          Se CadastroPaciente.php for o único a ter body branco e bg-light 
+          estiver em outro lugar, pode haver sobreposição. 
+          Considere se este `body` deve ser mais específico 
+          ou se está OK como um estilo global. */
+    background-color: white;
+}
+
+.form-container {
+    background-color: white;
+    padding: 30px;
+    margin-top: 60px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+input::placeholder {
+    color: #555;
+    opacity: 1;
+    font-size: 14px;
+}
+
+label {
+    margin-top: 10px;
+}
+
+.form-check-input {
+    vertical-align: middle;
+    margin-top: 0.9em;
+}
+
+/* Estilo movido do cadastroExames.php */
+td {
+    vertical-align: middle;
+}

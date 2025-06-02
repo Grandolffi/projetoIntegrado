@@ -6,22 +6,26 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="style.css">
     <title>Exames Bioquímicos</title>
-    <style>
-    td {
-        vertical-align: middle;
-    }
-    </style>
 </head>
 
-<body class="bg-light">
-    <div class="container py-5">
-        <div class="row justify-content-center">
-            <div class="col-lg-10 border bg-white p-5 shadow rounded">
-                <h2 class="mb-4 text-center">Resultado de exame</h2>
+<body> 
+    <div class="container"> 
+        <div class="row">
+            <div class="col-2 sidebar">
+            <div class="logo">🧪</div>
+            <nav class="nav flex-column">
+            <a class="nav-link" href='#'>Dashboard</a>
+            <a class="nav-link" href="CadastroPaciente.php">Cadastrar Paciente</a>
+            <a class="nav-link active" aria-current="page" href="cadastroExames.php">Exames</a>
+            <a class="nav-link" href="#">Usuario</a>
+            <a class="nav-link disabled" aria-disabled="true">Estoque</a>
+            </nav>
+    </div>
+            <div class="col-10 form-container"> <h2 class="mb-4 text-center">Resultado de exame</h2>
 
                 <form action="input.php" method="POST">
-                    <!-- Informações principais -->
                     <div class="row mb-4">
                         <div class="col-md-4">
                             <label for="numero_registro" class="form-label">Nº do Registro</label>
@@ -39,7 +43,6 @@
                         <input type="datetime-local" class="form-control" name="data_exame" id="data_exame">
                     </div>
 
-                    <!-- Tabela de exames -->
                     <div class="table-responsive mb-4">
                         <table class="table table-bordered align-middle text-center">
                             <thead class="table-secondary">
@@ -72,9 +75,9 @@
 
                                 foreach ($exames as $name => [$label, $referencia]) {
                                     echo "<tr>";
-                                    echo "<td class='text-start'><label for='{$name}'>{$label}</label></td>";
-                                    echo "<td><input type='number' step='0.01' class='form-control' name='{$name}' id='{$name}'></td>";
-                                    echo "<td class='text-muted text-start'>{$referencia}</td>";
+                                    echo "<td class='text-start'><label for='{$name}'>{$label}</label></td>"; //
+                                    echo "<td><input type='number' step='0.01' class='form-control' name='{$name}' id='{$name}'></td>"; //
+                                    echo "<td class='text-muted text-start'>{$referencia}</td>"; //
                                     echo "</tr>";
                                 }
                                 ?>
@@ -82,7 +85,6 @@
                         </table>
                     </div>
 
-                    <!-- Responsáveis -->
                     <div class="row">
                         <div class="col-md-6 mb-3">
                             <label for="responsavel_exame" class="form-label">Responsável pelo exame</label>
@@ -97,22 +99,17 @@
                     <button type="submit" class="btn btn-success w-100">Salvar Exames</button>
                 </form>
             </div>
-        </div>
+            </div>
     </div>
 </body>
 </html>
-
 <?php
-// Verifica se o formulário foi enviado via POST
+// 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Função para salvar o exame
     function salvarExame($dados) {
-        // Lógica para salvar os dados do exame (aqui você pode conectar ao banco de dados, por exemplo)
         echo "Exame salvo com sucesso!<br>";
         var_dump($dados);
     }
-
-    // Chama a função salvarExame com os dados do POST
     salvarExame($_POST);
 }
 ?>
