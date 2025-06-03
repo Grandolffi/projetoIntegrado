@@ -31,7 +31,7 @@ body, html {
     padding: 25px;
     background-color: #FFFFFF; /* Fundo branco para a área de conteúdo principal */
     overflow-y: auto; /* Adiciona scroll vertical se o conteúdo for maior que a altura */
-    height: 100%;
+    height: 100%; /* Garante que o scroll funcione dentro desta área */
 }
 
 /* ==========================================================================
@@ -50,7 +50,7 @@ body, html {
 .cabecalho-principal h2 { /* Para os títulos das páginas */
     font-size: 1.8em;
     color: #2D3748; /* Cinza escuro */
-    margin: 0;
+    margin: 0; /* Remove margens padrão para melhor controle */
 }
 
 .info-cabecalho { /* Container para saudação e data/hora */
@@ -83,25 +83,25 @@ body, html {
     padding-top: 20px;
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: 100%; /* Ocupa a altura total do .container-dashboard */
     flex-shrink: 0; /* Impede que o menu encolha */
 }
 
 .menu-cabecalho { /* Logo/Título no topo do menu */
     padding: 0 20px 20px 20px;
     text-align: center;
-    border-bottom: 1px solid #34495E;
+    border-bottom: 1px solid #34495E; /* Divisor sutil */
 }
 
 .menu-cabecalho h1 {
     font-size: 1.7em;
     margin: 0;
-    color: #FFFFFF;
+    color: #FFFFFF; /* Texto do título branco */
     font-weight: bold;
 }
 
 .menu-cabecalho .icone-bio {
-    color: #38B2AC; /* Teal */
+    color: #38B2AC; /* Teal, cor de destaque */
     margin-right: 8px;
     font-size: 1.1em;
 }
@@ -111,20 +111,20 @@ body, html {
     align-items: center;
     padding: 20px;
     border-bottom: 1px solid #34495E;
-    margin-bottom: 10px;
+    margin-bottom: 10px; /* Espaço antes dos links de navegação */
 }
 
 .perfil-usuario img {
     width: 40px;
     height: 40px;
-    border-radius: 50%;
+    border-radius: 50%; /* Imagem redonda */
     margin-right: 15px;
-    border: 2px solid #5680A6;
-    object-fit: cover;
+    border: 2px solid #5680A6; /* Borda sutil na imagem do avatar */
+    object-fit: cover; /* Garante que a imagem cubra o espaço sem distorcer */
 }
 
 .perfil-usuario .info-usuario {
-    flex-grow: 1;
+    flex-grow: 1; /* Ocupa o espaço restante */
 }
 
 .perfil-usuario .info-usuario .nome {
@@ -136,19 +136,19 @@ body, html {
 
 .perfil-usuario .info-usuario .cargo {
     font-size: 0.8em;
-    color: #A0AEC0;
+    color: #A0AEC0; /* Cor mais clara para o cargo */
 }
 
 .perfil-usuario .menu-kebab {
     font-size: 1.3em;
     color: #A0AEC0;
     cursor: pointer;
-    padding: 5px;
+    padding: 5px; /* Aumenta a área de clique */
 }
 
 /* Navegação Principal do Menu */
 .navegacao-menu ul {
-    list-style: none;
+    list-style: none; /* Remove marcadores de lista */
     padding: 0;
     margin: 0;
 }
@@ -156,67 +156,73 @@ body, html {
 .navegacao-menu ul li a { /* Estilo base para todos os links de navegação */
     display: flex;
     align-items: center;
-    padding: 14px calc(25px - 4px); /* Padding ajustado para a borda esquerda */
+    padding: 14px calc(25px - 4px); /* Padding esquerdo ajustado para a borda de 4px */
     text-decoration: none;
     color: #CBD5E0; /* Cor do texto dos links */
     font-size: 0.95em;
-    transition: background-color 0.2s, color 0.2s;
+    transition: background-color 0.2s, color 0.2s, border-left-color 0.2s;
     position: relative;
-    border-left: 4px solid transparent; /* Borda base para alinhamento */
+    border-left: 4px solid transparent; /* Borda base transparente para alinhamento e efeito hover/ativo */
 }
 
 .navegacao-menu ul li a:hover {
     background-color: #2C3E50; /* Fundo no hover */
-    color: #FFFFFF;
-    border-left-color: #4A5568; /* Borda sutil no hover */
+    color: #FFFFFF; /* Texto branco no hover */
+    border-left-color: #4A5568; /* Borda lateral sutil no hover */
 }
 
-.navegacao-menu ul li.item-ativo > a { /* Link direto de um item de menu principal ativo */
+.navegacao-menu ul li.item-ativo > a { /* Link direto de um item de menu principal ativo (pai ou item sem submenu) */
     background-color: #00A09A; /* Teal para item ativo */
     color: #FFFFFF;
     font-weight: bold;
-    border-left-color: #FFFFFF; /* Borda branca destacada */
+    border-left-color: #FFFFFF; /* Borda branca destacada para item ativo */
 }
 
 .navegacao-menu ul li a .icone-seta {
     margin-left: auto; /* Empurra a seta para a direita */
     font-size: 0.8em;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease; /* Transição suave para rotação */
 }
 
-/* Submenu */
+/* Submenu (Colapsável) */
 .navegacao-menu ul li.tem-submenu ul.submenu-nav {
     list-style: none;
-    padding-left: 0;
-    margin-top: 0;
-    background-color: #1A2A3A; /* Fundo escuro igual ao menu-lateral (ou #111A24 para leve contraste) */
+    padding-left: 0; /* Remove padding padrão da ul */
+    margin-top: 0; /* Remove margem entre o link pai e o submenu */
+    background-color: #1A2A3A; /* Fundo escuro (mesmo do menu-lateral ou um tom como #111A24) */
+    display: none; /* Submenu começa escondido */
+}
+
+.navegacao-menu ul li.tem-submenu ul.submenu-nav.submenu-visivel {
+    display: block; /* Mostra o submenu quando a classe é aplicada via JS */
 }
 
 .navegacao-menu ul li.tem-submenu ul.submenu-nav li a {
-    display: block;
-    padding: 10px 25px 10px 40px; /* Maior indentação à esquerda */
-    font-size: 0.9em;
+    display: block; /* Links do submenu ocupam toda a largura do li */
+    padding: 10px 25px 10px 40px; /* Maior indentação à esquerda para itens do submenu */
+    font-size: 0.9em; /* Fonte um pouco menor */
     color: #A0AEC0; /* Cor padrão para itens de submenu não ativos */
     background-color: transparent; /* Fundo transparente para mostrar o fundo do ul.submenu-nav */
-    border-left: 4px solid transparent; /* Reseta a borda do item pai */
+    border-left: 4px solid transparent; /* Reseta a borda para não herdar a do pai se estiver ativa */
+    /* text-decoration e transition já herdados de .navegacao-menu ul li a */
 }
 
 .navegacao-menu ul li.tem-submenu ul.submenu-nav li a:hover {
     color: #FFFFFF;
-    background-color: #2C3E50; /* Mesmo hover dos itens principais */
+    background-color: #2C3E50; /* Mesmo fundo de hover dos itens principais */
+    /* border-left-color: transparent; Não precisa de borda lateral no hover aqui, a menos que desejado */
 }
 
 .navegacao-menu ul li.tem-submenu ul.submenu-nav li.item-ativo a { /* Item ATIVO DENTRO do submenu */
     color: #FFFFFF;
     background-color: #00A09A; /* Destaque teal */
-    font-weight: bold; /* Ou 'normal' se preferir mais sutil */
+    font-weight: bold; /* Ou 'normal' se preferir mais sutil que o item pai ativo */
+    /* border-left-color: #FFFFFF;  Opcional: borda branca também para o item ativo do submenu */
 }
 
-/* Para girar a seta (requer JavaScript para adicionar a classe 'aberto' ao <li> pai)
-.navegacao-menu ul li.tem-submenu.aberto > a .icone-seta {
-    transform: rotate(180deg);
+.navegacao-menu ul li.tem-submenu.pai-aberto > a .icone-seta {
+    transform: rotate(180deg); /* Gira a seta para cima quando o submenu está aberto (classe .pai-aberto é adicionada via JS) */
 }
-*/
 
 /* ==========================================================================
    Botões Grandes do Dashboard
@@ -224,24 +230,24 @@ body, html {
 .botoes-dashboard {
     display: flex;
     flex-direction: column;
-    gap: 25px;
-    margin-top: 30px;
+    gap: 25px; /* Espaço entre os botões */
+    margin-top: 30px; /* Espaço acima do primeiro botão */
 }
 
 .link-botao-dashboard {
     text-decoration: none;
-    display: block;
+    display: block; /* Para o link ocupar toda a área do botão */
 }
 
 .botao-dashboard {
     background-color: #FFFFFF;
     border: 1px solid #E2E8F0;
-    border-left-width: 5px;
+    border-left-width: 5px; /* Espaço para a borda lateral colorida */
     border-radius: 8px;
     padding: 30px 25px;
     text-align: center;
     font-size: 1.15em;
-    color: #2D3748;
+    color: #2D3748; /* Cor do texto do botão */
     cursor: pointer;
     transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
     position: relative;
@@ -249,18 +255,18 @@ body, html {
 }
 
 .botao-dashboard:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 5px 12px rgba(0,0,0,0.12);
+    transform: translateY(-4px); /* Efeito de elevação */
+    box-shadow: 0 5px 12px rgba(0,0,0,0.12); /* Sombra mais pronunciada */
 }
 
-.botao-dashboard::after { /* Faixa colorida inferior */
+.botao-dashboard::after { /* Faixa colorida na parte inferior do botão */
     content: '';
     position: absolute;
     bottom: 0;
     left: 0;
     width: 100%;
     height: 7px;
-    border-bottom-left-radius: 7px;
+    border-bottom-left-radius: 7px; /* Arredonda os cantos inferiores da faixa */
     border-bottom-right-radius: 7px;
 }
 
@@ -274,12 +280,12 @@ body, html {
 .botao-resultado::after { background-color: #FC8181; }
 
 /* ==========================================================================
-   Estilos para Formulários e Conteúdo Geral (Mantenha os seus existentes)
+   Estilos para Formulários e Conteúdo Geral (Seus estilos existentes)
    ========================================================================== */
-.form-container { /* Usado em CadastroPaciente, CadastroExames, etc. */
+.form-container {
     background-color: white;
     padding: 30px;
-    margin-top: 20px; /* Espaço acima do bloco do formulário, ajuste conforme necessário */
+    margin-top: 20px; /* Ajustado para menos espaço acima do formulário, se necessário */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     border-radius: 8px;
 }
@@ -291,16 +297,16 @@ input::placeholder {
 }
 
 label {
-    /* margin-top: 10px;  Bootstrap mb-3 para os divs dos inputs já deve cuidar do espaçamento */
     font-weight: 500;
+    /* margin-top: 10px; O Bootstrap com mb-3 nos divs dos inputs já deve cuidar disso */
 }
 
 .form-check-input {
     vertical-align: middle;
-    /* margin-top: 0.9em; Ajuste se necessário, mas Bootstrap deve alinhar bem com labels */
+    /* margin-top: 0.9em; O Bootstrap geralmente alinha bem */
 }
 
-td { /* Estilo global para células de tabela, pode ser útil */
+td {
     vertical-align: middle;
 }
 
@@ -309,7 +315,17 @@ td { /* Estilo global para células de tabela, pode ser útil */
     margin-left: 20px;
     display: none; /* Começam escondidas - JS controla a visibilidade */
     padding: 10px;
-    background-color: #f8f9fa; /* Fundo leve para destacar */
+    background-color: #f8f9fa; /* Fundo leve para destacar (cinza Bootstrap) */
+    border: 1px solid #dee2e6; /* Borda sutil */
     border-radius: 5px;
-    margin-bottom: 15px;
+    margin-top: 5px; /* Espaço após o checkbox pai */
+    margin-bottom: 15px; /* Espaço antes do próximo grupo */
 }
+
+
+/* .sidebar {
+    min-height: 100vh;
+    background-color: #007bff;
+    // ... etc ...
+}
+*/

@@ -30,16 +30,15 @@ $exames = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resultado de Exames Bioquímicos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="Style.css">
-</head>
+    <link rel="stylesheet" href="Style.css"> </head>
 <body class="corpo-dashboard">
     <div class="container-dashboard">
-        <?php include 'menuLateral.php'; // Inclui o novo menu lateral ?>
+        <?php include 'menuLateral.php'; // O que tem o submenu e "Fernanda" ?>
 
         <main class="conteudo-principal">
             <header class="cabecalho-principal">
                 <h2>Resultado de Exame</h2>
-                <?php include 'info_cabecalho.php'; // INCLUINDO A SAUDAÇÃO, DATA E HORA ?>
+                <?php include 'info_cabecalho.php'; ?>
             </header>
 
             <div class="form-container">
@@ -54,49 +53,17 @@ $exames = [
                             <input type="date" class="form-control" name="data_laudo" id="data_laudo">
                         </div>
                     </div>
-
-                    <div class="mb-4">
-                        <label for="data_exame" class="form-label">Data e hora da realização do exame</label>
-                        <input type="datetime-local" class="form-control" name="data_exame" id="data_exame">
-                    </div>
-
                     <div class="table-responsive mb-4">
                         <table class="table table-bordered align-middle text-center">
-                            <thead class="table-secondary">
-                                <tr>
-                                    <th>Exame</th>
-                                    <th>Valor Absoluto</th>
-                                    <th>Valor de Referência</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <?php
-                                foreach ($exames as $name => [$label, $referencia]) {
-                                    echo "<tr>";
-                                    echo "<td class='text-start'><label for='{$name}'>{$label}</label></td>";
-                                    echo "<td><input type='number' step='0.01' class='form-control form-control-sm' name='{$name}' id='{$name}'></td>";
-                                    echo "<td class='text-muted text-start small'>{$referencia}</td>";
-                                    echo "</tr>";
-                                }
-                                ?>
-                            </tbody>
-                        </table>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6 mb-3">
-                            <label for="responsavel_exame" class="form-label">Responsável pelo exame</label>
-                            <input type="text" class="form-control" name="responsavel_exame" id="responsavel_exame">
-                        </div>
-                        <div class="col-md-6 mb-3">
-                            <label for="preceptor_responsavel" class="form-label">Preceptor responsável</label>
-                            <input type="text" class="form-control" name="preceptor_responsavel" id="preceptor_responsavel">
-                        </div>
+                            </table>
                     </div>
                     <button type="submit" class="btn btn-success w-100">Salvar Exames</button>
                 </form>
-            </div> </main> </div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+            </div>
+        </main>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/validacoes.js"></script> </body>
 </html>
 <?php
 // Este bloco PHP de processamento POST pode ser movido para o controller/ExameController.php

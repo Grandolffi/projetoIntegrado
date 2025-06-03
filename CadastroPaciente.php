@@ -1,4 +1,5 @@
 <?php
+// Para ver erros PHP, se houver
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -6,20 +7,22 @@ error_reporting(E_ALL);
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8"> <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cadastro de Paciente</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="Style.css">
-</head>
+    <link rel="stylesheet" href="Style.css"> </head>
 <body class="corpo-dashboard">
     <div class="container-dashboard"> 
-        <?php include 'menuLateral.php'; // Menu incluído corretamente ?>
+        <?php include 'menuLateral.php'; // Inclui o menu lateral com o submenu ?>
+        
         <main class="conteudo-principal">
-        <header class="cabecalho-principal"> 
-        <h1>Cadastro de Paciente</h1> 
-        <?php include 'info_cabecalho.php'; // Inclui a saudação, data e hora ?>
-</header>
+            <header class="cabecalho-principal"> 
+                <h1>Cadastro de Paciente</h1> 
+                <?php include 'info_cabecalho.php'; // Inclui a saudação, data e hora ?>
+            </header>
+
             <div class="form-container">
                 <h2 class="text-center mb-4">Dados do Paciente</h2> 
                 <form action="controller/PessoaController.php" method="POST">
@@ -63,7 +66,7 @@ error_reporting(E_ALL);
             </div> 
         </main> 
     </div>
-    <script src="js/validacoes.js"></script>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-</body>
+    <script src="js/validacoes.js"></script> </body>
 </html>

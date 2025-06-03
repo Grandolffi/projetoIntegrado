@@ -1,72 +1,67 @@
+<?php
+// Para ver erros PHP, se houver
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+?>
 <!DOCTYPE html>
-<html lang="en">
-
-<head>
+<html lang="pt-BR"> <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.6/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-4Q6Gf2aSP4eDXB8Miphtr37CMZZQ5oXLH2yaXMJ2w8e2ZtHTl7GptT4jmndRuHDT" crossorigin="anonymous">
-    <title>Document</title>
-</head>
+    <title>Listagem de Pacientes</title> <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> <link rel="stylesheet" href="Style.css"> </head>
+<body class="corpo-dashboard">
+    <div class="container-dashboard">
+        <?php include 'menuLateral.php'; // Inclui o menu lateral ?>
 
-<body>
-    <div class="container">
-        <div class="row">
-            <div class="col">
-                <table class="table table-hover">
-                    <thead> <!-- Cabeçalho -->
-                        <tr>
-                            <th scope="col">id</th>
-                            <th scope="col">Nome</th>
-                            <th scope="col">Cpf</th>
-                            <th scope="col">Nasc</th>
-                            <th scope="col">Email</th>
-                            <th scope="col">NomeMae</th>
-                            <th scope="col">Tel</th>
-                            <th scope="col">Genero</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <!-- Linha 1 da table -->
-                        <tr>
-                            <th scope="row">1</th>
-                            <td>Mark</td>
-                            <td>Otto</td>
-                            <td>@mdo</td>
-                            <td>editar </td>
-                        </tr>   
-                        <?php
-                        if($_SERVER["REQUEST_METHOD"] == "GET"){
-                            require 'dao/ConnectionFactory.php';
-                            require 'dao/PessoaDao.php';
-                            require 'model/ClassePessoas.php';
+        <main class="conteudo-principal">
+            <header class="cabecalho-principal">
+                <h2>Listagem de Pacientes</h2>
+                <?php include 'info_cabecalho.php'; // Inclui saudação, data e hora ?>
+            </header>
 
-                            $fabricanteDao = new PessoaDao();
-                            $lista = $fabricanteDao->read();
+            <div class="form-container"> <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead class="table-light">
+                            <tr>
+                                <th scope="col">ID</th>
+                                <th scope="col">Nome</th>
+                                <th scope="col">CPF</th>
+                                <th scope="col">Nascimento</th>
+                                <th scope="col">Email</th>
+                                <th scope="col">Nome da Mãe</th>
+                                <th scope="col">Telefone</th>
+                                <th scope="col">Gênero</th>
+                                <th scope="col">Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php
+                            // O if GET aqui pode não ser necessário se esta página é apenas para listar.
+                            // A lógica de carregamento dos dados deve ocorrer independentemente do método de requisição,
+                            // a menos que haja filtros via GET.
+                            // require 'dao/ConnectionFactory.php'; // É melhor usar require_once
+                            // require 'dao/PessoaDao.php';
+                            // require 'model/ClassePessoas.php';
 
-                            foreach($lista as $pessoas){
-                        ?>
-                        <tr>
-                            <td><?php echo $pessoas->getId() ?></td>
-                            <td><?php echo $pessoas->getnome() ?></td>
-                            <td><?php echo $pessoas->getCpf() ?></td>
-                            <td><?php echo $pessoas->getdataNasc() ?></td>
-                            <td><?php echo $pessoas->getEmail() ?></td>
-                            <td><?php echo $pessoas->getNomeMae() ?></td>
-                            <td><?php echo $pessoas->getnumCelular() ?></td>
-                            <td><?php echo $pessoas->getGenero() ?></td>
-                            <td>
-                                <a href="#">Editar</a> <a href="#">Excuir</a>
-                            </td>
-                        </tr>
-                        <?php
-                        }
-                    }
-                        ?>
-                    </tbody>
-                </table>
+                            // $pessoaDao = new PessoaDao(); // Renomeado de $fabricanteDao
+                            // $listaPessoas = $pessoaDao->read(); // Renomeado de $lista
+
+                            // if (!empty($listaPessoas)) {
+                            //    foreach($listaPessoas as $pessoa){
+                            ?>
+                            <?php
+                            //     } // Fim do foreach
+                            // } else {
+                            //     echo '<tr><td colspan="9" class="text-center">Nenhum paciente encontrado.</td></tr>';
+                            // }
+                            ?>
+                            <tr><td colspan="9" class="text-center"><i>Lógica de listagem de pacientes a ser implementada ou reativada.</i></td></tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
+        </main>
     </div>
-</body>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/validacoes.js"></script> </body>
 </html>

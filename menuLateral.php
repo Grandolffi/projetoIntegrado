@@ -3,9 +3,11 @@
 $paginaAtual = basename($_SERVER['PHP_SELF']);
 
 // --- DADOS DO USUÁRIO ---
-$nomeUsuarioLogin = "Fernanda"; // Usuário da imagem de exemplo que você enviou
+// Mantenha os dados do usuário que você preferir (Fernanda ou Kleber)
+$nomeUsuarioLogin = "Fernanda"; // Ou "Kleber", conforme sua preferência
 $cargoUsuarioLogin = "Super Admin";
-$avatarUsuarioLogin = "https://via.placeholder.com/50/1A2A3A/FFFFFF?Text=F"; // Placeholder para Fernanda
+// Atualize o link do avatar se necessário
+$avatarUsuarioLogin = "https://via.placeholder.com/50/1A2A3A/FFFFFF?Text=F"; // Placeholder para Fernanda (ou K para Kleber)
 
 // --- LINKS DO MENU ---
 $linkDashboard = "dashboard.php";
@@ -13,13 +15,13 @@ $linkCadastroPaciente = 'CadastroPaciente.php';
 
 // Links da seção Exame
 $linkListaExames = "lista_de_exames.php";
-$linkSolicitarNovoExame = "NewExamePaciente.php"; // Assumindo que NewExamePaciente.php é a tela de solicitação
+$linkSolicitarNovoExame = "NewExamePaciente.php"; // Ou o nome correto da sua página de solicitar exame
 $linkCadastrarResultadoExame = "cadastroExames.php"; 
 
 $linkUsuario = "sua_pagina_de_usuarios.php"; // Crie esta página
 $linkEstoque = "AcessarEstoque.php";
 
-// Lógica para destacar o item "Exame" se qualquer página da seção Exame estiver ativa
+// Lógica para destacar o item "Exame" (pai) se qualquer página da seção Exame estiver ativa
 $secaoExameAtiva = (
     $paginaAtual == basename($linkListaExames) ||
     $paginaAtual == basename($linkSolicitarNovoExame) ||
@@ -48,10 +50,10 @@ $secaoExameAtiva = (
                 <a href="<?php echo $linkCadastroPaciente; ?>">Cadastrar Paciente</a>
             </li>
 
-            <li class="tem-submenu <?php if ($secaoExameAtiva) echo 'item-ativo'; // Destaca "Exame" (pai) se uma subpágina estiver ativa ?>">
-                <a href="#">Exame <span class="icone-seta">▼</span></a>
-                <ul class="submenu-nav">
-                    <li class="<?php if ($paginaAtual == basename($linkListaExames)) echo 'item-ativo'; // Destaca "Lista de exames" (filho) se ativa ?>">
+            <li class="tem-submenu <?php if ($secaoExameAtiva) echo 'item-ativo'; ?>" id="menuPaiExame">
+                <a href="#" onclick="toggleSubmenu(event, 'submenuExame', 'menuPaiExame')">Exame <span class="icone-seta">▼</span></a>
+                <ul class="submenu-nav" id="submenuExame">
+                    <li class="<?php if ($paginaAtual == basename($linkListaExames)) echo 'item-ativo'; ?>">
                         <a href="<?php echo $linkListaExames; ?>">Lista de exames</a>
                     </li>
                     <li class="<?php if ($paginaAtual == basename($linkSolicitarNovoExame)) echo 'item-ativo'; ?>">
