@@ -1,8 +1,29 @@
 <?php
-// para ver erros PHP
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
+require_once 'ColetaDeAmostrasController.php';
+
+$statusClass = '';
+$statusMessage = '';
+
+if (isset($_GET['status'])) {
+    switch ($_GET['status']) {
+        case 'success':
+            $statusClass = 'alert-success';
+            $statusMessage = $_GET['message'] ?? 'Operação realizada com sucesso!';
+            break;
+        case 'error':
+            $statusClass = 'alert-danger';
+            $statusMessage = $_GET['message'] ?? 'Ocorreu um erro durante a operação.';
+            break;
+        case 'warning':
+            $statusClass = 'alert-warning';
+            $statusMessage = $_GET['message'] ?? 'Atenção: ação requer sua atenção.';
+            break;
+    }
+}
 ?>
 
 <!DOCTYPE html>
@@ -25,6 +46,7 @@ error_reporting(E_ALL);
             </header>
 
             <div class="form-container">
+            <form action="ColetaDeAmostrasController.php?action=processar" method="POST" id="formColeta">
                 <form action="processa_coleta.php" method="POST">
                     <div class="row mb-3">
                         <div class="col-md-6">
@@ -37,7 +59,6 @@ error_reporting(E_ALL);
                         </div>
                     </div>
 
-                    <!-- Exames por Setor -->
                     <div class="mb-3">
                         <h5>Exames do Paciente</h5>
 
@@ -94,7 +115,6 @@ error_reporting(E_ALL);
                         </div>
                     </div>
 
-                    <!-- Coleta e Materiais -->
                     <div class="mb-4">
                         <h5>Coleta e Materiais</h5>
                         <div class="form-check mb-3">
