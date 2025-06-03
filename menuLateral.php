@@ -1,32 +1,44 @@
 <?php
 // Pega o nome do arquivo da página que está sendo acessada no momento
-// Isso é usado para destacar o link correto no menu.
 $paginaAtual = basename($_SERVER['PHP_SELF']);
 
 // --- DADOS DO USUÁRIO ---
-// No futuro, estes dados podem vir de uma sessão de login ou banco de dados.
-$nomeUsuarioLogin = "Kleber";         
-$cargoUsuarioLogin = "Super Admin";   
-$avatarUsuarioLogin = "https://via.placeholder.com/50/A0AEC0/FFFFFF?Text=S"; // Link para a imagem do avatar
+$nomeUsuarioLogin = "Fernanda"; // Usuário da imagem de exemplo que você enviou
+$cargoUsuarioLogin = "Super Admin";
+$avatarUsuarioLogin = "https://via.placeholder.com/50/1A2A3A/FFFFFF?Text=F"; // Placeholder para Fernanda
 
 // --- LINKS DO MENU ---
-$linkDashboard = "dashboard.php";                 
+$linkDashboard = "dashboard.php";
 $linkCadastroPaciente = 'CadastroPaciente.php';
-$linkExames = "cadastroExames.php";
-$linkUsuario = "sua_pagina_de_usuarios.php";  
+
+// Links da seção Exame
+$linkListaExames = "lista_de_exames.php";
+$linkSolicitarNovoExame = "NewExamePaciente.php"; // Assumindo que NewExamePaciente.php é a tela de solicitação
+$linkCadastrarResultadoExame = "cadastroExames.php"; 
+
+$linkUsuario = "sua_pagina_de_usuarios.php"; // Crie esta página
 $linkEstoque = "AcessarEstoque.php";
+
+// Lógica para destacar o item "Exame" se qualquer página da seção Exame estiver ativa
+$secaoExameAtiva = (
+    $paginaAtual == basename($linkListaExames) ||
+    $paginaAtual == basename($linkSolicitarNovoExame) ||
+    $paginaAtual == basename($linkCadastrarResultadoExame)
+);
 ?>
 
 <div class="menu-lateral">
     <div class="menu-cabecalho">
-        <h1><span class="icone-bio">&#128736;</span>BioDiagnóstico</h1> </div>
+        <h1><span class="icone-bio">Bio</span>Diagnóstico</h1> 
+    </div>
     <div class="perfil-usuario">
         <img src="<?php echo htmlspecialchars($avatarUsuarioLogin); ?>" alt="Avatar do Usuário">
         <div class="info-usuario">
             <div class="nome"><?php echo htmlspecialchars($nomeUsuarioLogin); ?></div>
             <div class="cargo"><?php echo htmlspecialchars($cargoUsuarioLogin); ?></div>
         </div>
-        <div class="menu-kebab">⋮</div> </div>
+        <div class="menu-kebab">⋮</div>
+    </div>
     <nav class="navegacao-menu">
         <ul>
             <li class="<?php if ($paginaAtual == basename($linkDashboard)) echo 'item-ativo'; ?>">
@@ -35,9 +47,22 @@ $linkEstoque = "AcessarEstoque.php";
             <li class="<?php if ($paginaAtual == basename($linkCadastroPaciente)) echo 'item-ativo'; ?>">
                 <a href="<?php echo $linkCadastroPaciente; ?>">Cadastrar Paciente</a>
             </li>
-            <li class="<?php if ($paginaAtual == basename($linkExames)) echo 'item-ativo'; ?>">
-                <a href="<?php echo $linkExames; ?>">Exame <span class="icone-seta">▼</span></a>
-                 </li>
+
+            <li class="tem-submenu <?php if ($secaoExameAtiva) echo 'item-ativo'; // Destaca "Exame" (pai) se uma subpágina estiver ativa ?>">
+                <a href="#">Exame <span class="icone-seta">▼</span></a>
+                <ul class="submenu-nav">
+                    <li class="<?php if ($paginaAtual == basename($linkListaExames)) echo 'item-ativo'; // Destaca "Lista de exames" (filho) se ativa ?>">
+                        <a href="<?php echo $linkListaExames; ?>">Lista de exames</a>
+                    </li>
+                    <li class="<?php if ($paginaAtual == basename($linkSolicitarNovoExame)) echo 'item-ativo'; ?>">
+                        <a href="<?php echo $linkSolicitarNovoExame; ?>">Solicitar novo exame</a>
+                    </li>
+                    <li class="<?php if ($paginaAtual == basename($linkCadastrarResultadoExame)) echo 'item-ativo'; ?>">
+                        <a href="<?php echo $linkCadastrarResultadoExame; ?>">Cadastrar Resultado</a>
+                    </li>
+                </ul>
+            </li>
+
             <li class="<?php if ($paginaAtual == basename($linkUsuario)) echo 'item-ativo'; ?>">
                 <a href="<?php echo $linkUsuario; ?>">Usuário</a>
             </li>
