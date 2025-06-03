@@ -2,7 +2,7 @@
 
 class ExameDao {
 
-    public function inserir(Exames $exame) {
+    public function inserir(ResultadoExames $exame) {
         try {
             $sql = "INSERT INTO resultados_exames (nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame) 
                     VALUES (:nome_exame, :tipo_exame, :valor_absoluto, :valor_referencia, :paciente_registro, :data_hora_exame)";

@@ -1,6 +1,6 @@
 <?php
 
-class Exames{
+class ResultadoExames{
     private $idExame;
     private $nomeExame;
     private $tipoExame;

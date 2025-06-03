@@ -1,49 +1,194 @@
-/* codigo atualizado daqui pra baixo */
+/* Estilos Globais e Layout do Dashboard */
+body, html {
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    height: 100%;
+}
 
-  .sidebar {
-    min-height: 100vh; 
-    /* height: 150vh; (o 150 deixa o menu pela metade)*/
-    background-color: #007bff; /* azul bootstrap */
+.corpo-dashboard { /* Adicione esta classe ao <body> das páginas do dashboard */
+    background-color: #F0F2F5; /* Fundo cinza claro para a área fora do menu/conteúdo */
+    display: flex;
+    height: 100vh; /* Ocupa toda a altura da viewport */
+    overflow-x: hidden; /* Previne scroll horizontal */
+}
+
+.container-dashboard { /* Container que segura o menu e o conteúdo principal */
+    display: flex;
+    width: 100%;
+    height: 100%;
+}
+
+.conteudo-principal { /* Área à direita do menu */
+    flex-grow: 1; /* Ocupa o espaço restante */
+    padding: 25px;
+    background-color: #FFFFFF; /* Fundo branco para a área de conteúdo */
+    overflow-y: auto; /* Adiciona scroll se o conteúdo for maior que a tela */
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.cabecalho-principal { /* Cabeçalho dentro do .conteudo-principal */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #E2E8F0; /* Linha divisória sutil */
+}
+
+.cabecalho-principal h2 {
+    font-size: 1.8em;
+    color: #2D3748; /* Cinza escuro para o título */
+    margin: 0;
+}
+
+.info-cabecalho { /* Para saudação e data/hora no cabeçalho */
+    text-align: right;
+}
+.info-cabecalho .saudacao {
+    font-size: 0.95em;
+    color: #718096; /* Cinza */
+    margin-bottom: 4px;
+}
+.info-cabecalho .saudacao .icone-sol {
+    color: #F6E05E; /* Amarelo sol */
+    margin-left: 5px;
+}
+.info-cabecalho .data-hora {
+    font-size: 0.85em;
+    color: #A0AEC0; /* Cinza claro */
+}
+
+/* --- ESTILOS DO NOVO MENU LATERAL --- */
+.menu-lateral {
+    width: 260px;
+    background-color: #1A2A3A; /* Azul escuro/carvão */
+    color: #E0E0E0;
+    padding-top: 20px;
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Já definido por corpo-dashboard e container-dashboard, mas reforça */
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+.menu-cabecalho {
+    padding: 0 20px 20px 20px;
+    text-align: center;
+    border-bottom: 1px solid #34495E;
+}
+
+.menu-cabecalho h1 {
+    font-size: 1.7em;
+    margin: 0;
+    color: #FFFFFF;
+    font-weight: bold;
+}
+.menu-cabecalho .icone-bio {
+    color: #38B2AC; /* Teal */
+    margin-right: 8px;
+    font-size: 1.1em;
+}
+
+.perfil-usuario {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    border-bottom: 1px solid #34495E;
+    margin-bottom: 10px;
+}
+
+.perfil-usuario img {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    margin-right: 15px;
+    border: 2px solid #5680A6;
+    object-fit: cover;
+}
+
+.perfil-usuario .info-usuario {
+    flex-grow: 1;
+}
+.perfil-usuario .info-usuario .nome {
+    font-weight: bold;
+    color: #FFFFFF;
+    font-size: 0.9em;
+    margin-bottom: 2px;
+}
+.perfil-usuario .info-usuario .cargo {
+    font-size: 0.8em;
+    color: #A0AEC0;
+}
+.perfil-usuario .menu-kebab {
+    font-size: 1.3em;
+    color: #A0AEC0;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.navegacao-menu ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.navegacao-menu ul li a {
+    display: flex;
+    align-items: center;
+    padding: 14px calc(25px - 4px); /* Ajuste para compensar a borda */
+    text-decoration: none;
+    color: #CBD5E0;
+    font-size: 0.95em;
+    transition: background-color 0.2s, color 0.2s;
+    position: relative;
+    border-left: 4px solid transparent; /* Borda base transparente */
+}
+
+.navegacao-menu ul li a:hover {
+    background-color: #2C3E50;
+    color: #FFFFFF;
+    border-left-color: #4A5568; /* Borda sutil no hover */
+}
+
+.navegacao-menu ul li.item-ativo a {
+    background-color: #00A09A; /* Teal para item ativo */
+    color: #FFFFFF;
+    font-weight: bold;
+    border-left-color: #FFFFFF; /* Borda destacada para item ativo */
+}
+
+.navegacao-menu ul li a .icone-seta {
+    margin-left: auto;
+    font-size: 0.8em;
+    transition: transform 0.2s;
+}
+/* --- FIM DOS ESTILOS DO NOVO MENU LATERAL --- */
+
+
+/* --- SEUS ESTILOS EXISTENTES PARA FORMULÁRIOS E OUTROS (MANTENHA E AJUSTE SE NECESSÁRIO) --- */
+/* COMENTE OU REMOVA OS ESTILOS DA SUA ANTIGA CLASSE .sidebar (A AZUL) DAQUI */
+/* Exemplo do que comentar/remover:
+.sidebar {
+    min-height: 100vh;
+    background-color: #007bff;
     padding-top: 20px;
     color: white;
     text-align: center;
 }
+.sidebar .logo { ... }
+.sidebar .nav-link { ... }
+.sidebar .nav-link.active { ... }
+*/
 
-.sidebar .logo {
-    font-size: 2rem;
-    margin-bottom: 30px;
-    color: white;
-}
-
-.sidebar .nav-link {
-    color: white;
-    padding: 15px 10px;
-    font-weight: 500;
-}
-
-.sidebar .nav-link:hover {
-    background-color: #0056b3; /* azul mais escuro */
-    color: white;
-}
-
-.sidebar .nav-link.active {
-    background-color: #0056b3;
-}
-
-/* Estilos movidos do CadastroPaciente.php */
-body { /* Este estilo para o body pode ser global ou específico. 
-          Se CadastroPaciente.php for o único a ter body branco e bg-light 
-          estiver em outro lugar, pode haver sobreposição. 
-          Considere se este `body` deve ser mais específico 
-          ou se está OK como um estilo global. */
-    background-color: white;
-}
-
+/* Mantenha estes (ou similares que você já tem): */
 .form-container {
-    background-color: white;
+    background-color: white; /* Pode ser redundante se .conteudo-principal já é branco */
     padding: 30px;
-    margin-top: 60px;
+    /* margin-top: 60px;  Pode não ser mais necessário com o .cabecalho-principal */
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
 }
 
 input::placeholder {
@@ -53,15 +198,69 @@ input::placeholder {
 }
 
 label {
-    margin-top: 10px;
+    margin-top: 10px; /* Verifique se não conflita com margens do Bootstrap */
+    font-weight: 500;
 }
 
 .form-check-input {
     vertical-align: middle;
-    margin-top: 0.9em;
+    /* margin-top: 0.9em; */ /* Pode precisar de ajuste com Bootstrap */
 }
 
-/* Estilo movido do cadastroExames.php */
 td {
     vertical-align: middle;
 }
+
+/* Estilos para os Botões Grandes do Dashboard (NO SEU STYLE.CSS) */
+
+.botoes-dashboard {
+    display: flex;
+    flex-direction: column;
+    gap: 25px; /* Espaço entre os botões */
+    margin-top: 30px; /* Aumentei um pouco o espaço acima do primeiro botão */
+}
+
+.link-botao-dashboard {
+    text-decoration: none; /* Remove o sublinhado do link */
+    display: block;
+}
+
+.botao-dashboard {
+    background-color: #FFFFFF;
+    border: 1px solid #E2E8F0;
+    border-left-width: 5px; /* Espaço para a borda lateral colorida */
+    border-radius: 8px;
+    padding: 30px 25px;
+    text-align: center;
+    font-size: 1.15em;
+    color: #2D3748; /* Cor do texto (cinza escuro) */
+    cursor: pointer;
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+    position: relative;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.07);
+}
+
+.botao-dashboard:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 5px 12px rgba(0,0,0,0.12);
+}
+
+.botao-dashboard::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 7px;
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+}
+
+.botao-cliente { border-left-color: #68D391; /* Verde */ }
+.botao-cliente::after { background-color: #68D391; }
+
+.botao-coleta { border-left-color: #63B3ED; /* Azul */ }
+.botao-coleta::after { background-color: #63B3ED; }
+
+.botao-resultado { border-left-color: #FC8181; /* Vermelho */ }
+.botao-resultado::after { background-color: #FC8181; }

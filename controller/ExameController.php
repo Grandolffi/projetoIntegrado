@@ -2,7 +2,7 @@
 // Ajuste os caminhos conforme a estrutura do seu projeto
 include_once '../dao/ConnectionFactory.php'; // O ConnectionFactory já tem um echo "Conectado...", pode ser bom remover em produção.
 include_once '../dao/ExameDao.php';
-include_once '../model/Exames.php'; // Se o nome do arquivo for Exames.php
+include_once '../model/ResultadoExames.php'; // Se o nome do arquivo for Exames.php
 
 // Este array mapeia as chaves do formulário para os nomes descritivos e valores de referência.
 // Ele deve ser IGUAL ao array $exames usado em cadastroExames.php para gerar o formulário.
@@ -44,7 +44,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     foreach ($definicoesExames as $tipoExameChave => $detalhes) {
         // o isset verifica se o campo do exame foi enviado e não está vazio
         if (isset($_POST[$tipoExameChave]) && $_POST[$tipoExameChave] !== '') {
-            $Exame = new Exames();
+            $Exame = new ResultadoExames();
 
             $nomeExameDescritivo = $detalhes[0];
             $valorReferenciaTexto = $detalhes[1];
