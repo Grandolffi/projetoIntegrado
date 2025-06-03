@@ -1,5 +1,5 @@
 <?php
-// Adicione estas linhas NO TOPO ABSOLUTO do arquivo para ver erros PHP, se houver:
+// para ver erros PHP, se houver
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -23,12 +23,12 @@ error_reporting(E_ALL);
                 <?php include 'info_cabecalho.php'; // Inclui a saudação, data e hora ?>
             </header>
 
-            <div class="p-3">
-                <p>Aqui você poderá gerenciar o estoque de insumos e materiais do laboratório.</p>
-            </div>
+            <div class="p-3"> <p>Aqui você poderá gerenciar o estoque de insumos e materiais do laboratório.</p>
+                </div>
 
         </main>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-</body>
+    <script src="js/validacoes.js"></script>
+ </body>
 </html>
