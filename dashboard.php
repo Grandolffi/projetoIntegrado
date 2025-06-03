@@ -38,6 +38,12 @@ error_reporting(E_ALL);
                         Questionário de resultado de exames
                     </div>
                 </a>
+
+                <a href="coletaDeAmostras.php" class="link-botao-dashboard">
+                    <div class="botao-dashboard botao-coleta">
+                        Coleta de Amostras
+                    </div>
+                </a>
             </section>
         </main>
     </div>
