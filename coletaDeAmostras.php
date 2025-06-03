@@ -1,180 +1,172 @@
+<?php
+// para ver erros PHP
+ini_set('display_errors', 1);
+ini_set('display_startup_errors', 1);
+error_reporting(E_ALL);
+?>
+
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Coleta de Amostras</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 20px;
-            background-color: #f9f9f9;
-        }
-        header {
-            background-color: #005f73;
-            color: white;
-            padding: 15px;
-            text-align: center;
-            font-size: 24px;
-            border-radius: 8px;
-        }
-        nav {
-            margin: 20px 0;
-            display: flex;
-            gap: 20px;
-        }
-        nav a {
-            text-decoration: none;
-            color: #005f73;
-            font-weight: bold;
-        }
-        form {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-        }
-        fieldset {
-            border: 1px solid #ccc;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            padding: 15px;
-        }
-        legend {
-            font-weight: bold;
-            color: #005f73;
-        }
-        label {
-            display: block;
-            margin-top: 10px;
-            font-weight: bold;
-        }
-        input[type="text"], input[type="datetime-local"], select {
-            width: 100%;
-            padding: 8px;
-            margin-top: 5px;
-            border-radius: 5px;
-            border: 1px solid #ccc;
-        }
-        .checkbox-group {
-            margin-top: 10px;
-        }
-        .checkbox-group label {
-            font-weight: normal;
-            display: inline-block;
-            margin-right: 15px;
-        }
-        button {
-            background-color: #005f73;
-            color: white;
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            cursor: pointer;
-        }
-    </style>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <link rel="stylesheet" href="Style.css">
 </head>
-<body>
+<body class="corpo-dashboard">
+    <div class="container-dashboard">
+        <?php include 'menuLateral.php'; ?>
 
-<header>Mapa de Bioquímica - Coleta de Amostras</header>
+        <main class="conteudo-principal">
+            <header class="cabecalho-principal">
+                <h2>Mapa de Bioquímica - Coleta de Amostras</h2>
+                <?php include 'info_cabecalho.php'; ?>
+            </header>
 
-<nav>
-    <a href="#">Mapa de Bioquímica</a>
-    <a href="#">Coleta de Amostras</a>
-    <a href="#">Registrar</a>
-</nav>
+            <div class="form-container">
+                <form action="processa_coleta.php" method="POST">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="nome_paciente" class="form-label">Nome do Paciente</label>
+                            <input type="text" name="nome_paciente" id="nome_paciente" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="data_coleta" class="form-label">Data e Hora da Coleta</label>
+                            <input type="datetime-local" name="data_coleta" id="data_coleta" class="form-control" required>
+                        </div>
+                    </div>
 
-<form>
-    <fieldset>
-        <legend>Dados do Paciente</legend>
-        <label>Nome do Paciente:</label>
-        <input type="text" name="nome_paciente">
-        
-        <label>Data e Hora da Coleta:</label>
-        <input type="datetime-local" name="data_coleta">
-    </fieldset>
+                    <!-- Exames por Setor -->
+                    <div class="mb-3">
+                        <h5>Exames do Paciente</h5>
 
-    <fieldset>
-        <legend>Exames do Paciente</legend>
-        <label>Setor Hematologia:</label>
-        <div class="checkbox-group">
-            <label><input type="checkbox"> Hemograma</label>
-            <label><input type="checkbox"> Leucograma</label>
-            <label><input type="checkbox"> Plaquetas</label>
-        </div>
+                        <label class="form-label">Setor Hematologia</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="hematologia[]" value="Hemograma" id="hemograma">
+                            <label class="form-check-label" for="hemograma">Hemograma</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="hematologia[]" value="Leucograma" id="leucograma">
+                            <label class="form-check-label" for="leucograma">Leucograma</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="hematologia[]" value="Plaquetas" id="plaquetas">
+                            <label class="form-check-label" for="plaquetas">Plaquetas</label>
+                        </div>
 
-        <label>Setor Parasitologia:</label>
-        <div class="checkbox-group">
-            <label><input type="checkbox"> EPF</label>
-            <label><input type="checkbox"> Sangue Oculto</label>
-        </div>
+                        <label class="form-label mt-3">Setor Parasitologia</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="parasitologia[]" value="EPF" id="epf">
+                            <label class="form-check-label" for="epf">EPF</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="parasitologia[]" value="Sangue Oculto" id="sangue_oculto">
+                            <label class="form-check-label" for="sangue_oculto">Sangue Oculto</label>
+                        </div>
 
-        <label>Setor Microbiologia:</label>
-        <div class="checkbox-group">
-            <label><input type="checkbox"> Urina</label>
-            <label><input type="checkbox"> Escarro</label>
-            <label><input type="checkbox"> Antibiograma</label>
-        </div>
+                        <label class="form-label mt-3">Setor Microbiologia</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="microbiologia[]" value="Urina" id="urina">
+                            <label class="form-check-label" for="urina">Urina</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="microbiologia[]" value="Escarro" id="escarro">
+                            <label class="form-check-label" for="escarro">Escarro</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="microbiologia[]" value="Antibiograma" id="antibiograma">
+                            <label class="form-check-label" for="antibiograma">Antibiograma</label>
+                        </div>
 
-        <label>Setor Urinálise:</label>
-        <div class="checkbox-group">
-            <label><input type="checkbox"> Exame Macroscópico</label>
-            <label><input type="checkbox"> Exame Químico</label>
-            <label><input type="checkbox"> Exame Microscópico</label>
-        </div>
-    </fieldset>
+                        <label class="form-label mt-3">Setor Urinálise</label>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="urinalise[]" value="Exame Macroscópico" id="macro">
+                            <label class="form-check-label" for="macro">Exame Macroscópico</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="urinalise[]" value="Exame Químico" id="quimico">
+                            <label class="form-check-label" for="quimico">Exame Químico</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" name="urinalise[]" value="Exame Microscópico" id="micro">
+                            <label class="form-check-label" for="micro">Exame Microscópico</label>
+                        </div>
+                    </div>
 
-    <fieldset>
-        <legend>Coleta e Materiais</legend>
-        <label>Tipo de Coleta Realizada:</label>
-        <div class="checkbox-group">
-            <label><input type="checkbox"> Sim</label>
-        </div>
+                    <!-- Coleta e Materiais -->
+                    <div class="mb-4">
+                        <h5>Coleta e Materiais</h5>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" name="tipo_coleta" value="Sim" id="tipo_coleta">
+                            <label class="form-check-label" for="tipo_coleta">Tipo de Coleta Realizada</label>
+                        </div>
 
-        <label>Tubos utilizados na coleta:</label>
+                        <div class="row g-3 mb-3">
+                            <div class="col-md-4">
+                                <label for="lote_tubo" class="form-label">Lote do Tubo</label>
+                                <input type="text" name="lote_tubo" class="form-control" id="lote_tubo">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="validade_tubo" class="form-label">Validade do Tubo</label>
+                                <input type="text" name="validade_tubo" class="form-control" id="validade_tubo">
+                            </div>
+                        </div>
 
-        <label>Lote:</label>
-        <input type="text" name="lote_tubo">
+                        <label class="form-label">Tubos utilizados na coleta:</label>
+                        <?php
+                        $cores = ["Vermelha", "Cinza", "Amarela", "Preta", "Azul Claro", "Roxa", "Verde"];
+                        foreach ($cores as $cor) {
+                            $id = strtolower(str_replace(" ", "_", $cor));
+                            echo "<div class='form-check'>
+                                    <input class='form-check-input' type='checkbox' name='cores_tubos[]' value='$cor' id='$id'>
+                                    <label class='form-check-label' for='$id'>Tampa $cor</label>
+                                  </div>";
+                        }
+                        ?>
 
-        <label>Validade:</label>
-        <input type="text" name="validade_tubo">
+                        <div class="row g-3 mt-3">
+                            <div class="col-md-4">
+                                <label for="tamanho_seringa" class="form-label">Tamanho da Seringa</label>
+                                <input type="text" name="tamanho_seringa" id="tamanho_seringa" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="lote_seringa" class="form-label">Lote da Seringa</label>
+                                <input type="text" name="lote_seringa" id="lote_seringa" class="form-control">
+                            </div>
+                            <div class="col-md-4">
+                                <label for="validade_seringa" class="form-label">Validade da Seringa</label>
+                                <input type="text" name="validade_seringa" id="validade_seringa" class="form-control">
+                            </div>
+                        </div>
 
-        <div class="checkbox-group">
-            <label><input type="checkbox"> Tubo com Tampa Vermelha</label>
-            <label><input type="checkbox"> Tubo com Tampa Cinza</label>
-            <label><input type="checkbox"> Tubo com Tampa Amarela</label>
-            <label><input type="checkbox"> Tubo com Tampa Preta</label>
-            <label><input type="checkbox"> Tubo com Tampa Azul Claro</label>
-            <label><input type="checkbox"> Tubo com Tampa Roxa</label>
-            <label><input type="checkbox"> Tubo com Tampa Verde</label>
-        </div>
+                        <div class="row g-3 mt-3">
+                            <div class="col-md-6">
+                                <label for="lote_urina" class="form-label">Lote Potes de Urina</label>
+                                <input type="text" name="lote_urina" id="lote_urina" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="validade_urina" class="form-label">Validade</label>
+                                <input type="text" name="validade_urina" id="validade_urina" class="form-control">
+                            </div>
+                        </div>
 
-        <label>Seringa Utilizada:</label>
-        <label>Tamanho:</label>
-        <input type="text" name="tamanho_seringa">
+                        <div class="row g-3 mt-3">
+                            <div class="col-md-6">
+                                <label for="lote_fezes" class="form-label">Lote Potes de Fezes</label>
+                                <input type="text" name="lote_fezes" id="lote_fezes" class="form-control">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="validade_fezes" class="form-label">Validade</label>
+                                <input type="text" name="validade_fezes" id="validade_fezes" class="form-control">
+                            </div>
+                        </div>
+                    </div>
 
-        <label>Lote:</label>
-        <input type="text" name="lote_seringa">
-
-        <label>Validade:</label>
-        <input type="text" name="validade_seringa">
-
-        <label>Potes de Urina:</label>
-        <label>Lote:</label>
-        <input type="text" name="lote_urina">
-        <label>Validade:</label>
-        <input type="text" name="validade_urina">
-
-        <label>Potes de Fezes:</label>
-        <label>Lote:</label>
-        <input type="text" name="lote_fezes">
-        <label>Validade:</label>
-        <input type="text" name="validade_fezes">
-    </fieldset>
-
-    <button type="submit">Registrar</button>
-</form>
-
+                    <button type="submit" class="btn btn-primary">Registrar</button>
+                </form>
+            </div>
+        </main>
+    </div>
 </body>
 </html>
