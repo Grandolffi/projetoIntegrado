@@ -36,26 +36,11 @@ error_reporting(E_ALL);
                         </thead>
                         <tbody>
                             <?php
-                            // O if GET aqui pode não ser necessário se esta página é apenas para listar.
-                            // A lógica de carregamento dos dados deve ocorrer independentemente do método de requisição,
-                            // a menos que haja filtros via GET.
-                            // require 'dao/ConnectionFactory.php'; // É melhor usar require_once
-                            // require 'dao/PessoaDao.php';
-                            // require 'model/ClassePessoas.php';
-
-                            // $pessoaDao = new PessoaDao(); // Renomeado de $fabricanteDao
-                            // $listaPessoas = $pessoaDao->read(); // Renomeado de $lista
-
-                            // if (!empty($listaPessoas)) {
-                            //    foreach($listaPessoas as $pessoa){
+                            if($_SERVER["REQUEST_METHOD"] == "GET"){
+                                require_once 'controller/PessoaController.php';
+                                listar();
+                            }
                             ?>
-                            <?php
-                            //     } // Fim do foreach
-                            // } else {
-                            //     echo '<tr><td colspan="9" class="text-center">Nenhum paciente encontrado.</td></tr>';
-                            // }
-                            ?>
-                            <tr><td colspan="9" class="text-center"><i>Lógica de listagem de pacientes a ser implementada ou reativada.</i></td></tr>
                         </tbody>
                     </table>
                 </div>

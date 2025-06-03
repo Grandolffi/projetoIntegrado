@@ -8,7 +8,8 @@ include '../model/ClassePessoas.php';
     $PessoaDao = new PessoaDao();
 
     if(isset($_POST['cadastrar'])){
-        var_dump($_POST);
+        //var_dump($_POST);
+        $Pessoa = new Pessoa();
         $Pessoa->setnome($_POST['nome']);
         $Pessoa->setCpf($_POST['cpf']);
         $Pessoa->setDataNasc($_POST['datanasc']);
@@ -19,5 +20,22 @@ include '../model/ClassePessoas.php';
         $PessoaDao->inserir($Pessoa);
         
         header("location: ../CadastroPaciente.php");
+    }
+
+    function listar(){
+        $PessoaDao = new PessoaDao();
+        $lista = PessoaDao->read();
+        foreach($lista as $pessoa){
+            //atençao no get cpf
+            echo "<tr> 
+                    <td>{$pessoa->getId()}</td>
+                    <td>{$pessoa->getNome()}</td>
+                    <td>{$pessoa->getCpf()}</td> 
+                    <td> 
+                        <a href=''ListarPaciente.php?editar={$pessoa->getId()}>Editar</a>
+                        
+                    </td>
+            </tr>";
+        }
     }
 ?>  

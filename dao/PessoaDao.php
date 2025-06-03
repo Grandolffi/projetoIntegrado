@@ -3,6 +3,7 @@ class PessoaDao{
 
     public function inserir(Pessoa $pessoa){
         try{
+            //criando uma string, desenhando o comando
             $sql = "INSERT INTO pessoa(id, nome, cpf, dataNasc, email, nomeMae, numCelular, genero) VALUES(default, :nome, :cpf, :dataNasc, :email, :nomeMae, :numCelular, :genero);";
             $con_sql = ConnectionFactory::getConnection()->prepare($sql);
             $con_sql->bindValue(":nome", $pessoa->getnome()); 
