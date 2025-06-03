@@ -4,7 +4,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-$exames = [ // Movido para o topo para estar disponível antes do HTML se necessário, ou pode ficar onde estava
+$exames = [
     'bilirrubina_total' => ['Bilirrubina Total (mg/dL)', '0,2 – 1,2 mg/dL'],
     'bilirrubina_direta' => ['Bilirrubina Direta (mg/dL)', '0,0 – 0,2 mg/dL'],
     'proteina_total' => ['Proteína Total', ''],
@@ -39,6 +39,7 @@ $exames = [ // Movido para o topo para estar disponível antes do HTML se necess
         <main class="conteudo-principal">
             <header class="cabecalho-principal">
                 <h2>Resultado de Exame</h2>
+                <?php include 'info_cabecalho.php'; // INCLUINDO A SAUDAÇÃO, DATA E HORA ?>
             </header>
 
             <div class="form-container">
@@ -73,8 +74,8 @@ $exames = [ // Movido para o topo para estar disponível antes do HTML se necess
                                 foreach ($exames as $name => [$label, $referencia]) {
                                     echo "<tr>";
                                     echo "<td class='text-start'><label for='{$name}'>{$label}</label></td>";
-                                    echo "<td><input type='number' step='0.01' class='form-control form-control-sm' name='{$name}' id='{$name}'></td>"; // Adicionado form-control-sm
-                                    echo "<td class='text-muted text-start small'>{$referencia}</td>"; // Adicionado small para texto menor
+                                    echo "<td><input type='number' step='0.01' class='form-control form-control-sm' name='{$name}' id='{$name}'></td>";
+                                    echo "<td class='text-muted text-start small'>{$referencia}</td>";
                                     echo "</tr>";
                                 }
                                 ?>
@@ -94,9 +95,7 @@ $exames = [ // Movido para o topo para estar disponível antes do HTML se necess
                     </div>
                     <button type="submit" class="btn btn-success w-100">Salvar Exames</button>
                 </form>
-            </div> </main>
-    </div>
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+            </div> </main> </div> <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 <?php
@@ -105,7 +104,9 @@ $exames = [ // Movido para o topo para estar disponível antes do HTML se necess
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     function salvarExame($dados) {
         // Lógica real de salvamento iria aqui
-        echo "<div class='alert alert-success mt-3'>Exame salvo com sucesso!</div>";
+        // Para feedback visual, você pode redirecionar ou mostrar uma mensagem mais integrada ao layout.
+        // Este echo aqui aparecerá no final da página, após o HTML.
+        // echo "<div class='alert alert-success mt-3'>Exame salvo com sucesso!</div>";
         // var_dump($dados); // Para debug
     }
     // salvarExame($_POST); // Comente ou remova se o controller for tratar

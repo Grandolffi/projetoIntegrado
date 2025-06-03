@@ -15,14 +15,18 @@ error_reporting(E_ALL);
 </head>
 <body class="corpo-dashboard">
     <div class="container-dashboard">
-        <?php include 'menuLateral.php';?>  <!--aqui ocorre a inclusao do menu -->
+        <?php include 'menuLateral.php'; // Inclui o menu lateral ?>
+
         <main class="conteudo-principal">
             <header class="cabecalho-principal">
                 <h2>Estoque</h2>
-                </header>
+                <?php include 'info_cabecalho.php'; // Inclui a saudação, data e hora ?>
+            </header>
+
             <div class="p-3">
                 <p>Aqui você poderá gerenciar o estoque de insumos e materiais do laboratório.</p>
             </div>
+
         </main>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
