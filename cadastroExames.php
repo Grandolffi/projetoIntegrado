@@ -4,6 +4,7 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+
 $exames = [
     'bilirrubina_total' => ['Bilirrubina Total (mg/dL)', '0,2 – 1,2 mg/dL'],
     'bilirrubina_direta' => ['Bilirrubina Direta (mg/dL)', '0,0 – 0,2 mg/dL'],
@@ -34,14 +35,13 @@ $exames = [
 </head>
 <body class="corpo-dashboard">
     <div class="container-dashboard">
-        <?php include 'menuLateral.php'; // O que tem o submenu e "Fernanda" ?>
+        <?php include 'menuLateral.php';?>
 
         <main class="conteudo-principal">
             <header class="cabecalho-principal">
                 <h2>Resultado de Exame</h2>
                 <?php include 'info_cabecalho.php'; ?>
             </header>
-
             <div class="form-container">
                 <form action="controller/ExameController.php" method="POST">
                     <div class="row mb-4">
@@ -54,9 +54,33 @@ $exames = [
                             <input type="date" class="form-control" name="data_laudo" id="data_laudo">
                         </div>
                     </div>
+
+                    <h4 class="mt-4 mb-3">Resultados dos Exames Bioquímicos</h4>
                     <div class="table-responsive mb-4">
                         <table class="table table-bordered align-middle text-center">
-                            </table>
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="text-start">Exame</th>
+                                    <th scope="col">Valor de Referência</th>
+                                    <th scope="col">Resultado do Paciente</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <?php foreach ($exames as $key => $exame): ?>
+                                <tr>
+                                    <td class="text-start"><?php echo htmlspecialchars($exame[0]); ?></td>
+                                    <td><?php echo $exame[1]; ?></td>
+                                    <td>
+                                        <input type="text" class="form-control text-center"
+                                               name="exames[<?php echo htmlspecialchars($key); ?>]"
+                                               id="exame_<?php echo htmlspecialchars($key); ?>"
+                                               placeholder="Digite o resultado"
+                                               aria-label="Resultado para <?php echo htmlspecialchars($exame[0]); ?>">
+                                    </td>
+                                </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
                     <button type="submit" class="btn btn-success w-100">Salvar Exames</button>
                 </form>
@@ -73,7 +97,6 @@ $exames = [
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     function salvarExame($dados) {
         // Lógica real de salvamento iria aqui
-        // Para feedback visual, você pode redirecionar ou mostrar uma mensagem mais integrada ao layout.
         // Este echo aqui aparecerá no final da página, após o HTML.
         // echo "<div class='alert alert-success mt-3'>Exame salvo com sucesso!</div>";
         // var_dump($dados); // Para debug
