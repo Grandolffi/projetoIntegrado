@@ -16,7 +16,7 @@ class ConnectionFactory
             try {
                 self::$connection = new PDO("mysql:host=$host;dbname=$dbName;port=$port", $userDb, $pass); //CLASE PRA ACESSAR BANCO DE DADOS (PADRÃO PHP);
                 //(New pdo é uma classe para conectar com o banco) conection é obj da classe pdo que recebe por parametro em ordem a string de conexão, usuario e senha.
-            echo "Conectado com sucesso!<br>";
+            //echo "Conectado com sucesso!<br>";
             } catch (PDOException $ex) {
                  echo "<strong>Erro de conexão com o banco:</strong> " . $ex->getMessage();
                 return null;

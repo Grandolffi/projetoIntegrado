@@ -32,7 +32,7 @@ class PessoaDao{
             foreach($lista as $linha){
                 $pesList[] = $this->listaPessoas($linha);   
             }
-            echo "Temos ". count($pesList). " fabricantes cadastrados";
+            //echo "Temos ". count($pesList). " fabricantes cadastrados";
             return $pesList;
         }catch(PDOException $ex){
             echo "<p> Ocorreu um erro ao selecionar pessoas </p> $ex";

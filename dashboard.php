@@ -25,7 +25,7 @@ error_reporting(E_ALL);
             <section class="botoes-dashboard">
                 <a href="CadastroPaciente.php" class="link-botao-dashboard">
                     <div class="botao-dashboard botao-cliente">
-                        Cadastrar Cliente
+                        Cadastrar Paciente
                     </div>
                 </a>
 

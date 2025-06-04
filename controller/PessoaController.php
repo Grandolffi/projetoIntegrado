@@ -12,13 +12,12 @@ include __DIR__. '/../model/ClassePessoas.php';
         $Pessoa = new Pessoa();
         $Pessoa->setnome($_POST['nome']);
         $Pessoa->setCpf($_POST['cpf']);
-        $Pessoa->setDataNasc($_POST['datanasc']);
+        $Pessoa->setDataNasc($_POST['dtnasc']);
         $Pessoa->setEmail($_POST['email']);
         $Pessoa->setNomeMae($_POST['nomemae']);
         $Pessoa->setnumCelular($_POST['fone']);
         $Pessoa->setGenero($_POST['genero']);
         $PessoaDao->inserir($Pessoa);
-        
         header("location: ../CadastroPaciente.php");
     }
 
