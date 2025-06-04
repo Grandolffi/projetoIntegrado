@@ -50,7 +50,22 @@ class PessoaDao{
         $pessoa->setnumCelular($linha['numCelular']);
         $pessoa->setGenero($linha['genero']);
         return $pessoa;
+    }
 
+    function buscaPorId($id){
+        try{
+            $sql = "SELECT * FROM pessoa WHERE id = :id";
+            $conn = ConnectionFactory::getConnection()->prepare($sql);
+            $conn->bindValue(":id", $id);
+            $conn->execute();
+            $row = $conn->fetch(PDO::FETCH_ASSOC);
+            if($row){
+                return $this->listaPessoas($row);
+            }
+            return null;
+        }catch(PDOException $e){
+            echo "<p>Erro ao buscar ID: {$id}</p> <p>{$e->getMessage()}</p>";
+        }
     }
 }
 ?>

@@ -14,6 +14,15 @@ error_reporting(E_ALL);
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="Style.css"> </head>
 <body class="corpo-dashboard">
+    <?php
+
+    if(isset($_GET['editar'])){
+        echo "Chamou via editar"; //apenas pra testes
+        require_once 'controller/PessoaController.php';
+
+    }
+
+    ?>
     <div class="container-dashboard"> 
         <?php include 'menuLateral.php'; // Inclui o menu lateral com o submenu ?>
         
@@ -26,29 +35,30 @@ error_reporting(E_ALL);
             <div class="form-container">
                 <h2 class="text-center mb-4">Dados do Paciente</h2> 
                 <form action="controller/PessoaController.php" method="POST">
+                    <input type="hidden" name="id" value="<?php isset($pessoa) && $pessoa->getId() ? $pessoa->getId(): '' ?>">
                     <div class="mb-3">
                         <label for="nome" class="form-label">Nome completo</label>
-                        <input type="text" name="nome" id="nome" class="form-control" required>
+                        <input type="text" name="nome" id="nome" value="<?php isset($pessoa) && $pessoa->getNome() ? $pessoa->getNome(): '' ?>" class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label for="cpf" class="form-label">CPF</label>
-                        <input type="text" name="cpf" id="cpf" class="form-control" required>
+                        <input type="text" name="cpf" id="cpf" value="<?php isset($pessoa) && $pessoa->getCpf() ? $pessoa->getCpf(): '' ?>" class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label for="dtnasc" class="form-label">Data de nascimento</label>
-                        <input type="date" name="dtnasc" id="dtnasc" class="form-control" required>
+                        <input type="date" name="dtnasc" id="dtnasc" value="<?php isset($pessoa) && $pessoa->getDataNasc() ? $pessoa->getDataNasc(): '' ?>" class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label for="email" class="form-label">E-mail</label>
-                        <input type="email" name="email" id="email" class="form-control" required>
+                        <input type="email" name="email" id="email" value="<?php isset($pessoa) && $pessoa->getEmail() ? $pessoa->getEmail(): '' ?>"class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label for="nomemae" class="form-label">Nome da mãe</label>
-                        <input type="text" name="nomemae" id="nomemae" class="form-control">
+                        <input type="text" name="nomemae" id="nomemae" value="<?php isset($pessoa) && $pessoa->getNomeMae() ? $pessoa->getNomeMae(): '' ?>" class="form-control">
                     </div>
                     <div class="mb-3">
                         <label for="fone" class="form-label">Celular com DDD</label>
-                        <input type="tel" name="fone" id="fone" class="form-control" required pattern="[0-9]{2} [0-9]{5}-[0-9]{4}"
+                        <input type="tel" name="fone" id="fone" value="<?php isset($pessoa) && $pessoa->getnumCelular() ? $pessoa->getnumCelular(): '' ?>" class="form-control" required pattern="[0-9]{2} [0-9]{5}-[0-9]{4}"
                             placeholder="Ex: 11 99999-9999">
                     </div>
                     <div class="mb-3">
