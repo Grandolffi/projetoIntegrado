@@ -91,16 +91,3 @@ $exames = [
     <script src="js/validacoes.js"></script>
 </body>
 </html>
-<?php
-// Este bloco PHP de processamento POST pode ser movido para o controller/ExameController.php
-// ou mantido aqui para testes rápidos, mas para uma aplicação organizada, o controller é melhor.
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    function salvarExame($dados) {
-        // Lógica real de salvamento iria aqui
-        // Este echo aqui aparecerá no final da página, após o HTML.
-        // echo "<div class='alert alert-success mt-3'>Exame salvo com sucesso!</div>";
-        // var_dump($dados); // Para debug
-    }
-    // salvarExame($_POST); // Comente ou remova se o controller for tratar
-}
-?>
