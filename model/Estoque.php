@@ -12,11 +12,11 @@ class Estoque{
         $this->idEstoque = $idEstoque;
     }
     public function getNomeMaterial(){
-        return $this->NomeMaterial;
+        return $this->nomeMaterial;
     }
 
     public function setNomeMaterial($nomeMaterial){
-        $this->NomeMaterial = $nomeMaterial;
+        $this->nomeMaterial = $nomeMaterial;
     }
 
     public function getDescricao(){
