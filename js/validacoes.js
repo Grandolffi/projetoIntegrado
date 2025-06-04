@@ -13,7 +13,6 @@ function toggleSubmenu(event, submenuId, parentId) {
     }
 }
 
-// Manter o SUBMENU LATERAL aberto se uma das páginas estiver ativa ao carregar a página
 document.addEventListener('DOMContentLoaded', function() {
     const menuPaiExame = document.getElementById('menuPaiExame');
     if (menuPaiExame && menuPaiExame.classList.contains('item-ativo')) {
@@ -24,11 +23,3 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
-
-// Função para os CHECKBOXES da página NewExamePaciente.php
-function toggleSubOptions(id) { 
-    const subMenuElement = document.getElementById(id); // Renomeei a variável para evitar conflito de nome
-    if (subMenuElement) {
-        subMenuElement.style.display = subMenuElement.style.display === 'block' ? 'none' : 'block';
-    }
-}

@@ -3,11 +3,9 @@
 $paginaAtual = basename($_SERVER['PHP_SELF']);
 
 // --- DADOS DO USUÁRIO ---
-// Mantenha os dados do usuário que você preferir (Fernanda ou Kleber)
-$nomeUsuarioLogin = "Fernanda"; // Ou "Kleber", conforme sua preferência
+$nomeUsuarioLogin = "Fernanda"; 
 $cargoUsuarioLogin = "Super Admin";
-// Atualize o link do avatar se necessário
-$avatarUsuarioLogin = "https://via.placeholder.com/50/1A2A3A/FFFFFF?Text=F"; // Placeholder para Fernanda (ou K para Kleber)
+$avatarUsuarioLogin = "https://via.placeholder.com/50/1A2A3A/FFFFFF?Text=F"; 
 
 // --- LINKS DO MENU ---
 $linkDashboard = "dashboard.php";

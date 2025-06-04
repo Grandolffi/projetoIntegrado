@@ -30,7 +30,8 @@ $exames = [
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Resultado de Exames Bioquímicos</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="Style.css"> </head>
+    <link rel="stylesheet" href="Style.css">
+</head>
 <body class="corpo-dashboard">
     <div class="container-dashboard">
         <?php include 'menuLateral.php'; // O que tem o submenu e "Fernanda" ?>
@@ -63,7 +64,8 @@ $exames = [
         </main>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="js/validacoes.js"></script> </body>
+    <script src="js/validacoes.js"></script>
+</body>
 </html>
 <?php
 // Este bloco PHP de processamento POST pode ser movido para o controller/ExameController.php
