@@ -4,7 +4,7 @@ class Pessoa{
     private $id;
     private $nome;
     private $cpf;
-    private $dataNasc;
+    private $dtnasc;
     private $email;
     private $nomeMae;
     private $numCelular;
@@ -35,12 +35,12 @@ class Pessoa{
     }
 
 
-    public function getDataNasc(){
-        return $this->dataNasc;
+    public function getdtnasc(){
+        return $this->dtnasc;
     }
 
     public function setDataNasc($dataNasc){
-        $this->dataNasc = $dataNasc;
+        $this->dtnasc = $dataNasc;
     }
 
     public function getEmail(){
@@ -77,7 +77,7 @@ class Pessoa{
     }
 
     public function __toString(){
-        return "Pessoa - nome: {$this->nome}, cpf: {$this->cpf}, data Nascimento: {$this->dataNasc}, 
+        return "Pessoa - nome: {$this->nome}, cpf: {$this->cpf}, data Nascimento: {$this->dtnasc}, 
         numero Telefone: {$this->numCelular}, genero: {$this->genero}";
     }
     
