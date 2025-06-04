@@ -68,8 +68,8 @@ class ResultadoExames{
 
     // perguntar para a professora se o idExame precisa estar no toString
     public function __toString(){
-        return "Exame - Nome: {$this->nomeExaame}, tipo de exame: {$this->tipoExame}, Valor Absoluto: {$this->valorAbsoluto}, 
-        Valor de referência: {$this->valorReferencia}, Paciente: {$this->paciente}, Data e hora{$this->DataHora}";
+        return "Exame - Nome: {$this->nomeExame}, tipo de exame: {$this->tipoExame}, Valor Absoluto: {$this->valorAbsoluto}, 
+        Valor de referência: {$this->valorReferencia}, Paciente: {$this->paciente}, Data e hora{$this->dataHora}";
     }
 }
 ?>
