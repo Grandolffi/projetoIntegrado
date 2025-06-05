@@ -56,7 +56,7 @@ include __DIR__. '/../model/ClassePessoas.php';
                     <td>{$pessoa->getId()}</td>
                     <td>{$pessoa->getNome()}</td>
                     <td>{$pessoa->getCpf()}</td>
-                    <td>{$pessoa->getDataNasc()}</td>
+                    <td>{$pessoa->getDtnasc()}</td>
                     <td>{$pessoa->getEmail()}</td>
                     <td>{$pessoa->getNomeMae()}</td>
                     <td>{$pessoa->getnumCelular()}</td>

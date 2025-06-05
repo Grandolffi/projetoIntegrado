@@ -44,7 +44,7 @@ class PessoaDao{
         $pessoa->setId($linha['id']);
         $pessoa->setnome($linha['nome']);
         $pessoa->setCpf($linha['cpf']);
-        $pessoa->setDataNasc($linha['dataNasc']);
+        $pessoa->setDataNasc($linha['dtnasc']);
         $pessoa->setEmail($linha['email']);
         $pessoa->setNomeMae($linha['nomeMae']);
         $pessoa->setnumCelular($linha['numCelular']);
