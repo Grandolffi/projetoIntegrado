@@ -18,7 +18,6 @@ error_reporting(E_ALL);
                 <h2>Listagem de Pacientes</h2>
                 <?php include 'info_cabecalho.php'; // Inclui saudação, data e hora ?>
             </header>
-
             <div class="form-container"> <div class="table-responsive">
                     <table class="table table-hover table-striped">
                         <thead class="table-light">
