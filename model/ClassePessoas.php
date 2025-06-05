@@ -39,8 +39,8 @@ class Pessoa{
         return $this->dtnasc;
     }
 
-    public function setDataNasc($dataNasc){
-        $this->dtnasc = $dataNasc;
+    public function setDtnasc($dtnasc){
+        $this->dtnasc = $dtnasc;
     }
 
     public function getEmail(){

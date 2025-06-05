@@ -8,7 +8,7 @@ class PessoaDao{
             $con_sql = ConnectionFactory::getConnection()->prepare($sql);
             $con_sql->bindValue(":nome", $pessoa->getnome()); 
             $con_sql->bindValue(":cpf", $pessoa->getCpf());
-            $con_sql->bindValue(":dataNasc", $pessoa->getDtnasc());
+            $con_sql->bindValue(":dtnasc", $pessoa->getDtnasc());
             $con_sql->bindValue(":email", $pessoa->getEmail());
             $con_sql->bindValue(":nomeMae", $pessoa->getNomeMae());
             $con_sql->bindValue(":numCelular", $pessoa->getnumCelular());
@@ -44,7 +44,7 @@ class PessoaDao{
         $pessoa->setId($linha['id']);
         $pessoa->setnome($linha['nome']);
         $pessoa->setCpf($linha['cpf']);
-        $pessoa->setDataNasc($linha['dtnasc']);
+        $pessoa->setDtnasc($linha['dtnasc']);
         $pessoa->setEmail($linha['email']);
         $pessoa->setNomeMae($linha['nomeMae']);
         $pessoa->setnumCelular($linha['numCelular']);
