@@ -17,7 +17,7 @@ class ExameDao {
             $con_sql->bindValue(":data_hora_exame", $exame->getDataHora());
 
             $con_sql->execute();
-            echo "<p>Resultado de exame ({$exame->getNomeExame()}) cadastrado com sucesso!</p>"; // decidir se melhor tratar msgs no controller ou após redirect
+            echo "<p>Resultado de exame ({$exame->getNomeExame()}) cadastrado com sucesso!</p>";
             return true;
         } catch (PDOException $ex) {
             echo "<p>Erro ao inserir resultado de exame ({$exame->getNomeExame()}) no banco de dados: " . $ex->getMessage() . "</p>";
@@ -25,6 +25,17 @@ class ExameDao {
         }
     }
 
-    // Você pode adicionar outros métodos aqui (read, update, delete) conforme necessário
+    // NOVO MÉTODO: Para buscar todos os exames
+    public function getAll() {
+        try {
+            $sql = "SELECT * FROM resultados_exames ORDER BY data_hora_exame DESC, paciente_registro ASC";
+            $con_sql = ConnectionFactory::getConnection()->prepare($sql);
+            $con_sql->execute();
+            return $con_sql->fetchAll(PDO::FETCH_ASSOC); // Retorna todos os resultados como um array associativo
+        } catch (PDOException $ex) {
+            echo "<p>Erro ao buscar resultados de exames no banco de dados: " . $ex->getMessage() . "</p>";
+            return []; // Retorna um array vazio em caso de erro
+        }
+    }
 }
 ?>
