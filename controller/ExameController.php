@@ -30,7 +30,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Dados comuns a todos os exames desta submissão
     $numero_registro = isset($_POST['numero_registro']) ? $_POST['numero_registro'] : null;
-    $data_exame_realizado = isset($_POST['data_exame']) ? $_POST['data_exame'] : null;
+    $data_exame_realizado = isset($_POST['data_laudo']) ? $_POST['data_laudo'] : null;
     
     // em uma tabela principal de "laudos" ou "solicitações de exame".
     // $data_laudo_prevista = isset($_POST['data_laudo']) ? $_POST['data_laudo'] : null;
