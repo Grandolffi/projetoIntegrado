@@ -47,7 +47,7 @@ error_reporting(E_ALL);
                     <div class="mb-3">
                         <label for="dtnasc" class="form-label">Data de nascimento</label>
                         <input type="date" name="dtnasc" id="dtnasc" value="<?php isset($pessoa) && $pessoa->getDataNasc() ? $pessoa->getDataNasc(): '' ?>" class="form-control" required>
-                    </div>
+                    </div>  
                     <div class="mb-3">
                         <label for="email" class="form-label">E-mail</label>
                         <input type="email" name="email" id="email" value="<?php isset($pessoa) && $pessoa->getEmail() ? $pessoa->getEmail(): '' ?>"class="form-control" required>
