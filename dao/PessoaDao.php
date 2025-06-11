@@ -52,7 +52,7 @@ class PessoaDao{
         return $pessoa;
     }
 
-    function buscaPorId($id){
+    public function buscaPorId($id){
         try{
             $sql = "SELECT * FROM pessoa WHERE id = :id";
             $conn = ConnectionFactory::getConnection()->prepare($sql);
@@ -67,5 +67,7 @@ class PessoaDao{
             echo "<p>Erro ao buscar ID: {$id}</p> <p>{$e->getMessage()}</p>";
         }
     }
+
+    
 }
 ?>

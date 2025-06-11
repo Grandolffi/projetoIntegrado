@@ -3,6 +3,10 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
+
+        require_once 'controller/PessoaController.php';
+        require_once 'dao/PessoaDao.php';
+        require_once 'model/ClassePessoas.php';   
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -18,8 +22,9 @@ error_reporting(E_ALL);
 
     if(isset($_GET['editar'])){
         echo "Chamou via editar"; //apenas pra testes
-        require_once 'controller/PessoaController.php';
-
+         $id = $_GET['editar'];
+         $dao = new PessoaDao();
+         $pessoa = $dao->buscaPorId($id);
     }
 
     ?>
@@ -35,30 +40,30 @@ error_reporting(E_ALL);
             <div class="form-container">
                 <h2 class="text-center mb-4">Dados do Paciente</h2> 
                 <form action="controller/PessoaController.php" method="POST">
-                    <input type="hidden" name="id" value="<?php isset($pessoa) && $pessoa->getId() ? $pessoa->getId(): '' ?>">
+                    <input type="hidden" name="id" value="<?= isset($pessoa) && $pessoa->getId() ? $pessoa->getId(): '' ?>">
                     <div class="mb-3">
                         <label for="nome" class="form-label">Nome completo</label>
-                        <input type="text" name="nome" id="nome" value="<?php isset($pessoa) && $pessoa->getNome() ? $pessoa->getNome(): '' ?>" class="form-control" required>
+                        <input type="text" name="nome" id="nome" value="<?= isset($pessoa) && $pessoa->getNome() ? $pessoa->getNome(): '' ?>" class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label for="cpf" class="form-label">CPF</label>
-                        <input type="text" name="cpf" id="cpf" value="<?php isset($pessoa) && $pessoa->getCpf() ? $pessoa->getCpf(): '' ?>" class="form-control" required>
+                        <input type="text" name="cpf" id="cpf" value="<?= isset($pessoa) && $pessoa->getCpf() ? $pessoa->getCpf(): '' ?>" class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label for="dtnasc" class="form-label">Data de nascimento</label>
-                        <input type="date" name="dtnasc" id="dtnasc" value="<?php isset($pessoa) && $pessoa->getDataNasc() ? $pessoa->getDataNasc(): '' ?>" class="form-control" required>
+                        <input type="date" name="dtnasc" id="dtnasc" value="<?= isset($pessoa) && $pessoa->getDataNasc() ? $pessoa->getDataNasc(): '' ?>" class="form-control" required>
                     </div>  
                     <div class="mb-3">
                         <label for="email" class="form-label">E-mail</label>
-                        <input type="email" name="email" id="email" value="<?php isset($pessoa) && $pessoa->getEmail() ? $pessoa->getEmail(): '' ?>"class="form-control" required>
+                        <input type="email" name="email" id="email" value="<?= isset($pessoa) && $pessoa->getEmail() ? $pessoa->getEmail(): '' ?>"class="form-control" required>
                     </div>
                     <div class="mb-3">
                         <label for="nomemae" class="form-label">Nome da mãe</label>
-                        <input type="text" name="nomemae" id="nomemae" value="<?php isset($pessoa) && $pessoa->getNomeMae() ? $pessoa->getNomeMae(): '' ?>" class="form-control">
+                        <input type="text" name="nomemae" id="nomemae" value="<?= isset($pessoa) && $pessoa->getNomeMae() ? $pessoa->getNomeMae(): '' ?>" class="form-control">
                     </div>
                     <div class="mb-3">
                         <label for="fone" class="form-label">Celular com DDD</label>
-                        <input type="tel" name="fone" id="fone" value="<?php isset($pessoa) && $pessoa->getnumCelular() ? $pessoa->getnumCelular(): '' ?>" class="form-control" required pattern="[0-9]{2} [0-9]{5}-[0-9]{4}"
+                        <input type="tel" name="fone" id="fone" value="<?= isset($pessoa) && $pessoa->getnumCelular() ? $pessoa->getnumCelular(): '' ?>" class="form-control" required pattern="[0-9]{2} [0-9]{5}-[0-9]{4}"
                             placeholder="Ex: 11 99999-9999">
                     </div>
                     <div class="mb-3">

@@ -23,11 +23,12 @@ include __DIR__. '/../model/ClassePessoas.php';
 
     if(isset($_GET['editar'])){
         $idPessoa = $_GET['editar'];
-        $pessoa = $PessoaDao->buscarPorId($idPessoa);
+        $pessoa = $PessoaDao->buscaPorId($idPessoa);
         if(!isset($pessoa)){
             echo "<p>Pessoa de Id {$idPessoa} não encontrado. </p>";
             header("Location: ../index.php?erro=nao_encontrado");
         }
+        
     }
 
     if(isset($_POST['salvar_edicao'])){
@@ -62,7 +63,7 @@ include __DIR__. '/../model/ClassePessoas.php';
                     <td>{$pessoa->getnumCelular()}</td>
                     <td>{$pessoa->getGenero()}</td>
                     <td> 
-                        <a href=''ListarPaciente.php?editar={$pessoa->getId()}>Editar</a>
+                        <a href='CadastroPaciente.php?editar={$pessoa->getId()}'>Editar</a>
                         
                     </td>
             </tr>";
