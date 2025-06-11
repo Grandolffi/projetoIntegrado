@@ -21,10 +21,10 @@ error_reporting(E_ALL);
     <?php
 
     if(isset($_GET['editar'])){
-        echo "Chamou via editar"; //apenas pra testes
          $id = $_GET['editar'];
          $dao = new PessoaDao();
          $pessoa = $dao->buscaPorId($id);
+
     }
 
     ?>
@@ -51,7 +51,7 @@ error_reporting(E_ALL);
                     </div>
                     <div class="mb-3">
                         <label for="dtnasc" class="form-label">Data de nascimento</label>
-                        <input type="date" name="dtnasc" id="dtnasc" value="<?= isset($pessoa) && $pessoa->getDataNasc() ? $pessoa->getDataNasc(): '' ?>" class="form-control" required>
+                        <input type="date" name="dtnasc" id="dtnasc" value="<?= isset($pessoa) && $pessoa->getdtnasc() ? $pessoa->getdtnasc(): '' ?>" class="form-control" required>
                     </div>  
                     <div class="mb-3">
                         <label for="email" class="form-label">E-mail</label>
@@ -74,9 +74,15 @@ error_reporting(E_ALL);
                             <option value="nf">Não informar</option>
                         </select>
                     </div>
-                    <div class="text-center mt-4">
-                        <button type="submit" class="btn btn-dark" name="cadastrar">Enviar</button>
-                    </div>
+                    <?php if(isset($pessoa) && $pessoa->getId()): ?>
+                        <div class="text-center mt-4">
+                        <button type="submit" name="salvar_edicao" class="btn btn-primary">Salvar Edição</button>
+                        </div>
+                    <?php else: ?>
+                        <div class="text-center mt-4">
+                        <button type="submit" name="cadastrar" class="btn btn-success">Cadastrar</button>
+                        </div>
+                    <?php endif; ?>
                 </form>
             </div> 
         </main> 

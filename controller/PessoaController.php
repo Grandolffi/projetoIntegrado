@@ -34,14 +34,14 @@ include __DIR__. '/../model/ClassePessoas.php';
     if(isset($_POST['salvar_edicao'])){
         $pessoa = new Pessoa();
         $pessoa->setId($_POST['id']);
-        $Pessoa->setnome($_POST['nome']);
-        $Pessoa->setCpf($_POST['cpf']);
-        $Pessoa->setDtnasc($_POST['dtnasc']);
-        $Pessoa->setEmail($_POST['email']);
-        $Pessoa->setNomeMae($_POST['nomemae']);
-        $Pessoa->setnumCelular($_POST['fone']);
-        $Pessoa->setGenero($_POST['genero']);
-        $PessoaDao->editar($pessoa);
+        $pessoa->setnome($_POST['nome']);
+        $pessoa->setCpf($_POST['cpf']);
+        $pessoa->setDtnasc($_POST['dtnasc']);
+        $pessoa->setEmail($_POST['email']);
+        $pessoa->setNomeMae($_POST['nomemae']);
+        $pessoa->setnumCelular($_POST['fone']);
+        $pessoa->setGenero($_POST['genero']);
+        $PessoaDao->editar($pessoa); //falta fazer isso aqui pra editar funcionar
         header("Location: ../CadastroPaciente.php");
     }
 
