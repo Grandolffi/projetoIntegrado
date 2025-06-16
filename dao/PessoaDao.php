@@ -52,6 +52,27 @@ class PessoaDao{
         return $pessoa;
     }
 
+    public function editar(Pessoa $pes){
+        try{
+            $sql = "UPDATE pessoa SET 
+                nome = :nome, cpf = :cpf, dtnasc = :dtnasc, email = :email, nomeMae = :nomeMae, numCelular = :numCelular, genero = :genero WHERE id = :id";
+            $conn = ConnectionFactory::getConnection()->prepare($sql);
+            $conn->bindValue(":nome", $pes->getNome());
+            $conn->bindValue(":cpf", $pes->getCpf());
+            $conn->bindValue(":dtnasc", $pes->getdtnasc());
+            $conn->bindValue(":email", $pes->getEmail());
+            $conn->bindValue(":nomeMae", $pes->getNomeMae());
+            $conn->bindValue(":numCelular", $pes->getnumCelular());
+            $conn->bindValue(":genero", $pes->getGenero());
+            $conn->bindValue(":id", $pes->getId()); 
+            return $conn->execute(); // Executa o update
+        }catch(PDOException $ex){
+            echo "<p> Erro ao editar </p> <p> $ex </p>";
+        }
+    }
+
+
+
     public function buscaPorId($id){
         try{
             $sql = "SELECT * FROM pessoa WHERE id = :id";
@@ -67,6 +88,19 @@ class PessoaDao{
             echo "<p>Erro ao buscar ID: {$id}</p> <p>{$e->getMessage()}</p>";
         }
     }
+
+    public function excluir($id){
+    try{
+        $sql = "DELETE FROM pessoa WHERE id = :id";
+        $conn = ConnectionFactory::getConnection()->prepare($sql);
+        $conn->bindValue(":id", $id);
+        return $conn->execute();
+    }catch(PDOException $ex){
+        echo "<p>Erro ao excluir: $ex</p>";
+        return false;
+    }
+}
+
 
     
 }
