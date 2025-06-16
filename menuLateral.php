@@ -10,6 +10,7 @@ $avatarUsuarioLogin = "https://via.placeholder.com/50/1A2A3A/FFFFFF?Text=F";
 // --- LINKS DO MENU ---
 $linkDashboard = "dashboard.php";
 $linkCadastroPaciente = 'CadastroPaciente.php';
+$linkListaPaciente = 'ListarPaciente.php';
 
 // Links da seção Exame
 $linkListaExames = "lista_de_exames.php";
@@ -68,6 +69,9 @@ $secaoExameAtiva = (
             </li>
             <li class="<?php if ($paginaAtual == basename($linkEstoque)) echo 'item-ativo'; ?>">
                 <a href="<?php echo $linkEstoque; ?>">Estoque</a>
+            </li>
+            <li class="<?php if ($paginaAtual == basename($linkListaPaciente)) echo 'item-ativo'; ?>">
+                <a href="<?php echo $linkListaPaciente; ?>">Listar Paciente</a>
             </li>
         </ul>
     </nav>
