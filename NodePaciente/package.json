@@ -1,0 +1,26 @@
+{
+  "name": "nodepaciente",
+  "version": "1.0.0",
+  "description": "Projeto Node criado para php",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node controllers/index.js",
+    "dev": "nodemon controllers/index.js"
+  },
+  "keywords": [
+    "projeto",
+    "node",
+    "criado",
+    "para",
+    "php"
+  ],
+  "author": "Kleber Grandolffi",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "ejs": "^3.1.10",
+    "express": "^5.1.0",
+    "pg": "^8.16.0"
+  }
+}
