@@ -16,11 +16,6 @@ app.get("/", async (req, res) => {
     //res.status(200).render("listaalunos", {alunosDoController: alunos});
 })
 
-app.get("/alunos", async (req, res) => {
-    const alunos = await getAlunos();
-    console.log("Alunos: ", alunos);
-    res.status(200).render("listaalunos", {alunosDoController: alunos});
-})
 
 //inserindo via api
 app.post("/", async (req, res) =>{
