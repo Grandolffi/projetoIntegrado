@@ -14,24 +14,24 @@ class Exame {
   }
 }
 
-// READ (listar todos os resultados de exames)
+// READ  (listar todos os resultados de exames)
 async function getTodosResultadosExames() {
     const { rows } = await pool.query("SELECT * FROM resultados_exames ORDER BY data_hora_exame DESC, id_exame DESC");
-    const exames = rows;
+    const exames = rows; 
     return exames;
 }
 
-// READ(1) (busca por ID)
+// READ (1) (buscar por ID)
 async function getResultadoExameById(id) {
     if (id) {
         const { rows } = await pool.query("SELECT * FROM resultados_exames WHERE id_exame = $1", [id]);
-        return rows[0]; // retorna apenas o primeiro resultado, ou undefined
+        return rows[0]; 
     }
     console.error("Falha ao buscar Resultado de Exame, não foi passado o id.");
     return false;
 }
 
-// UPDATE
+// UPDATE 
 async function updateResultadoExame(id, laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame) {
     if (id && laudo_id && nome_exame && tipo_exame && valor_absoluto && valor_referencia && paciente_registro && data_hora_exame) {
         const result = await pool.query(`
@@ -45,7 +45,7 @@ async function updateResultadoExame(id, laudo_id, nome_exame, tipo_exame, valor_
         console.log("Resultado do edit Resultado de Exame: " + result.rows[0]);
 
         if (result.rows.length === 0) return false; // Se não achou o id, retorna false
-        return result.rows[0]; // Retorna o registro atualizado
+        return result.rows[0]; 
     }
     console.error("Falha ao editar Resultado de Exame, faltou algum dado.");
     return false;
@@ -60,14 +60,14 @@ async function deleteResultadoExame(id) {
             RETURNING id_exame`,
             [id]
         );
-        if (result.rows.length === 0) return false;
+        if (result.rows.length === 0) return false; // Se não achou o id, retorna false
         return true;
     }
     console.error("Falha ao remover o Resultado de Exame, não foi passado o id.");
     return false;
 }
 
-// CREATE 
+// CREATE (adiciona um novo resultado de exame) - Usado ao salvar Laudo
 async function insertResultadoExame(laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame) {
     if (laudo_id && nome_exame && tipo_exame && valor_absoluto && valor_referencia && paciente_registro && data_hora_exame) {
         const result = await pool.query(`
@@ -85,5 +85,6 @@ async function insertResultadoExame(laudo_id, nome_exame, tipo_exame, valor_abso
     console.error("Falha ao inserir Resultado de Exame, faltou algum dado.");
     return false;
 }
+
 
 module.exports = {Exame, getTodosResultadosExames, getResultadoExameById, updateResultadoExame, deleteResultadoExame, insertResultadoExame};
