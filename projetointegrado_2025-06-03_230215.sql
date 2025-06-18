@@ -330,3 +330,40 @@ CREATE TABLE IF NOT EXISTS aluno (
 );
 
 select * from pessoa;
+
+ALTER TABLE resultados_exames
+ADD COLUMN laudo_id INT NULL;
+
+DROP table laudos;
+
+CREATE TABLE laudos (
+    id_laudo INT AUTO_INCREMENT PRIMARY KEY, -- Renomeado para id_laudo para consistência
+    paciente_id INT NOT NULL, -- FK para a tabela 'pessoa' (o ID da pessoa/paciente)
+    responsavel_tecnico VARCHAR(255) NULL, -- Pode ser nulo inicialmente ou vir da sessão
+    observacoes TEXT,
+    data_finalizacao DATETIME DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_laudo_paciente FOREIGN KEY (paciente_id) REFERENCES pessoa(id) -- REFERENCIA 'id' da tabela 'pessoa'
+);
+
+CREATE TABLE solicitacoes (
+    id_solicitacao INT AUTO_INCREMENT PRIMARY KEY,
+    paciente_id INT NOT NULL, -- Corrigido para INT para corresponder a pessoa.id
+    data_solicitacao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    data_prevista_realizacao DATETIME,
+    solicitante_nome VARCHAR(255),
+    status VARCHAR(50) DEFAULT 'Pendente',
+    observacoes TEXT,
+    CONSTRAINT fk_solicitacao_paciente FOREIGN KEY (paciente_id) REFERENCES pessoa(id) -- Referencia 'id' da tabela 'pessoa'
+);
+
+CREATE TABLE solicitacao_exames_itens (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    solicitacao_id INT NOT NULL,
+    nome_exame VARCHAR(255) NOT NULL,
+    tipo_exame_categoria VARCHAR(100),
+    valor_referencia_solicitacao TEXT DEFAULT NULL,
+    status_item VARCHAR(50) DEFAULT 'Pendente',
+    FOREIGN KEY (solicitacao_id) REFERENCES solicitacoes(id_solicitacao)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+);
