@@ -3,34 +3,37 @@
 $paginaAtual = basename($_SERVER['PHP_SELF']);
 
 // --- DADOS DO USUÁRIO ---
-$nomeUsuarioLogin = "Fernanda"; 
+$nomeUsuarioLogin = "Fernanda";
 $cargoUsuarioLogin = "Super Admin";
-$avatarUsuarioLogin = "https://via.placeholder.com/50/1A2A3A/FFFFFF?Text=F"; 
+// Caminho do avatar: Ajuste se a imagem não estiver acessível do navegador via placeholder
+$avatarUsuarioLogin = "https://via.placeholder.com/50/1A2A3A/FFFFFF?Text=F";
 
 // --- LINKS DO MENU ---
+// Todos os links agora são NOME_DO_ARQUIVO.php porque todas as views estão na mesma pasta
 $linkDashboard = "dashboard.php";
 $linkCadastroPaciente = 'CadastroPaciente.php';
 $linkListaPaciente = 'ListarPaciente.php';
 
 // Links da seção Exame
 $linkListaExames = "lista_de_exames.php";
-$linkSolicitarNovoExame = "NewExamePaciente.php"; // Ou o nome correto da sua página de solicitar exame
-$linkCadastrarResultadoExame = "cadastroExames.php"; 
+$linkSolicitarNovoExame = "NewExamePaciente.php";
+// ALTERADO: O link "Cadastrar Resultado" agora aponta para a lista de solicitações pendentes
+$linkCadastrarResultadoExame = "lista_solicitacoes_pendentes.php"; // Novo nome da página
 
-$linkUsuario = "sua_pagina_de_usuarios.php"; // Crie esta página
-$linkEstoque = "AcessarEstoque.php";
+$linkUsuario = "sua_pagina_de_usuarios.php"; // Certifique-se de criar esta página na pasta views
+$linkEstoque = "AcessarEstoque.php"; // Certifique-se de que esta página está na pasta views
 
 // Lógica para destacar o item "Exame" (pai) se qualquer página da seção Exame estiver ativa
 $secaoExameAtiva = (
     $paginaAtual == basename($linkListaExames) ||
     $paginaAtual == basename($linkSolicitarNovoExame) ||
-    $paginaAtual == basename($linkCadastrarResultadoExame)
+    $paginaAtual == basename($linkCadastrarResultadoExame) // Note que agora ele referencia a nova página
 );
 ?>
 
 <div class="menu-lateral">
     <div class="menu-cabecalho">
-        <h1><span class="icone-bio">Bio</span>Diagnóstico</h1> 
+        <h1><span class="icone-bio">Bio</span>Diagnóstico</h1>
     </div>
     <div class="perfil-usuario">
         <img src="<?php echo htmlspecialchars($avatarUsuarioLogin); ?>" alt="Avatar do Usuário">
@@ -59,7 +62,7 @@ $secaoExameAtiva = (
                         <a href="<?php echo $linkSolicitarNovoExame; ?>">Solicitar novo exame</a>
                     </li>
                     <li class="<?php if ($paginaAtual == basename($linkCadastrarResultadoExame)) echo 'item-ativo'; ?>">
-                        <a href="<?php echo $linkCadastrarResultadoExame; ?>">Cadastrar Resultado</a>
+                        <a href="<?php echo $linkCadastrarResultadoExame; ?>">Preencher Resultados de Exames</a>
                     </li>
                 </ul>
             </li>
@@ -76,3 +79,39 @@ $secaoExameAtiva = (
         </ul>
     </nav>
 </div>
+
+<script>
+// A função toggleSubmenu precisa estar definida e ser acessível por todas as páginas.
+// Se ela está em validacoes.js, certifique-se de que validacoes.js é carregado em CADA PÁGINA que usa o menu.
+// Se ela não estiver em validacoes.js, você pode colocá-la diretamente aqui.
+
+// Exemplo da função (se não estiver em validacoes.js ou para debug)
+// function toggleSubmenu(event, submenuId, parentMenuId) {
+//     event.preventDefault(); // Impede o comportamento padrão do link '#'
+//     const submenu = document.getElementById(submenuId);
+//     const parentMenuItem = document.getElementById(parentMenuId);
+
+//     if (submenu && parentMenuItem) {
+//         // Alterna a exibição do submenu
+//         if (submenu.style.display === 'block') {
+//             submenu.style.display = 'none';
+//             parentMenuItem.classList.remove('submenu-ativo'); // Remova uma classe se o submenu estiver fechado
+//         } else {
+//             submenu.style.display = 'block';
+//             parentMenuItem.classList.add('submenu-ativo'); // Adicione uma classe se o submenu estiver aberto
+//         }
+//     }
+// }
+
+// Lógica para abrir o submenu se a seção "Exame" estiver ativa ao carregar a página
+document.addEventListener('DOMContentLoaded', function() {
+    const secaoExameAtiva = <?php echo json_encode($secaoExameAtiva); ?>;
+    const submenuExame = document.getElementById('submenuExame');
+    const menuPaiExame = document.getElementById('menuPaiExame');
+
+    if (secaoExameAtiva && submenuExame && menuPaiExame) {
+        submenuExame.style.display = 'block'; // Mostra o submenu
+        menuPaiExame.classList.add('submenu-ativo'); // Adiciona classe para estilização de "aberto"
+    }
+});
+</script>

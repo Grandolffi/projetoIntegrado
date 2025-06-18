@@ -1,49 +1,105 @@
+// Exemplo de como ExameDao.php (no PHP) deveria ser refeito:
 <?php
+// Não precisa mais de ConnectionFactory.php ou ResultadoExames.php aqui
+// se eles não forem usados para nada além de tipagem ou objetos.
 
 class ExameDao {
 
-    /**
-     * MODIFICADO: Agora aceita um segundo parâmetro, o $laudo_id.
-     */
-    public function inserir(ResultadoExames $exame, $laudo_id) { // <-- MUDANÇA 1: Novo parâmetro
-        try {
-            // MODIFICADO: Adiciona a coluna 'laudo_id' no INSERT
-            $sql = "INSERT INTO resultados_exames (laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame) 
-                    VALUES (:laudo_id, :nome_exame, :tipo_exame, :valor_absoluto, :valor_referencia, :paciente_registro, :data_hora_exame)"; // <-- MUDANÇA 2: Coluna no SQL
+    private $apiBaseUrl = "http://localhost:3000/api/exames"; // Endpoint base para exames na sua API Node.js
 
-            $con_sql = ConnectionFactory::getConnection()->prepare($sql);
+    // Helper para fazer requisições à API
+    private function callApi($method, $id = null, $data = null) {
+        $url = $this->apiBaseUrl;
+        if ($id) {
+            $url .= "/" . $id; // Ex: /api/exames/123
+        }
 
-            // MODIFICADO: Adiciona o bindValue para o novo parâmetro
-            $con_sql->bindValue(":laudo_id", $laudo_id); // <-- MUDANÇA 3: Novo bindValue
-            
-            // O resto dos bindValue continua igual
-            $con_sql->bindValue(":nome_exame", $exame->getNomeExame());
-            $con_sql->bindValue(":tipo_exame", $exame->getTipoExame());
-            $con_sql->bindValue(":valor_absoluto", $exame->getValorAbsoluto());
-            $con_sql->bindValue(":valor_referencia", $exame->getValorReferencia());
-            $con_sql->bindValue(":paciente_registro", $exame->getPaciente());
-            $con_sql->bindValue(":data_hora_exame", $exame->getDataHora());
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
 
-            $con_sql->execute();
-            return true;
-        } catch (PDOException $ex) {
-            // É melhor lançar a exceção para que o LaudoController possa capturá-la na transação.
-            throw $ex;
+        if ($method === 'POST' || $method === 'PUT') {
+            curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+        }
+        curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
+
+        $response = curl_exec($ch);
+        $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        $curlError = curl_error($ch);
+        curl_close($ch);
+
+        if ($response === false) {
+            throw new Exception("Erro de conexão com a API: " . $curlError);
+        }
+
+        $apiResponse = json_decode($response, true);
+
+        if ($httpCode >= 200 && $httpCode < 300) {
+            return $apiResponse; // Retorna os dados da API
+        } else {
+            $errorMessage = $apiResponse['message'] ?? 'Erro desconhecido da API.';
+            throw new Exception("Erro da API (código {$httpCode}): " . $errorMessage);
         }
     }
 
-    /**
-     * Este método não muda. Continua como está.
-     */
+    // MODIFICADO: Inserir um resultado de exame via API (usado pelo LaudoController)
+    public function inserir(ResultadoExames $exame, $laudo_id) {
+        $data = [
+            'laudo_id' => $laudo_id,
+            'nome_exame' => $exame->getNomeExame(),
+            'tipo_exame' => $exame->getTipoExame(),
+            'valor_absoluto' => $exame->getValorAbsoluto(),
+            'valor_referencia' => $exame->getValorReferencia(),
+            'paciente_registro' => $exame->getPaciente(),
+            'data_hora_exame' => $exame->getDataHora()
+        ];
+        // Note: A API Node.js espera que o tipo_exame e valor_referencia sejam preenchidos
+        // Se a API for buscar esses dados, você pode omiti-los aqui.
+
+        try {
+            return $this->callApi('POST', null, $data); // POST para criar novo
+        } catch (Exception $e) {
+            throw $e; // Re-lança a exceção para o controlador
+        }
+    }
+
+    // MODIFICADO: Buscar todos os resultados de exames via API (usado por lista_de_exames.php)
     public function getAll() {
         try {
-            $sql = "SELECT * FROM resultados_exames ORDER BY data_hora_exame DESC, paciente_registro ASC";
-            $con_sql = ConnectionFactory::getConnection()->prepare($sql);
-            $con_sql->execute();
-            return $con_sql->fetchAll(PDO::FETCH_ASSOC); // Retorna todos os resultados como um array associativo
-        } catch (PDOException $ex) {
-            echo "<p>Erro ao buscar resultados de exames no banco de dados: " . $ex->getMessage() . "</p>";
-            return []; // Retorna um array vazio em caso de erro
+            return $this->callApi('GET'); // GET sem ID para listar todos
+        } catch (Exception $e) {
+            // Em vez de echo, é melhor retornar um array vazio e logar o erro
+            error_log("Erro em ExameDao::getAll(): " . $e->getMessage());
+            return [];
+        }
+    }
+
+    // NOVO: Buscar um exame por ID para edição
+    public function getById($id) {
+        try {
+            return $this->callApi('GET', $id);
+        } catch (Exception $e) {
+            error_log("Erro em ExameDao::getById(): " . $e->getMessage());
+            return null;
+        }
+    }
+
+    // NOVO: Atualizar um exame via API
+    public function update(array $exameData) { // Espera um array com os dados do exame
+        $id = $exameData['id_exame']; // O ID do exame a ser atualizado
+        try {
+            return $this->callApi('PUT', $id, $exameData);
+        } catch (Exception $e) {
+            throw $e;
+        }
+    }
+
+    // NOVO: Excluir um exame via API
+    public function delete($id) {
+        try {
+            return $this->callApi('DELETE', $id);
+        } catch (Exception $e) {
+            throw $e;
         }
     }
 }

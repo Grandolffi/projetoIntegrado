@@ -9,20 +9,24 @@ error_reporting(E_ALL);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Solicitar Novo Exame</title> <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+    <title>Solicitar Novo Exame</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="Style.css"> </head>
+    
+    <link rel="stylesheet" href="../public/css/Style.css">
+</head>
 <body class="corpo-dashboard">
     <div class="container-dashboard">
-        <?php include 'menuLateral.php'; // Inclui o menu lateral padrão ?>
+        <?php include __DIR__ . '/menuLateral.php'; // Inclui o menu lateral padrão ?>
 
         <main class="conteudo-principal">
             <header class="cabecalho-principal">
-                <h2>Solicitar Novo Exame</h2> <?php include 'info_cabecalho.php'; // Inclui saudação, data e hora ?>
+                <h2>Solicitar Novo Exame</h2>
+                <?php include __DIR__ . '/info_cabecalho.php'; // Inclui saudação, data e hora ?>
             </header>
 
             <div class="form-container">
-                <form action="controller/MarcarExamePacienteController.php" method="POST">
+                <form action="../controller/MarcarExamePacienteController.php" method="POST">
                     <div class="row mb-3">
                         <div class="col-md-6">
                             <label for="nome" class="form-label">Nome do Paciente</label>

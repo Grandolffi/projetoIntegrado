@@ -1,37 +1,29 @@
 <?php
+// Para ver erros PHP, se houver
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Incluir os arquivos necessários
-include_once 'dao/ConnectionFactory.php';
-include_once 'dao/ExameDao.php';
+// --- Lógica para buscar os exames/laudos da API Node.js ---
+$exames_listados = [];
+$api_url_exames = "http://localhost:3000/api/exames"; // Endpoint da API Node.js para listar TODOS os resultados de exames
 
-$examesAgrupados = [];
-try {
-    $exameDao = new ExameDao();
-    $examesRegistrados = $exameDao->getAll(); // Busca todos os exames do banco de dados
+$response = @file_get_contents($api_url_exames); //para suprimir warnings em caso de falha de conexão
+$api_data = json_decode($response, true);
 
-    // Agrupar os exames por paciente e data do exame
-    foreach ($examesRegistrados as $exame) {
-        $key = $exame['paciente_registro'] . '_' . date('Y-m-d', strtotime($exame['data_hora_exame']));
-        if (!isset($examesAgrupados[$key])) {
-            $examesAgrupados[$key] = [
-                'paciente_registro' => $exame['paciente_registro'],
-                'data_exame' => date('d/m/Y', strtotime($exame['data_hora_exame'])),
-                'hora_exame' => date('H:i', strtotime($exame['data_hora_exame'])),
-                'exames_detalhes' => []
-            ];
-        }
-        $examesAgrupados[$key]['exames_detalhes'][] = [
-            'nome_exame' => $exame['nome_exame'],
-            'valor_absoluto' => $exame['valor_absoluto'],
-            'valor_referencia' => $exame['valor_referencia']
-        ];
-    }
-} catch (Exception $e) {
-    echo "<p>Erro ao carregar exames: " . $e->getMessage() . "</p>";
+if ($response === false) {
+    // Erro de conexão com a API
+    echo "<div class='alert alert-danger'>Erro ao conectar com a API Node.js para listar exames. Verifique se a API está rodando e acessível em {$api_url_exames}.</div>";
+} elseif (json_last_error() !== JSON_ERROR_NONE) {
+    // Erro ao decodificar JSON (resposta inválida da API)
+    echo "<div class='alert alert-danger'>Erro ao decodificar a resposta da API (JSON inválido). Resposta: " . htmlspecialchars($response) . "</div>";
+} elseif (isset($api_data['message']) && !isset($api_data[0])) {
+    // API retornou erro como um objeto com 'message' (não é um array de exames)
+    echo "<div class='alert alert-warning'>Erro da API ao listar exames: " . htmlspecialchars($api_data['message']) . "</div>";
+} else {
+    $exames_listados = $api_data; // A API deve retornar um array de objetos de exame
 }
+// --- Fim da lógica para buscar os exames ---
 
 ?>
 <!DOCTYPE html>
@@ -41,128 +33,80 @@ try {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lista de Exames</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="Style.css">
-    <style>
-        /* Estilos adicionais para melhor visualização */
-        .details-row {
-            display: none; /* Esconde os detalhes por padrão */
-        }
-        .details-row.show {
-            display: table-row; /* Mostra os detalhes quando a classe 'show' é adicionada */
-        }
-        .toggle-details {
-            cursor: pointer;
-            color: #0d6efd; /* Cor de link do Bootstrap */
-            text-decoration: none;
-        }
-        .toggle-details:hover {
-            text-decoration: underline;
-        }
-    </style>
+    <link rel="stylesheet" href="../public/css/Style.css">
 </head>
 <body class="corpo-dashboard">
     <div class="container-dashboard">
-        <?php include 'menuLateral.php'; // Inclui o menu lateral ?>
+        <?php include_once __DIR__ . '/menuLateral.php';?>
+
         <main class="conteudo-principal">
             <header class="cabecalho-principal">
-                <h2>Exame <span class="text-muted fw-light">&gt;</span> Lista de exames</h2>
-                <?php include 'info_cabecalho.php'; // Inclui a saudação, data e hora ?>
+                <h2>Exame > Lista de exames</h2>
+                <?php include_once __DIR__ . '/info_cabecalho.php'; ?>
             </header>
-            <div class="p-3">
-                <div class="d-flex justify-content-between align-items-center mb-3">
-                    <div class="input-group" style="max-width: 400px;">
-                        <input type="text" class="form-control" placeholder="Pesquisar...">
-                        <button class="btn btn-outline-secondary" type="button">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-search" viewBox="0 0 16 16">
-                                <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
-                            </svg>
-                        </button>
+
+            <div class="form-container">
+                <div class="d-flex justify-content-between mb-3">
+                    <div class="input-group" style="max-width: 300px;">
+                        <input type="text" class="form-control" placeholder="Pesquisar..." aria-label="Pesquisar">
+                        <button class="btn btn-outline-secondary" type="button">🔎</button>
                     </div>
-                    <a href="NewExamePaciente.php" class="btn btn-danger"> <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-plus-lg" viewBox="0 0 16 16" style="margin-bottom: 2px;">
-                           <path fill-rule="evenodd" d="M8 2a.5.5 0 0 1 .5.5v5h5a.5.5 0 0 1 0 1h-5v5a.5.5 0 0 1-1 0v-5h-5a.5.5 0 0 1 0-1h5v-5A.5.5 0 0 1 8 2Z"/>
-                        </svg>
-                        Solicitar novo exame
-                    </a>
+                    <a href="NewExamePaciente.php" class="btn btn-primary">+ Solicitar novo exame</a>
                 </div>
 
                 <div class="table-responsive">
-                    <table class="table table-striped table-hover">
-                        <thead>
+                    <table class="table table-hover table-striped">
+                        <thead class="table-light">
                             <tr>
-                                <th>Nº Registro Paciente</th>
-                                <th>Data do Exame</th>
-                                <th>Hora do Exame</th>
-                                <th>Ações</th>
+                                <th scope="col">ID Laudo</th> <th scope="col">Nº Registro Paciente</th>
+                                <th scope="col">Nome Exame</th> <th scope="col">Valor Absoluto</th>
+                                <th scope="col">col">Valor Referência</th>
+                                <th scope="col">Data e Hora (Realização)</th>
+                                <th scope="col">Ações</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <?php if (empty($examesAgrupados)): ?>
+                            <?php if (!empty($exames_listados)): ?>
+                                <?php foreach ($exames_listados as $exame):
+                                    // Certifique-se de que 'data_hora_exame' existe e é válido
+                                    $dataHoraExame = isset($exame['data_hora_exame']) ? new DateTime($exame['data_hora_exame']) : null;
+                                    $dataExameFormatada = $dataHoraExame ? $dataHoraExame->format('d/m/Y') : 'N/A';
+                                    $horaExameFormatada = $dataHoraExame ? $dataHoraExame->format('H:i') : 'N/A';
+                                ?>
                                 <tr>
-                                    <td colspan="4" class="text-center">Nenhum exame cadastrado ainda.</td>
+                                    <td><?php echo htmlspecialchars($exame['laudo_id'] ?? 'N/A'); ?></td>
+                                    <td><?php echo htmlspecialchars($exame['paciente_registro'] ?? 'N/A'); ?></td>
+                                    <td><?php echo htmlspecialchars($exame['nome_exame'] ?? 'N/A'); ?></td>
+                                    <td><?php echo htmlspecialchars($exame['valor_absoluto'] ?? 'N/A'); ?></td>
+                                    <td><?php echo htmlspecialchars($exame['valor_referencia'] ?? 'N/A'); ?></td>
+                                    <td><?php echo htmlspecialchars($dataExameFormatada . ' ' . $horaExameFormatada); ?></td>
+                                    <td>
+                                        <a href="editar_exame.php?id=<?php echo htmlspecialchars($exame['id_exame'] ?? ''); ?>" class="btn btn-warning btn-sm me-1">Editar</a>
+                                        <button type="button" class="btn btn-danger btn-sm" onclick="confirmarExclusao(<?php echo htmlspecialchars($exame['id_exame'] ?? ''); ?>)">Excluir</button>
+                                    </td>
                                 </tr>
-                            <?php else: ?>
-                                <?php foreach ($examesAgrupados as $key => $grupoExames): ?>
-                                    <tr id="main-row-<?php echo htmlspecialchars($key); ?>">
-                                        <td><?php echo htmlspecialchars($grupoExames['paciente_registro']); ?></td>
-                                        <td><?php echo htmlspecialchars($grupoExames['data_exame']); ?></td>
-                                        <td><?php echo htmlspecialchars($grupoExames['hora_exame']); ?></td>
-                                        <td>
-                                            <a href="#" class="toggle-details" data-target="details-<?php echo htmlspecialchars($key); ?>">
-                                                Ver Detalhes Completos
-                                            </a>
-                                        </td>
-                                    </tr>
-                                    <tr class="details-row" id="details-<?php echo htmlspecialchars($key); ?>">
-                                        <td colspan="4">
-                                            <table class="table table-bordered table-sm my-2">
-                                                <thead>
-                                                    <tr>
-                                                        <th>Exame</th>
-                                                        <th>Valor</th>
-                                                        <th>Valor de Referência</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    <?php foreach ($grupoExames['exames_detalhes'] as $detalhe): ?>
-                                                        <tr>
-                                                            <td><?php echo htmlspecialchars($detalhe['nome_exame']); ?></td>
-                                                            <td><?php echo htmlspecialchars($detalhe['valor_absoluto']); ?></td>
-                                                            <td><?php echo $detalhe['valor_referencia']; ?></td>
-                                                        </tr>
-                                                    <?php endforeach; ?>
-                                                </tbody>
-                                            </table>
-                                        </td>
-                                    </tr>
                                 <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td colspan="7">Nenhum exame encontrado.</td>
+                                </tr>
                             <?php endif; ?>
                         </tbody>
                     </table>
                 </div>
-
             </div>
         </main>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="../public/js/validacoes.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            document.querySelectorAll('.toggle-details').forEach(function(button) {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault(); // Evita que o link navegue para outra página
-                    var targetId = this.dataset.target;
-                    var targetRow = document.getElementById(targetId);
-                    if (targetRow) {
-                        targetRow.classList.toggle('show');
-                        // Opcional: Altera o texto do botão
-                        if (targetRow.classList.contains('show')) {
-                            this.textContent = 'Esconder Detalhes';
-                        } else {
-                            this.textContent = 'Ver Detalhes Completos';
-                        }
-                    }
-                });
-            });
-        });
+        // Função JavaScript para confirmar exclusão
+        function confirmarExclusao(idExame) {
+            if (confirm('Tem certeza que deseja excluir este resultado de exame? Esta ação é irreversível.')) {
+                // Se confirmar, redireciona para o controlador PHP que irá chamar a API Node.js para exclusão
+                window.location.href = '../controller/ExameController.php?action=delete&id=' + idExame;
+            }
+        }
     </script>
 </body>
 </html>
