@@ -1,107 +1,135 @@
 <?php
+
+//chamar rota para essa pasta
+
 class PessoaDao{
 
+    //funcao(create)
     public function inserir(Pessoa $pessoa){
-        try{
-            //criando uma string, desenhando o comando
-            $sql = "INSERT INTO pessoa(id, nome, cpf, dtnasc, email, nomeMae, numCelular, genero) VALUES(default, :nome, :cpf, :dtnasc, :email, :nomeMae, :numCelular, :genero);";
-            $con_sql = ConnectionFactory::getConnection()->prepare($sql);
-            $con_sql->bindValue(":nome", $pessoa->getnome()); 
-            $con_sql->bindValue(":cpf", $pessoa->getCpf());
-            $con_sql->bindValue(":dtnasc", $pessoa->getDtnasc());
-            $con_sql->bindValue(":email", $pessoa->getEmail());
-            $con_sql->bindValue(":nomeMae", $pessoa->getNomeMae());
-            $con_sql->bindValue(":numCelular", $pessoa->getnumCelular());
-            $con_sql->bindValue(":genero", $pessoa->getGenero());
-            
-         echo "<p> Pessoa cadastrado com sucesso";
-            return $con_sql->execute();   
-        }catch(PDOException $ex){
-            echo "<p> Erro ao inserir Pessoa no banco de dados $ex" ;
-            return null;
-        }
+        $url = "http://localhost:3000/"; // "BARRA" VIA POST INSERE
+        $dados = [
+            //"id" => $fab->getId(),
+            "nome" => $pessoa->getNome(),
+            "cpf" => $pessoa->getCpf(),
+            "dtnasc" => $pessoa->getDtnasc(),
+            "email" => $pessoa->getEmail(),
+            "nomeMae" => $pessoa->getNomeMae(),
+            "numCelular" => $pessoa->getnumCelular(),
+            "genero" => $pessoa->getGenero()
+        ];
+
+        $options = [
+            "http" => [
+                "header"  => "Content-Type: application/json\r\n",
+                "method"  => "POST",
+                "content" => json_encode($dados)
+            ]
+        ];
+
+        $context = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
+        return $result ? json_decode($result, true) : false;
     }
 
-    //Executa SELECT * FROM fabricante 
+    //(update)
+    public function editar(Pessoa $pessoa){
+        $url = "http://localhost:3000/editarpaciente/".$pessoa->getId();
+        $dados = [
+            "nome" => $pessoa->getNome(),
+            "cpf" => $pessoa->getCpf(),
+            "dtnasc" => $pessoa->getDtnasc(),
+            "email" => $pessoa->getEmail(),
+            "nomeMae" => $pessoa->getNomeMae(),
+            "numCelular" => $pessoa->getnumCelular(),
+            "genero" => $pessoa->getGenero()
+        ];
+
+        $options = [
+            "http" => [
+                "header"  => "Content-Type: application/json\r\n",
+                "method"  => "PUT",
+                "content" => json_encode($dados)
+                
+            ]
+        ];
+
+        $context = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
+        
+        if ($result === FALSE) {
+            return ["erro" => "Falha na requisição PATCH"];
+        }
+
+        return json_decode($result, true);
+    }
+
+    // Executa SELECT * FROM no banco(read)
     public function read(){
-        try{
-            $sql = "SELECT * FROM pessoa";
-            $con_sql = ConnectionFactory::getConnection()->query($sql);
-            $lista = $con_sql->fetchall(PDO::FETCH_ASSOC);
-            $pesList = array();
-            foreach($lista as $linha){
-                $pesList[] = $this->listaPessoas($linha);   
-            }
-            //echo "Temos ". count($pesList). " fabricantes cadastrados";
-            return $pesList;
-        }catch(PDOException $ex){
-            echo "<p> Ocorreu um erro ao selecionar pessoas </p> $ex";
-        }
+        $url = "http://localhost:3000/";
+        $result = file_get_contents($url);
+        $pesList = array();
+        $lista = json_decode($result, true);
+        foreach ($lista as $pes):
+            $pesList[] = $this->listaPessoas($pes);
+        endforeach;
+        return $pesList;
     }
 
-    public function listaPessoas($linha){
+
+     public function listaPessoas($row){
         $pessoa = new Pessoa();
-        $pessoa->setId($linha['id']);
-        $pessoa->setnome($linha['nome']);
-        $pessoa->setCpf($linha['cpf']);
-        $pessoa->setDtnasc($linha['dtnasc']);
-        $pessoa->setEmail($linha['email']);
-        $pessoa->setNomeMae($linha['nomeMae']);
-        $pessoa->setnumCelular($linha['numCelular']);
-        $pessoa->setGenero($linha['genero']);
+        $pessoa->setId(htmlspecialchars($row['id']));
+        $pessoa->setNome(htmlspecialchars($row['nome']));
+        $pessoa->setCpf(htmlspecialchars($row['cpf']));
+        $pessoa->setDtnasc(htmlspecialchars($row['dtnasc']));
+        $pessoa->setEmail(htmlspecialchars($row['email']));
+        $pessoa->setNomeMae(htmlspecialchars($row['nomemae']));
+        $pessoa->setnumCelular(htmlspecialchars($row['numcelular']));
+        $pessoa->setGenero(htmlspecialchars($row['genero']));
         return $pessoa;
-    }
-
-    public function editar(Pessoa $pes){
-        try{
-            $sql = "UPDATE pessoa SET 
-                nome = :nome, cpf = :cpf, dtnasc = :dtnasc, email = :email, nomeMae = :nomeMae, numCelular = :numCelular, genero = :genero WHERE id = :id";
-            $conn = ConnectionFactory::getConnection()->prepare($sql);
-            $conn->bindValue(":nome", $pes->getNome());
-            $conn->bindValue(":cpf", $pes->getCpf());
-            $conn->bindValue(":dtnasc", $pes->getdtnasc());
-            $conn->bindValue(":email", $pes->getEmail());
-            $conn->bindValue(":nomeMae", $pes->getNomeMae());
-            $conn->bindValue(":numCelular", $pes->getnumCelular());
-            $conn->bindValue(":genero", $pes->getGenero());
-            $conn->bindValue(":id", $pes->getId()); 
-            return $conn->execute(); // Executa o update
-        }catch(PDOException $ex){
-            echo "<p> Erro ao editar </p> <p> $ex </p>";
-        }
-    }
-
-
+    } 
 
     public function buscaPorId($id){
-        try{
-            $sql = "SELECT * FROM pessoa WHERE id = :id";
-            $conn = ConnectionFactory::getConnection()->prepare($sql);
-            $conn->bindValue(":id", $id);
-            $conn->execute();
-            $row = $conn->fetch(PDO::FETCH_ASSOC);
-            if($row){
-                return $this->listaPessoas($row);
+        $url = "http://localhost:3000/pacientes/" . urlencode($id);
+        try {
+            // @file_get_contents() para evitar warnings automáticos.
+            $response = @file_get_contents($url);
+            if ($response === FALSE) {
+                return null; // ID não encontrado ou erro na requisição
+            }
+            $data = json_decode($response, true);
+            if ($data) {
+                return $this->listaPessoas($data);
             }
             return null;
-        }catch(PDOException $e){
-            echo "<p>Erro ao buscar ID: {$id}</p> <p>{$e->getMessage()}</p>";
+        } catch (Exception $e) {
+            echo "<p>Erro ao buscar pessoa por ID: </p> <p>{$e->getMessage()}</p>";
+            return null;
         }
     }
 
+
     public function excluir($id){
-    try{
-        $sql = "DELETE FROM pessoa WHERE id = :id";
-        $conn = ConnectionFactory::getConnection()->prepare($sql);
-        $conn->bindValue(":id", $id);
-        return $conn->execute();
-    }catch(PDOException $ex){
-        echo "<p>Erro ao excluir: $ex</p>";
-        return false;
+        $url = "http://localhost:3000/paciente/" . urlencode($id);
+
+        $options = [
+            "http" => [
+                "header"  => "Content-Type: application/json\r\n",
+                "method"  => "DELETE"
+            ]
+        ];
+
+        $context = stream_context_create($options);
+        $result = file_get_contents($url, false, $context);
+        
+        if ($result === FALSE) {
+            return ["erro" => "Erro ao excluir"];
+        }
+
+        return json_decode($result, true);
     }
+
 }
 
 
-    
-}
 ?>

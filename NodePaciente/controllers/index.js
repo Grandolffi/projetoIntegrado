@@ -6,18 +6,20 @@ const Paciente = require('../model/DAO/pacienteDAO');
 app.use(bodyParser.json()); //convertendo requisição em json
 app.use(bodyParser.urlencoded({extended: true}));
 
-const{insertPaciente, getPacientes} = require("../model/DAO/pacienteDAO");
+const{insertPaciente, getPacientes, editPaciente, deletePaciente} = require("../model/DAO/pacienteDAO");
 
 
-app.get("/", async (req, res) => {
+//read
+app.get("/", async (req, res) => { //PessoaDao acessa via json, e lista os pacientes do banco
    //res.status(200).json(Paciente);
-   const alunos = await getPacientes();
-   console.log("Alunos: ", alunos);
-    //res.status(200).render("listaalunos", {alunosDoController: alunos});
+   const paciente = await getPacientes(); // função SELECT * FROM pacientes
+   console.log("paciente: ", paciente);
+   res.json(paciente);
+   
 })
 
 
-//inserindo via api
+//inserindo via api (create)
 app.post("/", async (req, res) =>{
     const {nome, cpf, dtnasc, email, nomeMae, numCelular, genero} = req.body;
     console.log(`nome: ${nome} cpf: ${cpf}, dtnasc: ${dtnasc}, nomeMae: ${nomeMae}, numCelular ${numCelular}, genero ${genero}`);
@@ -28,6 +30,47 @@ app.post("/", async (req, res) =>{
     return res.status(404).json({sucess: false});
 })
 
+//update
+app.put("/editarpaciente/:idpaciente", async (req, res) => { //PessoaDao acessa via json, e editamos paciente
+  const {nome, cpf, dtnasc, email, nomeMae, numCelular, genero} = req.body
+  const id = parseInt(req.params.idpaciente);
+  const pacientes = await getPacientes(); //chamando a função que exibe paciente
+  const paciente = pacientes.find(a => a.id === id); // busca real por id
+    if (!paciente) {
+        return res.status(404).send("paciente não encontrado");
+    }
+
+  const result = await editPaciente(id, nome, cpf, dtnasc, email, nomeMae, numCelular, genero);
+  console.log("abc: ", id, nome, cpf, dtnasc, email, nomeMae, numCelular, genero)
+    if(result){
+        res.status(200).send("paciente Editado");
+    }
+});
+
+
+//API PARA REMOVER paciente
+app.delete("/paciente/:id", async (req, res) => {
+    const id = parseInt(req.params.id);
+    const result = await deletePaciente(id);
+    if(result){
+        return res.status(200).json({sucess: true});
+    }
+
+    return res.status(404).json({sucess: false});
+})
+
+
+
+
+
+// Buscar fabricante por ID
+app.get('/pacientes/:id', async (req, res) => {
+  const id = parseInt(req.params.id);
+  const pacientes = await getPacientes();
+  const paciente = pacientes.find(p => p.id === id);
+  if (!paciente) return res.status(404).json({ message: 'paciente não encontrado' });
+  res.json(paciente);
+});
 
 
 

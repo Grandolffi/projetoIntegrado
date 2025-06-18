@@ -1,11 +1,13 @@
 <?php
 include __DIR__. '/../dao/ConnectionFactory.php';
 include __DIR__. '/../dao/PessoaDao.php';
+//include __DIR__. '/../dao/PessoaDaoSql.php';
 include __DIR__. '/../model/ClassePessoas.php';
 
 
     //$Pessoa = new Pessoa();
     $PessoaDao = new PessoaDao();
+    //$PessoaDaoSql = new PessoaDaoSql(); DESCOMENTAR
 
     if(isset($_POST['cadastrar'])){
         //var_dump($_POST);
@@ -17,7 +19,7 @@ include __DIR__. '/../model/ClassePessoas.php';
         $Pessoa->setNomeMae($_POST['nomemae']);
         $Pessoa->setnumCelular($_POST['fone']);
         $Pessoa->setGenero($_POST['genero']);
-        $PessoaDao->inserir($Pessoa);
+        $PessoaDao->inserir($Pessoa); //$PessoaDaoSql
         header("location: ../CadastroPaciente.php");
     }
 
@@ -26,7 +28,7 @@ include __DIR__. '/../model/ClassePessoas.php';
         $pessoa = $PessoaDao->buscaPorId($idPessoa);
         if(!isset($pessoa)){
             echo "<p>Pessoa de Id {$idPessoa} não encontrado. </p>";
-            header("Location: ../index.php?erro=nao_encontrado");
+            //header("Location: ../index.php?erro=nao_encontrado");
         }
         
     }
