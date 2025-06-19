@@ -1,7 +1,5 @@
 <?php
 
-//chamar rota para essa pasta
-
 class PessoaDao{
 
     //funcao(create)
@@ -63,19 +61,35 @@ class PessoaDao{
         return json_decode($result, true);
     }
 
-    // Executa SELECT * FROM no banco(read)
     public function read(){
-        $url = "http://localhost:3000/";
-        $result = file_get_contents($url);
-        $pesList = array();
-        $lista = json_decode($result, true);
-        foreach ($lista as $pes):
-            $pesList[] = $this->listaPessoas($pes);
-        endforeach;
-        return $pesList;
+    $url = "http://localhost:3000/";
+    $result = @file_get_contents($url); // Use @ para suprimir o aviso temporariamente
+
+    if ($result === FALSE) {
+        // Lidar com o erro - registre-o, exiba uma mensagem amigável ao usuário, etc.
+        error_log("Falha ao buscar dados de " . $url);
+        return array(); // Retorna um array vazio ou lida de forma apropriada
     }
 
+    $pesList = array();
+    $lista = json_decode($result, true);
 
+    if (json_last_error() !== JSON_ERROR_NONE) {
+        error_log("Erro ao decodificar JSON: " . json_last_error_msg());
+        return array();
+    }
+
+    if (!is_array($lista)) {
+        error_log("Esperava um array de " . $url . ", mas recebeu outra coisa.");
+        return array();
+    }
+
+    foreach ($lista as $pes):
+        $pesList[] = $this->listaPessoas($pes);
+    endforeach;
+    return $pesList;
+}
+    
      public function listaPessoas($row){
         $pessoa = new Pessoa();
         $pessoa->setId(htmlspecialchars($row['id']));
@@ -89,6 +103,7 @@ class PessoaDao{
         return $pessoa;
     } 
 
+    
     public function buscaPorId($id){
         $url = "http://localhost:3000/pacientes/" . urlencode($id);
         try {

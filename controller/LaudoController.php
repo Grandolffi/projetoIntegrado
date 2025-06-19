@@ -3,8 +3,8 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 // Inclua os modelos necessários (não mais DAOs diretos ao banco)
-// include_once __DIR__ . '/../model/ResultadoExames.php'; // Pode ser necessário para tipagem ou objetos
-// include_once __DIR__ . '/../model/Laudo.php'; // Pode ser necessário para tipagem ou objetos
+include_once __DIR__ . '/../model/ResultadoExames.php'; // Pode ser necessário para tipagem ou objetos
+include_once __DIR__ . '/../model/Laudo.php'; // Pode ser necessário para tipagem ou objetos
 
 // NOTA: Os DAOs PHP não se conectarão mais ao BD diretamente.
 // Eles serão substituídos por chamadas HTTP para a API Node.js.

@@ -21,12 +21,11 @@ require_once __DIR__ . '/../model/ClassePessoas.php';
 <body class="corpo-dashboard">
     <?php
 
-    if(isset($_GET['editar'])){
-         $id = $_GET['editar'];
-         $dao = new PessoaDao();
-         $pessoa = $dao->buscaPorId($id);
-
-    }
+   if(isset($_GET['editar'])){
+    $id = $_GET['editar']; // Isso agora pegará o ID real do paciente
+    $dao = new PessoaDao();
+    $pessoa = $dao->buscaPorId($id); // Chama o novo método do DAO
+}
 
     ?>
     <div class="container-dashboard"> 
