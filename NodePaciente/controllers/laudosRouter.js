@@ -1,14 +1,8 @@
+// laudosRouter.js
 const express = require("express");
-const bodyParser = require("body-parser");
-const app = express(); 
+const router = express.Router();
 
 const { insertLaudo, getTodosLaudos, getLaudoById, updateLaudo, deleteLaudo } = require("../model/DAO/laudoDAO");
-const { insertResultadoExame } = require("../model/DAO/exameDAO");
-const { updateSolicitacaoStatus } = require("../model/DAO/solicitacaoDAO");
-
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 // ROTAS PARA LAUDOS
 // POST /laudos - Criar um novo laudo e inserir seus resultados de exames
@@ -105,3 +99,5 @@ app.delete("/laudos/:id", async (req, res) => {
 app.listen(3000, 'localhost', () => {
     console.log("Servidor rodando na porta 3000 (Laudos)"); // Adaptado para diferenciar o log
 });
+
+module.exports = router; // EXPORTA O OBJETO ROUTER

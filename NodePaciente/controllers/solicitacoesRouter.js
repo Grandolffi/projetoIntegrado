@@ -1,12 +1,7 @@
+// solicitacoesRouter.js
 const express = require("express");
-const bodyParser = require("body-parser");
-const app = express();
-
+const router = express.Router();
 const { insertSolicitacao, getSolicitacoes, getSolicitacaoById, updateSolicitacaoStatus, deleteSolicitacao } = require("../model/DAO/solicitacaoDAO");
-
-
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
 
 // ROTAS PARA SOLICITAÇÕES
 // POST /solicitacoes - Criar nova solicitação e seus itens
@@ -74,3 +69,5 @@ app.delete("/solicitacoes/:id", async (req, res) => {
 app.listen(3000, 'localhost', () => {
     console.log("Servidor rodando na porta 3000 (Solicitações)"); // Adaptado para diferenciar o log
 });
+
+module.exports = router; // EXPORTA O OBJETO ROUTER

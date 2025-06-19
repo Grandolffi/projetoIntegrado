@@ -33,8 +33,8 @@ require_once __DIR__ . '/../model/ClassePessoas.php';
         
         <main class="conteudo-principal">
             <header class="cabecalho-principal"> 
-                <h1>Cadastro de Paciente</h1> 
-                <?php include 'info_cabecalho.php'; // Inclui a saudação, data e hora ?>
+            <h1>Cadastro de Paciente</h1> 
+            <?php include_once __DIR__ . '/info_cabecalho.php';?>
             </header>
 
             <div class="form-container">

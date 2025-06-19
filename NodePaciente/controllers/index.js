@@ -25,9 +25,9 @@ app.post("/", async (req, res) =>{
     console.log(`nome: ${nome} cpf: ${cpf}, dtnasc: ${dtnasc}, nomeMae: ${nomeMae}, numCelular ${numCelular}, genero ${genero}`);
     const result = await insertPaciente(nome, cpf, dtnasc, email, nomeMae, numCelular, genero);
     if(result){
-        return res.status(202).json({sucess: true});
+        return res.status(202).json({success: true});
     }
-    return res.status(404).json({sucess: false});
+    return res.status(404).json({success: false});
 })
 
 //update
@@ -53,15 +53,11 @@ app.delete("/paciente/:id", async (req, res) => {
     const id = parseInt(req.params.id);
     const result = await deletePaciente(id);
     if(result){
-        return res.status(200).json({sucess: true});
+        return res.status(200).json({success: true});
     }
 
-    return res.status(404).json({sucess: false});
+    return res.status(404).json({success: false});
 })
-
-
-
-
 
 // Buscar fabricante por ID
 app.get('/pacientes/:id', async (req, res) => {
@@ -74,6 +70,15 @@ app.get('/pacientes/:id', async (req, res) => {
 
 
 
+//  ROTAS DE EXAMES
+const examesRouter = require('./examesRouter.js'); 
+const solicitacoesRouter = require('./solicitacoesRouter.js'); 
+const solicitacoesRouter = require('./laudosRouter.js'); 
+
+// Registra as rotas de exames. Se examesRouter.js já usa '/exames' nos seus paths, use apenas `app.use()`.
+app.use(examesRouter);
+app.use(solicitacoesRouter);
+app.use(laudosRouter);
 
 app.listen(3000, 'localhost', () => {
     console.log("Servidor rodando na porta 3000");

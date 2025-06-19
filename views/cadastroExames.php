@@ -4,6 +4,10 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
+require_once __DIR__ . '/../controller/ExameController.php';
+require_once __DIR__ . '/../dao/ExameDao.php';
+require_once __DIR__ . '/../model/ResultadoExames.php';   
+
 $exames_solicitados_para_preencher = [];
 $paciente_registro = null;
 $data_laudo_prevista = null;
