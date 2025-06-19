@@ -39,7 +39,7 @@ require_once __DIR__ . '/../model/ClassePessoas.php';
 
             <div class="form-container">
                 <h2 class="text-center mb-4">Dados do Paciente</h2> 
-                <form action="controller/PessoaController.php" method="POST">
+                <form action="/projetoIntegrado/controller/PessoaController.php" method="POST">
                     <input type="hidden" name="id" value="<?= isset($pessoa) && $pessoa->getId() ? $pessoa->getId(): '' ?>">
                     <div class="mb-3">
                         <label for="nome" class="form-label">Nome completo</label>
