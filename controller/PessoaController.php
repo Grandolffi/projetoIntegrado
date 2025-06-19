@@ -44,7 +44,7 @@ include __DIR__. '/../model/ClassePessoas.php';
         $pessoa->setnumCelular($_POST['fone']);
         $pessoa->setGenero($_POST['genero']);
         $PessoaDao->editar($pessoa); //falta fazer isso aqui pra editar funcionar
-        header("Location: ../ListarPaciente.php");
+        header("Location: ../views/ListarPaciente.php");
     }
 
      if (isset($_GET['excluir'])) {
@@ -70,8 +70,9 @@ include __DIR__. '/../model/ClassePessoas.php';
                     <td>{$pessoa->getGenero()}</td>
                     <td> 
                         <a href='CadastroPaciente.php?editar={$pessoa->getId()}'>Editar</a>
-                        <a href='controller/PessoaController.php?excluir={$pessoa->getId()}' onclick=\"return confirm('Tem certeza que deseja excluir esta pessoa?')\">Excluir</a>
+                        <a href='/projetoIntegrado/controller/PessoaController.php?excluir={$pessoa->getId()}' onclick=\"return confirm('Tem certeza que deseja excluir esta pessoa?')\">Excluir</a>
                         
+
                     </td>
             </tr>";
         }   
