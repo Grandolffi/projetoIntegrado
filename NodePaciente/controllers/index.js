@@ -73,7 +73,7 @@ app.get('/pacientes/:id', async (req, res) => {
 //  ROTAS DE EXAMES
 const examesRouter = require('./examesRouter.js'); 
 const solicitacoesRouter = require('./solicitacoesRouter.js'); 
-const solicitacoesRouter = require('./laudosRouter.js'); 
+const laudosRouter = require('./laudosRouter.js'); 
 
 // Registra as rotas de exames. Se examesRouter.js já usa '/exames' nos seus paths, use apenas `app.use()`.
 app.use(examesRouter);

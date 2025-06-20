@@ -20,7 +20,7 @@ include __DIR__. '/../model/ClassePessoas.php';
         $Pessoa->setnumCelular($_POST['fone']);
         $Pessoa->setGenero($_POST['genero']);
         $PessoaDao->inserir($Pessoa); //$PessoaDaoSql
-        header("location: ../views/CadastroPaciente.php");
+        //header("location: ../views/CadastroPaciente.php");
     }
 
     if(isset($_GET['editar'])){

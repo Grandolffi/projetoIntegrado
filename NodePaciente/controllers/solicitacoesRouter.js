@@ -1,6 +1,7 @@
 // solicitacoesRouter.js
 const express = require("express");
 const router = express.Router();
+const app = express();
 const { insertSolicitacao, getSolicitacoes, getSolicitacaoById, updateSolicitacaoStatus, deleteSolicitacao } = require("../model/DAO/solicitacaoDAO");
 
 // ROTAS PARA SOLICITAÇÕES

@@ -1,6 +1,9 @@
 // laudosRouter.js
 const express = require("express");
 const router = express.Router();
+const app = express();
+
+ 
 
 const { insertLaudo, getTodosLaudos, getLaudoById, updateLaudo, deleteLaudo } = require("../model/DAO/laudoDAO");
 
