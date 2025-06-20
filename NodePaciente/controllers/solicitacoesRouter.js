@@ -1,33 +1,32 @@
 // solicitacoesRouter.js
 const express = require("express");
 const router = express.Router();
-const app = express();
+// const app = express();
 const { insertSolicitacao, getSolicitacoes, getSolicitacaoById, updateSolicitacaoStatus, deleteSolicitacao } = require("../model/DAO/solicitacaoDAO");
 
 // ROTAS PARA SOLICITAÇÕES
-// POST /solicitacoes - Criar nova solicitação e seus itens
-app.post("/solicitacoes", async (req, res) => {
-    const { pacienteId, dataSolicitacao, dataPrevistaRealizacao, solicitanteNome, status, observacoes, exames } = req.body;
 
-    if (!pacienteId || !dataPrevistaRealizacao || !exames || exames.length === 0) {
-        return res.status(400).json({ success: false, message: 'Dados mínimos (ID do Paciente, Data Prevista, e ao menos um Exame) são obrigatórios para a solicitação.' });
+//inserindo via api (create)
+router.post("/", async (req, res) =>{
+    const {pacienteId, dataSolicitacao, dataPrevistaRealizacao, solicitanteNome, status, observacoes, exames} = req.body;
+    console.log(`ID do paciente: ${pacienteId} Data da solicitação: ${dataSolicitacao}, Data prevista realização: ${dataPrevistaRealizacao}, Nome do solicitante: ${solicitanteNome}, Status: ${status}, Observações: ${observacoes}, Exames: ${exames}`);
+    const result = await insertPaciente(pacienteId, dataSolicitacao, dataPrevistaRealizacao, solicitanteNome, status, observacoes, exames);
+    if(result){
+        return res.status(202).json({success: true});
     }
-    const result = await insertSolicitacao(pacienteId, dataSolicitacao, dataPrevistaRealizacao, solicitanteNome, status, observacoes, exames);
-    if (result && result.success) {
-        return res.status(201).json({ success: true, message: "Solicitação criada com sucesso.", idSolicitacao: result.idSolicitacao });
-    }
-    return res.status(500).json({ success: false, message: "Falha ao criar solicitação no banco de dados." });
+    return res.status(404).json({success: false});
 });
 
-// GET /solicitacoes - Listar solicitações (com filtro opcional por status)
-app.get("/solicitacoes", async (req, res) => {
-    const statusFilter = req.query.status;
-    const solicitacoes = await getSolicitacoes(statusFilter);
-    res.status(200).json(solicitacoes);
+//read
+router.get("/solicitacoes", async (req, res) => { 
+   const solicitacao = await getSolicitacoes(); // função SELECT * FROM solicitacoes
+   console.log("Solicitação: ", solicitacao);
+   res.json(solicitacao);
+   
 });
 
-// GET /solicitacoes/:id - Buscar uma solicitação específica com seus itens
-app.get("/solicitacoes/:id", async (req, res) => {
+// GET Buscar uma solicitação específica
+router.get("/solicitacoes/:id", async (req, res) => {
     const id = parseInt(req.params.id);
     if (isNaN(id)) {
         return res.status(400).json({ success: false, message: 'ID de solicitação inválido.' });
@@ -39,22 +38,36 @@ app.get("/solicitacoes/:id", async (req, res) => {
     res.status(200).json(solicitacao);
 });
 
-// PUT /solicitacoes/:id/status - Atualizar apenas o status de uma solicitação
-app.put("/solicitacoes/:id/status", async (req, res) => {
+//update
+router.put("/editarsolicitacao/:idsolicitacao", async (req, res) => {
+  const {pacienteId, dataSolicitacao, dataPrevistaRealizacao, solicitanteNome, status, observacoes, exames} = req.body
+  const id = parseInt(req.params.idsolicitacao);
+  const solicitacoes = await getSolicitacoes(); //chamando a função que exibe paciente
+  const  solicitacao = solicitacoes.find(a => a.id === id); // busca real por id
+    if (!solicitacao){
+        return res.status(404).send("Laudo não encontrado");
+    }
+
+  const result = await editSolicitacoes(pacienteId, dataSolicitacao, dataPrevistaRealizacao, solicitanteNome, status, observacoes, exames);
+  console.log("abc: ", pacienteId, dataSolicitacao, dataPrevistaRealizacao, solicitanteNome, status, observacoes, exames)
+    if(result){
+        res.status(200).send("Laudo editado");
+    }
+});
+
+//API PARA REMOVER solicitações
+router.delete("/solicitacao/:id", async (req, res) => {
     const id = parseInt(req.params.id);
-    const { newStatus } = req.body;
-    if (isNaN(id) || !newStatus) {
-        return res.status(400).json({ success: false, message: 'ID de solicitação e novo status são obrigatórios.' });
+    const result = await deleteSolicitacao(id);
+    if(result){
+        return res.status(200).json({success: true});
     }
-    const result = await updateSolicitacaoStatus(id, newStatus);
-    if (result) {
-        return res.status(200).json({ success: true, message: "Status da solicitação atualizado com sucesso.", solicitacao: result });
-    }
-    return res.status(404).json({ success: false, message: "Solicitação não encontrada ou status não alterado." });
+
+    return res.status(404).json({success: false});
 });
 
 // DELETE /solicitacoes/:id - Excluir uma solicitação
-app.delete("/solicitacoes/:id", async (req, res) => {
+router.delete("/solicitacoes/:id", async (req, res) => {
     const id = parseInt(req.params.id);
     if (isNaN(id)) {
         return res.status(400).json({ success: false, message: 'ID de solicitação inválido.' });
@@ -67,8 +80,8 @@ app.delete("/solicitacoes/:id", async (req, res) => {
 });
 
 
-app.listen(3000, 'localhost', () => {
-    console.log("Servidor rodando na porta 3000 (Solicitações)"); // Adaptado para diferenciar o log
-});
+// app.listen(3000, 'localhost', () => {
+//     console.log("Servidor rodando na porta 3000 (Solicitações)"); // Adaptado para diferenciar o log
+// });
 
 module.exports = router; // EXPORTA O OBJETO ROUTER
