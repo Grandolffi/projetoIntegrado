@@ -20,7 +20,7 @@ include __DIR__. '/../model/ClassePessoas.php';
         $Pessoa->setnumCelular($_POST['fone']);
         $Pessoa->setGenero($_POST['genero']);
         $PessoaDao->inserir($Pessoa); //$PessoaDaoSql
-        //header("location: ../views/CadastroPaciente.php");
+        header("location: ../views/CadastroPaciente.php");
     }
 
     if(isset($_GET['editar'])){
@@ -50,7 +50,7 @@ include __DIR__. '/../model/ClassePessoas.php';
      if (isset($_GET['excluir'])) {
     $id = $_GET['excluir'];
     $PessoaDao->excluir($id);
-    header("Location: ../ListarPaciente.php");
+    header("Location: ../views/ListarPaciente.php");
     }
 
 
@@ -70,7 +70,7 @@ include __DIR__. '/../model/ClassePessoas.php';
                     <td>{$pessoa->getGenero()}</td>
                     <td> 
                         <a href='CadastroPaciente.php?editar={$pessoa->getId()}'>Editar</a>
-                        <a href='/projetoIntegrado/controller/PessoaController.php?excluir={$pessoa->getId()}' onclick=\"return confirm('Tem certeza que deseja excluir esta pessoa?')\">Excluir</a>
+                        <a href='../controller/PessoaController.php?excluir={$pessoa->getId()}' onclick=\"return confirm('Tem certeza que deseja excluir esta pessoa?')\">Excluir</a>
                         
 
                     </td>
