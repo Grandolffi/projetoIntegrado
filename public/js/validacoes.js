@@ -23,3 +23,21 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 });
+
+// Função JavaScript para confirmar exclusão de Laudo
+function confirmarExclusaoLaudo(idLaudo) {
+    if (confirm('Tem certeza que deseja excluir este laudo e todos os exames associados? Esta ação é irreversível.')) {
+        // Se confirmar, redireciona para o controlador PHP que irá lidar com a exclusão
+        // O caminho aqui deve apontar para o seu LaudoController.php
+        window.location.href = '../controller/LaudoController.php?excluir=' + idLaudo;
+    }
+}
+
+// Função JavaScript para confirmar exclusão
+function confirmarExclusao(idExame) {
+    if (confirm('Tem certeza que deseja excluir este resultado de exame? Esta ação é irreversível.')) {
+    // Se confirmar, redireciona para o controlador PHP que agora lida com a exclusão via DAO PHP
+         window.location.href = '../controller/ExameController.php?excluir=' + idExame; // Ajustado para 'excluir'
+     }
+}
+        

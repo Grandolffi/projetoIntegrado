@@ -1,14 +1,13 @@
 <?php
-// Ajuste os caminhos conforme a estrutura do seu projeto
-ini_set('display_errors', 1);
-ini_set('display_startup_errors', 1);
-error_reporting(E_ALL);
 
-// Não precisamos mais dos DAOs PHP que acessam o BD diretamente aqui.
-// A comunicação será via API Node.js.
-// include_once '../dao/ConnectionFactory.php';
-// include_once '../dao/ExameDao.php';
-// include_once '../model/ResultadoExames.php';
+// Incluir as dependências do DAO PHP e da Model
+require_once __DIR__ . '/../dao/ConnectionFactory.php'; // Para a conexão com o banco de dados
+require_once __DIR__ . '/../dao/ExameDao.php';        // O DAO PHP que irá interagir com o banco
+require_once __DIR__ . '/../model/ResultadoExames.php'; // O Modelo do Exame
+require_once __DIR__ . '/../model/Laudo.php'; // Pode ser necessário se a lógica de laudo for aqui
+
+// Instanciar o DAO do Exame
+$exameDao = new ExameDao();
 
 // Array com as definições dos exames (ainda útil para referências e tipagem)
 $definicoesExames = [
@@ -30,110 +29,112 @@ $definicoesExames = [
     'ldh' => ['LDH', '']
 ];
 
-
-// Função genérica para fazer requisições à API Node.js
-function callApi($method, $endpoint, $data = null) {
-    $url = "http://localhost:3000/api" . $endpoint; // Base da sua API Node.js
-    $ch = curl_init($url);
-
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-    curl_setopt($ch, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-
-    if ($method === 'POST' || $method === 'PUT') {
-        curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
+// Lógica para CADASTRO de Exame (formulário para cadastrar exames individuais)
+if (isset($_POST['cadastrar_exame'])) {
+    $exame = new ResultadoExames();
+    // precisa garantir que todos esses campos estão sendo enviados pelo formulário
+    $exame->setLaudoId($_POST['laudo_id'] ?? null); // Se um exame pode ser cadastrado sem um laudo ainda
+    $exame->setNomeExame($_POST['nome_exame'] ?? null);
+    $tipoExameKey = $_POST['tipo_exame'] ?? null;
+    $exame->setTipoExame($tipoExameKey); // Salvar a chave do tipo, ou o nome completo
+    $exame->setValorAbsoluto($_POST['valor_absoluto'] ?? null);
+    
+    $definicaoReferencia = $definicoesExames[$tipoExameKey][1] ?? null;
+    $exame->setValorReferencia($definicaoReferencia);
+    
+    $exame->setPacienteRegistro($_POST['paciente_registro'] ?? null);
+    $dataHoraExame = $_POST['data_hora_exame'] ?? date('Y-m-d H:i:s'); // Usar data atual se não fornecida
+    if ($dataHoraExame && strpos($dataHoraExame, 'T') !== false) {
+         $dataHoraExame = str_replace('T', ' ', $dataHoraExame) . ':00'; // Formatar de datetime-local
     }
-    curl_setopt($ch, CURLOPT_CUSTOMREQUEST, $method);
-
-    $response = curl_exec($ch);
-    $httpCode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-    $curlError = curl_error($ch);
-    curl_close($ch);
-
-    if ($response === false) {
-        throw new Exception("Erro de conexão com a API: " . $curlError);
-    }
-
-    $apiResponse = json_decode($response, true);
-
-    if ($httpCode >= 200 && $httpCode < 300) {
-        return ['success' => true, 'data' => $apiResponse];
-    } else {
-        $errorMessage = $apiResponse['message'] ?? 'Erro desconhecido da API.';
-        throw new Exception("Erro da API (código {$httpCode}): " . $errorMessage);
-    }
-}
-
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Ação de UPDATE de Exame
-    if (isset($_POST['action']) && $_POST['action'] === 'update') {
-        $id_exame = $_POST['id_exame'] ?? null;
-        $laudo_id = $_POST['laudo_id'] ?? null; // Passar o laudo_id que veio
-        $nome_exame = $_POST['nome_exame'] ?? null;
-        $tipo_exame_key = $_POST['tipo_exame'] ?? null;
-        $valor_absoluto = $_POST['valor_absoluto'] ?? null;
-        $valor_referencia = $_POST['valor_referencia'] ?? null;
-        $paciente_registro = $_POST['paciente_registro'] ?? null;
-        $data_hora_exame = $_POST['data_hora_exame'] ?? null; // datetime-local format 'YYYY-MM-DDTHH:MM'
-
-        if ($data_hora_exame) {
-             // Formatar para 'YYYY-MM-DD HH:MM:SS' para o banco de dados
-             $data_hora_exame = str_replace('T', ' ', $data_hora_exame) . ':00';
-        }
-
-        // Tentar obter valor_referencia da definição, se tipo_exame_key existe
-        $definicao_referencia = $definicoesExames[$tipo_exame_key][1] ?? $valor_referencia;
-        
-        $exameData = [
-            'laudo_id' => $laudo_id,
-            'nome_exame' => $nome_exame,
-            'tipo_exame' => $tipo_exame_key, // Salvar a chave do tipo, ou o nome completo
-            'valor_absoluto' => $valor_absoluto,
-            'valor_referencia' => $definicao_referencia, // Usar a ref da definição ou a passada
-            'paciente_registro' => $paciente_registro,
-            'data_hora_exame' => $data_hora_exame
-        ];
-
-        try {
-            callApi('PUT', "/exames/{$id_exame}", $exameData);
-            header("Location: ../views/lista_de_exames.php?status=success&message=" . urlencode("Resultado de exame atualizado com sucesso!"));
-            exit();
-        } catch (Exception $e) {
-            header("Location: ../views/editar_exame.php?id={$id_exame}&status=error&message=" . urlencode($e->getMessage()));
-            exit();
-        }
-    }
-    // Lógica antiga de inserção de exames (do cadastroExames.php original)
-    // Se você estiver usando o LaudoController para salvar os resultados,
-    // esta seção pode ser removida ou adaptada para outra finalidade.
-    // O LaudoController já lida com a inserção de múltiplos resultados de exames.
-    else {
-        // Redireciona de volta se for um POST sem ação definida (ex: do antigo cadastroExames.php)
-        // Isso é mais um fallback, o fluxo ideal é via LaudoController ou a nova solicitação.
-        header("Location: ../views/dashboard.php?status=error&message=" . urlencode("Ação não reconhecida ou dados inválidos."));
-        exit();
-    }
-
-} elseif ($_SERVER['REQUEST_METHOD'] === 'GET' && isset($_GET['action']) && $_GET['action'] === 'delete') {
-    // Ação de DELETE de Exame
-    $id_exame = $_GET['id'] ?? null;
-
-    if (!$id_exame) {
-        header("Location: ../views/lista_de_exames.php?status=error&message=" . urlencode("ID do exame não fornecido para exclusão."));
-        exit();
-    }
+    $exame->setDataHoraExame($dataHoraExame);
 
     try {
-        callApi('DELETE', "/exames/{$id_exame}");
-        header("Location: ../views/lista_de_exames.php?status=success&message=" . urlencode("Resultado de exame excluído com sucesso!"));
+        $exameDao->inserir($exame);
+        header("Location: ../views/lista_de_exames.php?status=success&message=" . urlencode("Exame cadastrado com sucesso!"));
         exit();
     } catch (Exception $e) {
-        header("Location: ../views/lista_de_exames.php?status=error&message=" . urlencode($e->getMessage()));
+        header("Location: ../views/cadastro_exame.php?status=error&message=" . urlencode($e->getMessage()));
         exit();
     }
-} else {
-    // Redireciona se não for POST ou GET com ação específica
-    header("Location: ../views/dashboard.php");
-    exit();
 }
-?>
+
+
+// Lógica para EDITAR e SALVAR EDIÇÃO de Exame (via GET para editar, POST para salvar)
+if(isset($_GET['editar'])) {
+    $idExame = $_GET['editar'];
+    $exame = $exameDao->buscarPorId($idExame);
+    if (!isset($exame)) {
+        echo "<p>Exame de ID {$idExame} não encontrado.</p>";
+    }
+    // A variável $exame agora pode ser usada na view 'editar_exame.php' para preencher o formulário
+}
+
+if(isset($_POST['salvar_edicao'])) {
+    $exame = new ResultadoExames();
+    $exame->setId($_POST['id']); // ID é crucial para o método UPDATE do DAO
+    $exame->setLaudoId($_POST['laudo_id'] ?? null);
+    $exame->setNomeExame($_POST['nome_exame'] ?? null);
+    $tipoExameKey = $_POST['tipo_exame'] ?? null;
+    $exame->setTipoExame($tipoExameKey); 
+
+    // Tentar obter valor_referencia da definição, se tipo_exame_key existe
+    $definicaoReferencia = $definicoesExames[$tipoExameKey][1] ?? $_POST['valor_referencia'];
+    $exame->setValorReferencia($definicaoReferencia);
+
+    $exame->setValorAbsoluto($_POST['valor_absoluto'] ?? null);
+    $exame->setPacienteRegistro($_POST['paciente_registro'] ?? null);
+    $dataHoraExame = $_POST['data_hora_exame'] ?? null;
+    if ($dataHoraExame && strpos($dataHoraExame, 'T') !== false) {
+         $dataHoraExame = str_replace('T', ' ', $dataHoraExame) . ':00';
+    }
+    $exame->setDataHoraExame($dataHoraExame);
+
+    try {
+        $exameDao->editar($exame); // Chama o método editar no DAO
+        header("Location: ../views/lista_de_exames.php?status=success&message=" . urlencode("Resultado de exame atualizado com sucesso!"));
+        exit();
+    } catch (Exception $e) {
+        header("Location: ../views/editar_exame.php?id=" . $exame->getId() . "&status=error&message=" . urlencode($e->getMessage()));
+        exit();
+    }
+}
+
+
+// EXCLUIR Exame
+if (isset($_GET['excluir'])) {
+    $id = $_GET['excluir'];
+    $exameDao->excluir($id); // Chama o método excluir no DAO
+    header("Location: ../views/lista_de_exames.php"); // Redireciona para a lista de exames
+    exit(); // Garante que o script pare após o redirecionamento
+}
+
+
+// Função para listar exames na interface (geralmente chamada a partir de uma view)
+function listarExames(){
+    $exameDao = new ExameDao(); // Instancia o DAO dentro da função
+    $lista = $exameDao->read(); // Lê todos os exames do banco de dados
+
+    if (!empty($lista)) {
+        foreach($lista as $exame){
+            // Atenção: Certifique-se de que os métodos get correspondem às propriedades do seu objeto ResultadoExames
+            // E que os nomes das colunas HTML correspondem à sua tabela.
+            echo "<tr> 
+                    <td>{$exame->getId()}</td>
+                    <td>{$exame->getLaudoId()}</td>
+                    <td>{$exame->getNomeExame()}</td>
+                    <td>{$exame->getTipoExame()}</td>
+                    <td>{$exame->getValorAbsoluto()}</td>
+                    <td>{$exame->getValorReferencia()}</td>
+                    <td>{$exame->getPacienteRegistro()}</td>
+                    <td>{$exame->getDataHoraExame()}</td>
+                    <td> 
+                        <a href='editar_exame.php?editar={$exame->getId()}'>Editar</a>
+                        <a href='../controller/ExameController.php?excluir={$exame->getId()}' onclick=\"return confirm('Tem certeza que deseja excluir este exame?')\">Excluir</a>
+                    </td>
+                </tr>";
+        }
+    } else {
+        echo "<tr><td colspan='9'>Nenhum exame encontrado.</td></tr>";
+    }
+}
