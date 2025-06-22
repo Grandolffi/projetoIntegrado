@@ -40,9 +40,9 @@ router.get("/exames/:id", async (req, res) => {
 
 // crate
 router.post("/exames", async (req, res) => {
-    const { laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame, data_cadastro } = req.body;
+    const { laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame} = req.body;
     try {
-        const novoExame = await insertResultadoExame(laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame, data_cadastro);
+        const novoExame = await insertResultadoExame(laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame);
         if (novoExame) {
             res.status(201).json({ success: true, message: "Exame inserido com sucesso.", exame: novoExame });
         } else {
@@ -60,9 +60,9 @@ router.put("/exames/:id", async (req, res) => {
     if (isNaN(id_exame)) {
         return res.status(400).json({ success: false, message: 'ID de exame inválido.' });
     }
-    const { laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame } = req.body;
+    const { laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro} = req.body;
     try {
-        const result = await editResultadoExame(id_exame, laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame);
+        const result = await editResultadoExame(id_exame, laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro);
         if (result) {
             res.status(200).json({ success: true, message: "Exame atualizado com sucesso.", exame: result });
         } else {
@@ -94,3 +94,4 @@ router.delete("/exames/:id", async (req, res) => {
 });
 
 module.exports = router; // EXPORTA O OBJETO ROUTER
+

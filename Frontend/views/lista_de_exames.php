@@ -30,7 +30,7 @@ error_reporting(E_ALL);
                         <input type="text" class="form-control" placeholder="Pesquisar..." aria-label="Pesquisar">
                         <button class="btn btn-outline-secondary" type="button">🔎</button>
                     </div>
-                    <a href="NewExamePaciente.php" class="btn btn-primary">+ Solicitar novo exame</a>
+                    <a href="solicitacao_form.php" class="btn btn-primary">+ Solicitar novo exame</a>
                 </div>
 
                 <div class="table-responsive">

@@ -1,77 +1,91 @@
 // laudosRouter.js
 const express = require("express");
 const router = express.Router();
-// const app = express();
-
-const {insertLaudo, getTodosLaudos, getLaudoById, updateLaudo, deleteLaudo} = require("../model/DAO/laudoDAO");
 
 // ROTAS PARA LAUDOS
+const {insertLaudo, getTodosLaudos, getLaudoById, updateLaudo, deleteLaudo} = require("../model/DAO/laudoDAO");
 
-// inserindo via api (create)
-router.post("/laudos", async (req, res) =>{
-    const {solicitacaoId, pacienteId, responsavelTecnico, dataFinalizacao, observacoes, resultadosExames} = req.body;
-    console.log(`ID da solicitação: ${solicitacaoId} ID do paciente: ${pacienteId}, Responsável técnico: ${responsavelTecnico}, Data fim: ${dataFinalizacao}, Observações: ${observacoes}, Resultado exame: ${resultadosExames}`);
-    const result = await insertLaudo(solicitacaoId, pacienteId, responsavelTecnico, dataFinalizacao, observacoes, resultadosExames);
-    if(result){
-        return res.status(202).json({success: true});
+// POST /laudos
+//create 
+router.post("/laudos", async (req, res) => {
+     const {solicitacao_id, paciente_id, responsavel_tecnico, data_finalizacao, observacoes, resultadosExames} = req.body;
+
+    try {
+         const result = await insertLaudo(solicitacao_id, paciente_id, responsavel_tecnico, data_finalizacao, observacoes, resultadosExames);
+    } catch (error) {
+        console.error("Erro ao inserir laudo de exame:", error.message);
+        res.status(500).json({ success: false, message: `Erro interno ao inserir laudo de exame: ${error.message}` });
     }
-    return res.status(404).json({success: false});
 });
 
-// read
-router.get("/", async (req, res) => { //PessoaDao acessa via json, e lista os pacientes do banco
-   //res.status(200).json(Paciente);
-   const laudo = await getLaudos(); // função SELECT * FROM pacientes
-   console.log("Laudo: ", laudo);
-   res.json(laudo);
-   
+// READ (Listar todos os laudos) - Mude a rota para /laudos
+router.get("/laudos", async (req, res) => { // Alterado de "/" para "/laudos"
+   const laudos = await getTodosLaudos(); // Função renomeada no DAO
+   console.log("Laudos: ", laudos);
+   res.json(laudos);
 });
 
-// GET /laudos/:id - Buscar um laudo específico por ID
-router.get("/laudos/:id", async (req, res) => {
+// POST /laudos
+router.post("/laudos", async (req, res) => {
+    // Nomes das variáveis aqui devem ser os mesmos que o PHP envia.
+    // O PHP em LaudoController.php envia: solicitacao_id, paciente_id, responsavel_tecnico, data_finalizacao, observacoes, resultadosExames
+    const {solicitacao_id, paciente_id, responsavel_tecnico, data_finalizacao, observacoes, resultadosExames} = req.body; // Mude para snake_case como o PHP envia
+    console.log(`Dados Laudo POST: Solicitacao ID: ${solicitacao_id}, Paciente ID: ${paciente_id}, Responsável: ${responsavel_tecnico}`);
+
+    try {
+        const result = await insertLaudo(
+            solicitacao_id,       // Passando o solicitacao_id
+            paciente_id,          // Passando o paciente_id
+            responsavel_tecnico,
+            data_finalizacao,
+            observacoes,
+            resultadosExames      // Array de exames
+        );
+        if(result.success){ // Se o DAO retornar { success: true, idLaudo: ... }
+            return res.status(201).json(result); // 201 Created
+        }
+        return res.status(400).json({success: false, message: "Falha ao inserir laudo."});
+    } catch (error) {
+        console.error("Erro ao inserir laudo:", error);
+        res.status(500).json({success: false, message: "Erro interno do servidor ao inserir laudo."});
+    }
+});
+
+// ...
+// UPDATE - ajuste os parâmetros e a chamada da função
+router.put("/laudos/:id", async (req, res) => { // Rota mais RESTful: /laudos/:id
+  const {solicitacao_id, paciente_id, responsavel_tecnico, data_finalizacao, observacoes} = req.body; // Adapte nomes
+  const id = parseInt(req.params.id); // id do laudo
+
+  try {
+      const result = await updateLaudo(id, solicitacao_id, paciente_id, responsavel_tecnico, data_finalizacao, observacoes); // Chame updateLaudo
+      if(result){
+          res.status(200).json({ success: true, message: "Laudo editado com sucesso.", laudo: result });
+      } else {
+          res.status(404).json({ success: false, message: "Laudo não encontrado ou falha na edição." });
+      }
+  } catch (error) {
+      console.error(`Erro ao editar laudo com ID ${id}:`, error);
+      res.status(500).json({ success: false, message: `Erro interno ao editar laudo: ${error.message}` });
+  }
+});
+
+// ...
+// DELETE - rota mais RESTful
+router.delete("/laudos/:id", async (req, res) => { // Rota mais RESTful: /laudos/:id
     const id = parseInt(req.params.id);
-    if (isNaN(id)) {
-        return res.status(400).json({ success: false, message: 'ID de laudo inválido.' });
-    }
-    const laudo = await getLaudoById(id);
-    if (!laudo) {
-        return res.status(404).json({ success: false, message: 'Laudo não encontrado.' });
-    }
-    res.status(200).json(laudo);
-});
-
-// update
-router.put("/editarlaudo/:idlaudo", async (req, res) => { 
-  const {solicitacaoId, pacienteId, responsavelTecnico, dataFinalizacao, observacoes, resultadosExames} = req.body
-  const id = parseInt(req.params.idlaudo);
-  const laudos = await getLaudos(); //chamando a função que exibe o laudo
-  const laudo = laudos.find(a => a.id === id); // busca real por id
-    if (!laudo) {
-        return res.status(404).send("Laudo não encontrado");
-    }
-
-  const result = await editPaciente(solicitacaoId, pacienteId, responsavelTecnico, dataFinalizacao, observacoes, resultadosExames);
-  console.log("abc: ", solicitacaoId, pacienteId, responsavelTecnico, dataFinalizacao, observacoes, resultadosExames)
-    if(result){
-        res.status(200).send("Laudo editado");
+    if (isNaN(id)) { /* ... */ }
+    try {
+        const result = await deleteLaudo(id);
+        if(result){
+            return res.status(200).json({success: true, message: "Laudo removido com sucesso."});
+        } else {
+            return res.status(404).json({success: false, message: "Laudo não encontrado para exclusão."});
+        }
+    } catch (error) {
+        console.error(`Erro ao deletar laudo com ID ${id}:`, error);
+        res.status(500).json({success: false, message: `Erro interno ao deletar laudo: ${error.message}`});
     }
 });
 
-
-//API PARA REMOVER laudo
-router.delete("/laudo/:id", async (req, res) => {
-    const id = parseInt(req.params.id);
-    const result = await deleteLaudo(id);
-    if(result){
-        return res.status(200).json({success: true});
-    }
-
-    return res.status(404).json({success: false});
-});
-
-
-// app.listen(3000, 'localhost', () => {
-//     console.log("Servidor rodando na porta 3000 (Laudos)"); // Adaptado para diferenciar o log
-// });
-
-module.exports = router; // EXPORTA O OBJETO ROUTER
+module.exports = router;

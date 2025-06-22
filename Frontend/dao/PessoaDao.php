@@ -4,7 +4,7 @@ class PessoaDao{
 
     //funcao(create)
     public function inserir(Pessoa $pessoa){
-        $url = "http://localhost:3000/"; // "BARRA" VIA POST INSERE
+        $url = "http://localhost:3000/pacientes"; // "BARRA" VIA POST INSERE
         $dados = [
             //"id" => $fab->getId(),
             "nome" => $pessoa->getNome(),
@@ -31,7 +31,7 @@ class PessoaDao{
 
     //(update)
     public function editar(Pessoa $pessoa){
-        $url = "http://localhost:3000/editarpaciente/".$pessoa->getId();
+        $url = "http://localhost:3000/pacientes/".$pessoa->getId();
         $dados = [
             "nome" => $pessoa->getNome(),
             "cpf" => $pessoa->getCpf(),
@@ -62,7 +62,7 @@ class PessoaDao{
     }
 
     public function read(){
-    $url = "http://localhost:3000/";
+    $url = "http://localhost:3000/pacientes";
     $result = @file_get_contents($url); // Use @ para suprimir o aviso temporariamente
 
     if ($result === FALSE) {
@@ -125,7 +125,7 @@ class PessoaDao{
 
 
     public function excluir($id){
-        $url = "http://localhost:3000/paciente/" . urlencode($id);
+        $url = "http://localhost:3000/pacientes/" . urlencode($id);
 
         $options = [
             "http" => [

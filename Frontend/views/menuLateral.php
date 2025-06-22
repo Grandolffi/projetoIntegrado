@@ -16,7 +16,7 @@ $linkListaPaciente = 'ListarPaciente.php';
 
 // Links da seção Exame
 $linkListaExames = "lista_de_exames.php";
-$linkSolicitarNovoExame = "NewExamePaciente.php";
+$linkSolicitarNovoExame = "solicitacao_form.php";
 // ALTERADO: O link "Cadastrar Resultado" agora aponta para a lista de solicitações pendentes
 $linkCadastrarResultadoExame = "lista_solicitacoes_pendentes.php"; // Novo nome da página
 

@@ -1,89 +1,108 @@
 const pool = require('./db');
 
-class Exame {
-  constructor(id_exame, laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame, data_cadastro) {
-    this.id_exame = id_exame;
-    this.laudo_id = laudo_id;
-    this.nome_exame = nome_exame;
-    this.tipo_exame = tipo_exame;
-    this.valor_absoluto = valor_absoluto;
-    this.valor_referencia = valor_referencia;
-    this.paciente_registro = paciente_registro;
-    this.data_hora_exame = data_hora_exame;
-    this.data_cadastro = data_cadastro;
+class Laudo {
+  constructor(id_laudo, solicitacao_id, paciente_id, responsavel_tecnico, observacoes, data_finalizacao) {
+    this.id_laudo = id_laudo;
+    this.solicitacao_id = solicitacao_id;
+    this.paciente_id = paciente_id;
+    this.responsavel_tecnico = responsavel_tecnico;
+    this.observacoes = observacoes;
+    this.data_finalizacao = data_finalizacao;
   }
 }
 
-// READ (listar todos os resultados de exames)
-async function getTodosResultadosExames() {
-    const { rows } = await pool.query("SELECT * FROM resultados_exames ORDER BY data_hora_exame DESC, id_exame DESC");
-    const exames = rows;
-    return exames;
+// CREATE
+async function insertLaudo(solicitacaoId, pacienteId, responsavelTecnico, dataFinalizacao, observacoes, resultadosExames) {
+    const client = await pool.connect();
+    try {
+        await client.query('BEGIN');
+
+        const laudoResult = await client.query(`
+            INSERT INTO laudos (solicitacao_id, paciente_id, responsavel_tecnico, observacoes, data_finalizacao)
+            VALUES ($1, $2, $3, $4, $5)
+            RETURNING id_laudo`,
+            [solicitacaoId, pacienteId, responsavelTecnico, observacoes, dataFinalizacao]
+        );
+        const novoLaudoId = laudoResult.rows[0].id_laudo;
+        const {insertResultadoExame} = require('./exameDAO'); // Importar o DAO de exames
+
+        if (resultadosExames && resultadosExames.length > 0) {
+            for (const exameData of resultadosExames) {
+                // Chame a função de inserção de exame
+                await insertResultadoExame(
+                    novoLaudoId, // laudo_id
+                    exameData.nomeExame,
+                    exameData.tipoExame,
+                    exameData.valorAbsoluto,
+                    exameData.valorReferencia,
+                    exameData.pacienteRegistro, // ou pacienteId, dependendo do que `paciente_registro` guarda
+                    exameData.dataHoraExame,
+                    pacienteId // paciente_id_fk OBRIGATÓRIO
+                );
+            }
+        }
+
+        await client.query('COMMIT');
+        console.log("Resultado do insert Laudo: ", { idLaudo: novoLaudoId });
+        return { success: true, idLaudo: novoLaudoId };
+    } catch (error) {
+        await client.query('ROLLBACK');
+        console.error("Erro ao inserir laudo e exames:", error);
+        throw error;
+    } finally {
+        client.release();
+    }
 }
 
-// READ(1) (busca por ID)
-async function getResultadoExameById(id) {
+// READ todos
+async function getTodosLaudos() { // Renomeado para evitar conflito com 'Exame'
+    const { rows } = await pool.query("SELECT * FROM laudos ORDER BY data_finalizacao DESC, id_laudo DESC");
+    return rows;
+}
+
+// READ por ID
+async function getLaudoById(id) {
     if (id) {
-        const { rows } = await pool.query("SELECT * FROM resultados_exames WHERE id_exame = $1", [id]);
-        return rows[0]; // retorna apenas o primeiro resultado, ou undefined
+        const { rows } = await pool.query("SELECT * FROM laudos WHERE id_laudo = $1", [id]);
+        return rows[0];
     }
-    console.error("Falha ao buscar Resultado de Exame, não foi passado o id.");
+    console.error("Falha ao buscar Laudo, não foi passado o id.");
     return false;
 }
 
 // UPDATE
-async function updateResultadoExame(id, laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame) {
-    if (id && laudo_id && nome_exame && tipo_exame && valor_absoluto && valor_referencia && paciente_registro && data_hora_exame) {
+async function updateLaudo(id, solicitacaoId, pacienteId, responsavelTecnico, dataFinalizacao, observacoes) {
+    if (id && solicitacaoId && pacienteId && responsavelTecnico && dataFinalizacao) {
         const result = await pool.query(`
-            UPDATE resultados_exames
-            SET laudo_id = $1, nome_exame = $2, tipo_exame = $3, valor_absoluto = $4, 
-                valor_referencia = $5, paciente_registro = $6, data_hora_exame = $7
-            WHERE id_exame = $8
+            UPDATE laudos
+            SET solicitacao_id = $1, paciente_id = $2, responsavel_tecnico = $3,
+                observacoes = $4, data_finalizacao = $5
+            WHERE id_laudo = $6
             RETURNING *`,
-            [laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame, id]
+            [solicitacaoId, pacienteId, responsavelTecnico, observacoes, dataFinalizacao, id]
         );
-        console.log("Resultado do edit Resultado de Exame: " + result.rows[0]);
-
-        if (result.rows.length === 0) return false; // Se não achou o id, retorna false
-        return result.rows[0]; // Retorna o registro atualizado
+        console.log("Resultado do update Laudo: ", result.rows[0]);
+        if (result.rows.length === 0) return false;
+        return result.rows[0];
     }
-    console.error("Falha ao editar Resultado de Exame, faltou algum dado.");
+    console.error("Falha ao editar Laudo, faltou algum dado.");
     return false;
 }
 
-// DELETE
-async function deleteResultadoExame(id) {
+// DELETE (excluir o laudo e os exames associados, se houver FK com CASCADE)
+async function deleteLaudo(id) {
     if (id) {
         const result = await pool.query(`
-            DELETE FROM resultados_exames
-            WHERE id_exame = $1
-            RETURNING id_exame`,
+            DELETE FROM laudos
+            WHERE id_laudo = $1
+            RETURNING id_laudo`,
             [id]
         );
         if (result.rows.length === 0) return false;
         return true;
     }
-    console.error("Falha ao remover o Resultado de Exame, não foi passado o id.");
+    console.error("Falha ao remover o Laudo, não foi passado o id.");
     return false;
 }
 
-// CREATE 
-async function insertResultadoExame(laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame) {
-    if (laudo_id && nome_exame && tipo_exame && valor_absoluto && valor_referencia && paciente_registro && data_hora_exame) {
-        const result = await pool.query(`
-            INSERT INTO resultados_exames (laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame)
-            VALUES ($1, $2, $3, $4, $5, $6, $7)
-            RETURNING *`,
-            [laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame]
-        );
-        console.log("Resultado do insert Resultado de Exame: ", result.rows[0]);
-        if (result.rows.length > 0) {
-            return result.rows[0];
-        }
-        return false;
-    }
-    console.error("Falha ao inserir Resultado de Exame, faltou algum dado.");
-    return false;
-}
-
-module.exports = {Exame, getTodosResultadosExames, getResultadoExameById, updateResultadoExame, deleteResultadoExame, insertResultadoExame};
+module.exports = {Laudo, insertLaudo, getTodosLaudos, getLaudoById, updateLaudo, deleteLaudo};

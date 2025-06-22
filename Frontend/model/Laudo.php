@@ -4,6 +4,7 @@ class Laudo {
     private $id;
     private $solicitacao_id;
     private $responsavel_tecnico;
+    private $paciente_id;
     private $data_finalizacao;
     private $observacoes;
 
@@ -18,6 +19,10 @@ class Laudo {
 
     public function getResponsavelTecnico() {
         return $this->responsavel_tecnico;
+    }
+
+    public function getPacienteId() { // NOVO GETTER
+        return $this->paciente_id;
     }
 
     public function getDataFinalizacao() {
@@ -41,6 +46,10 @@ class Laudo {
         $this->responsavel_tecnico = $responsavel_tecnico;
     }
 
+    public function setPacienteId($paciente_id) { // NOVO SETTER
+        $this->paciente_id = $paciente_id;
+    }
+    
     public function setDataFinalizacao($data_finalizacao) {
         $this->data_finalizacao = $data_finalizacao;
     }

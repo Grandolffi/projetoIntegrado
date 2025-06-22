@@ -14,10 +14,41 @@ class Exame {
   }
 }
 
+async function insertResultadoExame(laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame, paciente_id_fk){
+    if (nome_exame && tipo_exame && data_hora_exame && paciente_id_fk) {
+        const result = await pool.query(`
+            INSERT INTO resultados_exames(
+                laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia,
+                paciente_registro, data_hora_exame, paciente_id_fk
+            )
+            VALUES($1, $2, $3, $4, $5, $6, $7, $8)
+            RETURNING *`,
+            [
+                laudo_id,
+                nome_exame,
+                tipo_exame,
+                valor_absoluto,
+                valor_referencia,
+                paciente_registro, // Pode ser null se não for obrigatório
+                data_hora_exame,
+                paciente_id_fk     // OBRIGATÓRIO (NOT NULL)
+            ]
+        );
+        console.log("Resultado do insert: ", result.rows[0]);
+        if (result.rows.length > 0) {
+            return result.rows[0]; // Retorna o objeto inserido com id_exame e data_cadastro
+        }
+        return false;
+    }
+    console.error("Falha ao inserir resultado de exame, faltou um campo obrigatório (nome_exame, tipo_exame, paciente_id_fk, data_hora_exame).");
+    return false;
+}
+
 // READ  (listar todos os resultados de exames)
 async function getResultadoExame() {
     const {rows} = await pool.query("SELECT * FROM resultados_exames ORDER BY id_exame");
     const exames = rows; 
+    console.log(exames);
     return exames;
 }
 
@@ -31,70 +62,35 @@ async function getResultadoExameById(id_exame) { // RENOMEADO 'id' para 'id_exam
     return false;
 }
 
-// CREATE (adiciona um novo resultado de exame)
-// exameDAO.js
-async function insertResultadoExame(
-    laudo_id,             // Opcional no BD, então pode ser null
-    nome_exame,
-    tipo_exame,
-    valor_absoluto,       // Opcional no BD
-    valor_referencia,     // Opcional no BD
-    paciente_registro,    // Opcional no BD
-    data_hora_exame,
-    data_cadastro,        // Opcional no BD (default)
-    paciente_id_fk        // Este é obrigatório no BD
-) {
-    // Validação do lado do Node.js: apenas os campos que são NOT NULL no BD
-    if (nome_exame && tipo_exame && paciente_id_fk && data_hora_exame) {
-        const result = await pool.query(`
-            INSERT INTO resultados_exames(
-                laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia,
-                paciente_registro, data_hora_exame, data_cadastro, paciente_id_fk
-            )
-            VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9)
-            RETURNING *`,
-            [
-                laudo_id,             // $1
-                nome_exame,           // $2
-                tipo_exame,           // $3
-                valor_absoluto,       // $4
-                valor_referencia,     // $5
-                paciente_registro,    // $6
-                data_hora_exame,      // $7
-                data_cadastro,        // $8 - Pode ser null/undefined e o BD usará o DEFAULT
-                paciente_id_fk        // $9
-            ]
-        );
-        console.log("Resultado do insert: ", result.rows[0]);
-        if (result.rows.length > 0) {
-            return result.rows[0];
-        }
-        return false;
-    }
-    // Esta mensagem agora só aparecerá se um dos campos REALMENTE obrigatórios faltar
-    console.error("Falha ao inserir resultado de exame, faltou um campo obrigatório (nome_exame, tipo_exame, paciente_id_fk, data_hora_exame).");
-    return false;
-}
-
 // UPDATE 
-async function editResultadoExame(id_exame, laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame) {
-    console.log("Dados: ", id_exame, laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame, data_cadastro);
-    if (id_exame && laudo_id && nome_exame && tipo_exame && valor_absoluto && valor_referencia && paciente_registro && data_hora_exame) {
-        console.log("Dados: ", id_exame, laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame, data_cadastro);
+// ...
+async function editResultadoExame(id_exame, laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame, paciente_id_fk) { // Adicione paciente_id_fk se for atualizado
+    // Valide apenas os campos REALMENTE obrigatórios ou o ID.
+    // Se a ausência de um campo opcional significa que ele deve ser setado como NULL, o DB lida com isso.
+    if (id_exame && nome_exame && tipo_exame && data_hora_exame) { // Apenas campos NOT NULL aqui.
         const result = await pool.query(`
             UPDATE resultados_exames
-            SET laudo_id = $1, nome_exame = $2, tipo_exame = $3, valor_absoluto = $4, 
-                valor_referencia = $5, paciente_registro = $6, data_hora_exame = $7
-            WHERE id_exame = $8
+            SET laudo_id = $1,
+                nome_exame = $2,
+                tipo_exame = $3,
+                valor_absoluto = $4,
+                valor_referencia = $5,
+                paciente_registro = $6,
+                data_hora_exame = $7,
+                paciente_id_fk = $8  -- Inclua paciente_id_fk no UPDATE se ele pode mudar.
+                                     -- Se não muda na edição, pode removê-lo do SET e da lista de parâmetros.
+            WHERE id_exame = $9
             RETURNING *`,
-            [laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame, id_exame]
+            [laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame, paciente_id_fk, id_exame] // Adicione paciente_id_fk aqui
         );
-        console.log("Resultado do editar Resultado de Exame: " + result.rows[0]);
-
-        if (result.rows.length === 0) return false; // Se não achou o id, retorna false
-        return result.rows[0]; 
+        console.log("Resultado do editar Resultado de Exame: ", result.rows[0]); // Use vírgula para objetos
+        if (result.rows.length === 0) {
+            console.warn(`Nenhum exame encontrado com ID ${id_exame} para edição.`);
+            return false;
+        }
+        return result.rows[0];
     }
-    console.error("Falha ao editar Resultado de Exame, faltou algum dado.");
+    console.error("Falha ao editar Resultado de Exame, faltou ID ou campo obrigatório (nome_exame, tipo_exame, data_hora_exame).");
     return false;
 }
 

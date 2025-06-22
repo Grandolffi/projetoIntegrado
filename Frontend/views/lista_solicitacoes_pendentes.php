@@ -8,7 +8,7 @@ $solicitacoes = [];
 $errorMessage = null;
 
 // URL do endpoint da sua API Node.js para listar solicitações pendentes
-$api_url_pendentes = "http://localhost:3000/api/solicitacoes?status=Pendente"; // Ajuste o endpoint conforme sua API
+$api_url_pendentes = "http://localhost:3000/solicitacoes?status=Pendente";
 
 $response = @file_get_contents($api_url_pendentes);
 $solicitacoes_data = json_decode($response, true);
@@ -69,14 +69,14 @@ if ($response === false) {
                             <tbody>
                                 <?php foreach ($solicitacoes as $solicitacao): ?>
                                 <tr>
-                                    <td><?php echo htmlspecialchars($solicitacao['idSolicitacao'] ?? ''); ?></td>
-                                    <td><?php echo htmlspecialchars($solicitacao['pacienteId'] ?? ''); ?></td>
-                                    <td><?php echo htmlspecialchars($solicitacao['dataSolicitacao'] ?? ''); ?></td>
-                                    <td><?php echo htmlspecialchars($solicitacao['dataPrevistaRealizacao'] ?? ''); ?></td>
-                                    <td><?php echo htmlspecialchars($solicitacao['solicitanteNome'] ?? ''); ?></td>
+                                    <td><?php echo htmlspecialchars($solicitacao['id_solicitacao'] ?? ''); ?></td>
+                                    <td><?php echo htmlspecialchars($solicitacao['paciente_id'] ?? ''); ?></td>
+                                    <td><?php echo htmlspecialchars($solicitacao['data_solicitacao'] ?? ''); ?></td>
+                                    <td><?php echo htmlspecialchars($solicitacao['data_prevista_realizacao'] ?? ''); ?></td>
+                                    <td><?php echo htmlspecialchars($solicitacao['solicitante_nome'] ?? ''); ?></td>
                                     <td><?php echo htmlspecialchars($solicitacao['status'] ?? ''); ?></td>
                                     <td>
-                                        <a href="cadastroExames.php?solicitacao_id=<?php echo htmlspecialchars($solicitacao['idSolicitacao'] ?? ''); ?>" class="btn btn-primary btn-sm">Preencher Resultados</a>
+                                        <a href="cadastroExames.php?solicitacao_id=<?php echo htmlspecialchars($solicitacao['id_solicitacao'] ?? ''); ?>" class="btn btn-primary btn-sm">Preencher Resultados</a>
                                     </td>
                                 </tr>
                                 <?php endforeach; ?>

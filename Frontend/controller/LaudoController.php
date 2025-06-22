@@ -3,16 +3,15 @@ ini_set('display_errors', 1);
 error_reporting(E_ALL);
 
 // Inclua os DAOs necessários para interagir diretamente com o banco de dados
-require_once __DIR__ . '/../dao/ConnectionFactory.php'; // Para a conexão com o banco de dados
-require_once __DIR__ . '/../dao/LaudoDao.php';        // O DAO para Laudo
-require_once __DIR__ . '/../dao/ExameDao.php';        // O DAO para Exame (LaudoDao o usará para inserir exames)
+require_once __DIR__ . '/../dao/LaudoDaoApi.php'; // O DAO para Laudo que usa a API Node.js
+require_once __DIR__ . '/../dao/ExameDaoApi.php'; // O DAO para Exame que usa a API Node.js (se precisar aqui)
 
 // Inclua os modelos necessários
 require_once __DIR__ . '/../model/ResultadoExames.php';
 require_once __DIR__ . '/../model/Laudo.php';
 
 // Instanciar o DAO do Laudo
-$laudoDao = new LaudoDao();
+$laudoDao = new LaudoDaoApi();
 
 // Array de definições de exames (útil para preencher detalhes como tipo ou valor de referência)
 $definicoesExames = [
@@ -51,12 +50,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        $laudo = new Laudo();
+         $laudo = new Laudo();
         $laudo->setSolicitacaoId((int)$solicitacao_id);
-        $laudo->setPacienteId((int)$paciente_registro);
+        $laudo->setPacienteId((int)$paciente_registro); // << Adicionar setPacienteId ao modelo Laudo
         $laudo->setResponsavelTecnico($responsavel_tecnico);
-        $laudo->setDataFinalizacao(date('Y-m-d H:i:s')); // Data/hora da finalização do laudo
-        $laudo->setObservacoes("Laudo finalizado para solicitação {$solicitacao_id}."); // Adicione observações do formulário se houver
+        $laudo->setDataFinalizacao(date('Y-m-d H:i:s'));
+        $laudo->setObservacoes("Laudo finalizado para solicitação {$solicitacao_id}.");
+
 
         $examesParaLaudo = [];
         foreach ($resultados_preenchidos as $nomeDoExame => $valorDoResultado) {
@@ -70,7 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     'valorAbsoluto' => $valorDoResultado,
                     'tipoExame' => $tipo_exame,
                     'valorReferencia' => $valor_referencia,
-                    'dataHoraExame' => $data_laudo_prevista . " 00:00:00" // Use a data prevista do laudo
+                    'dataHoraExame' => $data_laudo_prevista . " 00:00:00",// Use a data prevista do laudo
+                    'pacienteIdFk' => (int)$paciente_registro
                 ];
             }
         }
@@ -154,7 +155,7 @@ else {
 
 //Função para listar laudos na interface.
 function listarLaudos(){
-    $laudoDao = new LaudoDao(); // Instancia o DAO dentro da função
+    $laudoDao = new LaudoDaoApi(); // Instancia o DAO dentro da função
     $lista = $laudoDao->read(); // Lê todos os laudos do banco de dados
 
     if (!empty($lista)) {
