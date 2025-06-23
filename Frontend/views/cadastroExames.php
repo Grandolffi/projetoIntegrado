@@ -5,13 +5,13 @@ ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
 // Inclui o controlador de exames
-require_once __DIR__ . '/../controller/ExameController.php'; 
+require_once __DIR__ . '/../controller/ExameController.php';
 // Inclui o modelo ResultadoExames
-require_once __DIR__ . '/../model/ResultadoExames.php'; 
+require_once __DIR__ . '/../model/ResultadoExames.php';
 
 // Variáveis de controle para o formulário
 $exames_solicitados_para_preencher = [];
-$paciente_registro_formulario = null; 
+$paciente_registro_formulario = null;
 $data_laudo_prevista = null; // Usado para a data/hora do input no modo de preenchimento de solicitação
 $solicitacao_id = null;
 $errorMessage = null;
@@ -22,12 +22,12 @@ $exameParaEdicao = null; // Objeto ResultadoExames para edição
 // 1. Prioriza a EDIÇÃO DE UM EXAME INDIVIDUAL (se 'editar' está na URL)
 if (isset($_GET['editar'])) {
     $idExameParaEditar = $_GET['editar'];
-    
+
     // A variável $exame (definida globalmente no ExameController.php) já deve conter o objeto
     // após a inclusão de ExameController.php e o processamento de seu GET 'editar'.
     global $exame; // Acesse a variável global $exame do ExameController.php
     $exameParaEdicao = $exame;
-    
+
     if (!isset($exameParaEdicao) || $exameParaEdicao === false) { // Verifica se o exame foi encontrado
         $errorMessage = "Exame não encontrado para edição (ID: " . htmlspecialchars($idExameParaEditar) . ").";
     } else {
@@ -43,11 +43,11 @@ if (isset($_GET['editar'])) {
         // No modo edição de exame individual, o array de exames solicitados não é usado.
     }
 }
-// 2. Senão, verifica se é um PREENCHIMENTO DE SOLICITAÇÃO (se 'solicitacao_id' está na URL)
+// 2. Senão, verifica se é um PREENCHIMENTO DE LAUDO PARA UMA SOLICITAÇÃO (se 'solicitacao_id' está na URL)
 elseif (isset($_GET['solicitacao_id'])) {
     $solicitacao_id = $_GET['solicitacao_id'];
     // Ajuste o endpoint conforme sua API Node.js (sem /api/)
-    $api_url_solicitacao = "http://localhost:3000/solicitacoes/" . urlencode($solicitacao_id); 
+    $api_url_solicitacao = "http://localhost:3000/solicitacoes/" . urlencode($solicitacao_id);
 
     $response = @file_get_contents($api_url_solicitacao);
     $solicitacao_data = json_decode($response, true);
@@ -56,8 +56,17 @@ elseif (isset($_GET['solicitacao_id'])) {
         $errorMessage = "Erro ao conectar com a API para carregar detalhes da solicitação.";
     } elseif ($solicitacao_data && isset($solicitacao_data['exames'])) {
         // Use snake_case conforme o retorno do seu solicitacaoDAO.js
-        $paciente_registro_formulario = $solicitacao_data['paciente_id'] ?? 'N/A'; // Corrigido para snake_case
-        $data_laudo_prevista = $solicitacao_data['data_prevista_realizacao'] ?? null; // Corrigido para snake_case
+        $paciente_registro_formulario = $solicitacao_data['paciente_id'] ?? 'N/A';
+        // Adapte data_laudo_prevista para o formato datetime-local
+        if (isset($solicitacao_data['data_prevista_realizacao'])) {
+            try {
+                $dt = new DateTime($solicitacao_data['data_prevista_realizacao']);
+                $data_laudo_prevista = $dt->format('Y-m-d\TH:i');
+            } catch (Exception $e) {
+                // Tenta pegar apenas a parte da data e hora se não for um formato completo
+                $data_laudo_prevista = substr($solicitacao_data['data_prevista_realizacao'], 0, 16);
+            }
+        }
         $exames_solicitados_para_preencher = $solicitacao_data['exames'];
     } else {
         $errorMessage = "Solicitação não encontrada ou erro ao carregar dados.";
@@ -99,13 +108,12 @@ else {
                         <a href="lista_solicitacoes_pendentes.php" class="btn btn-secondary">Voltar para Solicitações</a>
                     <?php endif; ?>
                 <?php else: ?>
-                    <form action="<?php echo isset($exameParaEdicao) ? '../controller/ExameController.php' : '../controller/LaudoController.php'; ?>" method="POST">
-                        <?php if (isset($exameParaEdicao)): ?>
+                    <form action="cadastroExames.php" method="POST"> <?php if (isset($exameParaEdicao)): ?>
                             <input type="hidden" name="id" value="<?php echo htmlspecialchars($exameParaEdicao->getIdExame() ?? ''); ?>">
                             <input type="hidden" name="salvar_edicao" value="true">
                         <?php else: ?>
                             <input type="hidden" name="solicitacao_id" value="<?php echo htmlspecialchars($solicitacao_id ?? ''); ?>">
-                            <input type="hidden" name="salvar_novo_laudo" value="true"> 
+                            <input type="hidden" name="salvar_novo_laudo" value="true">
                         <?php endif; ?>
 
                         <div class="row mb-4">
@@ -146,7 +154,7 @@ else {
                                         <td class="text-start">
                                             <input type="hidden" name="nome_exame" value="<?php echo htmlspecialchars($exameParaEdicao->getNomeExame() ?? ''); ?>">
                                             <input type="hidden" name="tipo_exame" value="<?php echo htmlspecialchars($exameParaEdicao->getTipoExame() ?? ''); ?>">
-                                            <?php echo htmlspecialchars($exameParaEdicao->getNomeExame() ?? 'N/A'); ?>
+                                            <input type="hidden" name="valor_referencia" value="<?php echo htmlspecialchars($exameParaEdicao->getValorReferencia() ?? ''); ?>"> <?php echo htmlspecialchars($exameParaEdicao->getNomeExame() ?? 'N/A'); ?>
                                         </td>
                                         <td><?php echo htmlspecialchars($exameParaEdicao->getValorReferencia() ?? 'N/A'); ?></td>
                                         <td>
@@ -164,18 +172,18 @@ else {
                                         <?php foreach ($exames_solicitados_para_preencher as $exame_solicitado): ?>
                                         <tr>
                                             <td class="text-start">
-                                                <input type="hidden" name="resultados[<?php echo htmlspecialchars($exame_solicitado['nomeExame'] ?? ''); ?>][nome_exame]" value="<?php echo htmlspecialchars($exame_solicitado['nomeExame'] ?? ''); ?>">
-                                                <input type="hidden" name="resultados[<?php echo htmlspecialchars($exame_solicitado['nomeExame'] ?? ''); ?>][tipo_exame]" value="<?php echo htmlspecialchars($exame_solicitado['tipoExameCategoria'] ?? ''); ?>">
-                                                <input type="hidden" name="resultados[<?php echo htmlspecialchars($exame_solicitado['nomeExame'] ?? ''); ?>][valor_referencia]" value="<?php echo htmlspecialchars($exame_solicitado['valorReferenciaSolicitacao'] ?? ''); ?>">
-                                                <?php echo htmlspecialchars($exame_solicitado['nomeExame'] ?? ''); ?>
+                                                <input type="hidden" name="resultados[<?php echo htmlspecialchars($exame_solicitado['nome_exame'] ?? ''); ?>][nome_exame]" value="<?php echo htmlspecialchars($exame_solicitado['nome_exame'] ?? ''); ?>">
+                                                <input type="hidden" name="resultados[<?php echo htmlspecialchars($exame_solicitado['nome_exame'] ?? ''); ?>][tipo_exame]" value="<?php echo htmlspecialchars($exame_solicitado['tipo_exame_categoria'] ?? ''); ?>">
+                                                <input type="hidden" name="resultados[<?php echo htmlspecialchars($exame_solicitado['nome_exame'] ?? ''); ?>][valor_referencia]" value="<?php echo htmlspecialchars($exame_solicitado['valor_referencia_solicitacao'] ?? ''); ?>">
+                                                <?php echo htmlspecialchars($exame_solicitado['nome_exame'] ?? ''); ?>
                                             </td>
-                                            <td><?php echo htmlspecialchars($exame_solicitado['valorReferenciaSolicitacao'] ?? 'N/A'); ?></td>
+                                            <td><?php echo htmlspecialchars($exame_solicitado['valor_referencia_solicitacao'] ?? 'N/A'); ?></td>
                                             <td>
                                                 <input type="text" class="form-control text-center"
-                                                       name="resultados[<?php echo htmlspecialchars($exame_solicitado['nomeExame'] ?? ''); ?>][valor_absoluto]"
-                                                       id="exame_<?php echo htmlspecialchars(str_replace([' ', '(', ')', '-', '/', '.'], '_', strtolower($exame_solicitado['nomeExame'] ?? ''))); ?>"
+                                                       name="resultados[<?php echo htmlspecialchars($exame_solicitado['nome_exame'] ?? ''); ?>][valor_absoluto]"
+                                                       id="exame_<?php echo htmlspecialchars(str_replace([' ', '(', ')', '-', '/', '.'], '_', strtolower($exame_solicitado['nome_exame'] ?? ''))); ?>"
                                                        placeholder="Digite o resultado"
-                                                       aria-label="Resultado para <?php echo htmlspecialchars($exame_solicitado['nomeExame'] ?? ''); ?>">
+                                                       aria-label="Resultado para <?php echo htmlspecialchars($exame_solicitado['nome_exame'] ?? ''); ?>">
                                             </td>
                                         </tr>
                                         <?php endforeach; ?>

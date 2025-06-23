@@ -26,7 +26,7 @@ router.post("/pacientes", async (req, res) =>{
 })
 
 //update
-router.put("/pacientes/:idpaciente", async (req, res) => { //PessoaDao acessa via json, e editamos paciente
+router.put("/editarpacientes/:idpaciente", async (req, res) => { //PessoaDao acessa via json, e editamos paciente
   const {nome, cpf, dtnasc, email, nomeMae, numCelular, genero} = req.body
   const id = parseInt(req.params.idpaciente);
   const pacientes = await getPacientes(); //chamando a função que exibe paciente

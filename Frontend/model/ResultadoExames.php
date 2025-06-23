@@ -6,10 +6,10 @@ class ResultadoExames{
     private $tipoExame;
     private $valorAbsoluto;
     private $valorReferencia;
-    // Remova 'private $paciente;' se 'paciente_registro' for apenas uma string
-    private $pacienteRegistro; // Adicionado para mapear 'paciente_registro' do DB
-    private $laudoId;        // Adicionado para mapear 'laudo_id' do DB
+    private $pacienteRegistro; 
+    private $laudoId;       
     private $dataHora;
+    private $pacienteIdFk;
     // Se tiver 'data_cadastro' no DB e quiser no modelo, adicione aqui
     // private $dataCadastro;
 
@@ -44,6 +44,10 @@ class ResultadoExames{
 
     public function getLaudoId() { // NOVO GETTER para laudoId
         return $this->laudoId;
+    }
+
+    public function getPacienteIdFk(){ // <-- ADICIONE ESTE MÉTODO
+        return $this->pacienteIdFk;
     }
     
     // public function getDataCadastro() { // Opcional, se adicionar dataCadastro
@@ -83,6 +87,10 @@ class ResultadoExames{
         $this->laudoId = $laudoId;
     }
 
+    public function setPacienteIdFk($pacienteIdFk){ // <-- ADICIONE ESTE MÉTODO
+        $this->pacienteIdFk = $pacienteIdFk;
+    }
+    
     // public function setDataCadastro($dataCadastro) { // Opcional, se adicionar dataCadastro
     //    $this->dataCadastro = $dataCadastro;
     // }

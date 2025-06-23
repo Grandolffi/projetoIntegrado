@@ -31,7 +31,7 @@ class PessoaDao{
 
     //(update)
     public function editar(Pessoa $pessoa){
-        $url = "http://localhost:3000/pacientes/".$pessoa->getId();
+        $url = "http://localhost:3000/editarpacientes/".$pessoa->getId();
         $dados = [
             "nome" => $pessoa->getNome(),
             "cpf" => $pessoa->getCpf(),

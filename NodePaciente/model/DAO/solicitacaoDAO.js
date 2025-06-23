@@ -82,12 +82,21 @@ async function getSolicitacoes(statusFilter = null) {
 // READ(1) (buscar uma solicitação por ID, incluindo seus itens)
 async function getSolicitacaoById(id) {
     if (id) {
+        console.log(`[SolicitacaoDAO - GET by ID - Debug] Buscando solicitação principal para ID: ${id}`); // DEBUG 1
         const solicitacaoResult = await pool.query("SELECT * FROM solicitacoes WHERE id_solicitacao = $1", [id]);
         const solicitacao = solicitacaoResult.rows[0];
 
         if (solicitacao) {
+            console.log(`[SolicitacaoDAO - GET by ID - Debug] Solicitação principal encontrada:`, solicitacao); // DEBUG 2
+            console.log(`[SolicitacaoDAO - GET by ID - Debug] Buscando itens de exame para solicitacao_id: ${id}`); // DEBUG 3
             const itensResult = await pool.query("SELECT * FROM solicitacao_exames_itens WHERE solicitacao_id = $1", [id]);
-            solicitacao.exames = itensResult.rows; // Adiciona os itens de exame à solicitação
+            
+            console.log(`[SolicitacaoDAO - GET by ID - Debug] Resultados da busca de itens:`, itensResult.rows); // DEBUG 4
+            solicitacao.exames = itensResult.rows; // <--- ESTA LINHA ANEXA OS ITENS
+
+            console.log(`[SolicitacaoDAO - GET by ID - Debug] Solicitação final com itens anexados:`, solicitacao); // DEBUG 5: OBJETO COMPLETO AQUI
+        } else {
+            console.warn(`[SolicitacaoDAO - GET by ID - Debug] Solicitação ID ${id} não encontrada no DB.`);
         }
         return solicitacao;
     }
