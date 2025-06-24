@@ -16,7 +16,6 @@ $data_laudo_prevista = null; // Usado para a data/hora do input no modo de preen
 $solicitacao_id = null;
 $errorMessage = null;
 $exameParaEdicao = null; // Objeto ResultadoExames para edição
-
 $solicitacaoId = $_GET['solicitacao_id'] ?? null;
 $solicitacaoData = null;
 
@@ -218,6 +217,7 @@ else {
             </div>
         </main>
     </div>
+    
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="../public/js/validacoes.js"></script>
 </body>
