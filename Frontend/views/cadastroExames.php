@@ -17,7 +17,7 @@ $solicitacao_id = null;
 $errorMessage = null;
 $exameParaEdicao = null; // Objeto ResultadoExames para edição
 
-<?php
+
 $solicitacaoId = $_GET['solicitacao_id'] ?? null;
 $solicitacaoData = null;
 
