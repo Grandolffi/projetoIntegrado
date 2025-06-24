@@ -1,14 +1,20 @@
 {
-    "pacienteId": 1,
-    "dataSolicitacao": "2025-06-24 16:19:57",
-    "dataPrevistaRealizacao": "2025-06-18 11:19:00",
+    "pacienteId": 8,
+    "dataSolicitacao": "2025-06-24 17:57:35",
+    "dataPrevistaRealizacao": "2025-06-29 07:00:00",
     "solicitanteNome": "Atendente BioDiagn\u00f3stico",
     "status": "Pendente",
-    "observacoes": "Solicita\u00e7\u00e3o criada para paciente Lucas Almeida",
+    "observacoes": "Solicita\u00e7\u00e3o criada para paciente Ingrid de Freitas",
     "exames": [
         {
-            "nomeExame": "Urocultura com antibiograma",
-            "tipoExameCategoria": "Microbiologia",
+            "nomeExame": "Glicose",
+            "tipoExameCategoria": "Bioquimica",
+            "valorReferenciaSolicitacao": null,
+            "statusItem": "Pendente"
+        },
+        {
+            "nomeExame": "Colesterol",
+            "tipoExameCategoria": "Bioquimica",
             "valorReferenciaSolicitacao": null,
             "statusItem": "Pendente"
         }

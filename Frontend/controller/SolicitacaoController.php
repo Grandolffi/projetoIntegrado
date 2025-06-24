@@ -20,7 +20,7 @@ $solicitacaoParaEdicao = null;
 // Lógica para Salvar Nova Solicitação ou Salvar Edição de Solicitação
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['marcar_exame'])) { // Nome do botão de submit em NewExamePaciente.php
-        $paciente_id = $_POST['idPac'] ?? null;
+        $paciente_id = filter_var($_POST['idPac'] ?? null, FILTER_VALIDATE_INT); //Assim, garante que o ID será um número inteiro ou null.
         $data_marcada_exame = $_POST['data_marcada_exame'] ?? null;
         $exames_solicitados_por_categoria = $_POST['examesSolicitados'] ?? [];
         $nome_paciente_form = $_POST['nome'] ?? null; // Nome do paciente do formulário (para observações/solicitante)
@@ -38,6 +38,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($data_marcada_exame && strpos($data_marcada_exame, 'T') !== false) {
              $data_marcada_exame = str_replace('T', ' ', $data_marcada_exame) . ':00';
         }
+
+        //Assim, evita que a pessoa envie uma data inválida ou com erro de formato.
+        $date = DateTime::createFromFormat('Y-m-d H:i:s', $data_marcada_exame);
+        if (!$date) {
+            header("Location: ../views/solicitacao_form.php?status=error&message=" . urlencode("Data de realização inválida."));
+            exit();
+        }
+
         $solicitacao->setDataPrevistaRealizacao($data_marcada_exame);
         $solicitacao->setSolicitanteNome("Atendente BioDiagnóstico"); // Exemplo, pode vir da sessão
         $solicitacao->setStatus("Pendente");
@@ -47,8 +55,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         foreach ($exames_solicitados_por_categoria as $categoria => $exames) {
             foreach ($exames as $nome_exame) {
                 $item = new SolicitacaoExameItem();
-                $item->setNomeExame($nome_exame);
-                $item->setTipoExameCategoria($categoria);
+                //impede injeção de código malicioso nesses campos.
+                $item->setNomeExame(htmlspecialchars($nome_exame));
+                $item->setTipoExameCategoria(htmlspecialchars($categoria));
+
                 $item->setStatusItem("Pendente"); // Item de exame também pendente
                 // valor_referencia_solicitacao pode ser buscado aqui ou deixado nulo
                 $examesItens[] = $item;
@@ -114,14 +124,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $context = stream_context_create($options);
     $result = @file_get_contents($api_url, false, $context);
 
-    if ($result === false) {
-        header("Location: ../views/lista_de_exames.php?status=error&message=" . urlencode("Erro ao atualizar a solicitação na API."));
+// Captura o código de resposta HTTP
+    $responseCode = null;
+    foreach ($http_response_header as $header) {
+        if (preg_match('#HTTP/\d+\.\d+\s+(\d+)#', $header, $matches)) {
+            $responseCode = intval($matches[1]);
+            break;
+        }
+    }
+
+    if ($result === false || $responseCode >= 400) {
+        header("Location: ../views/lista_de_exames.php?status=error&message=" . urlencode("Erro ao atualizar a solicitação na API. Código: $responseCode"));
         exit();
     } else {
         header("Location: ../views/lista_de_exames.php?status=success&message=" . urlencode("Solicitação atualizada com sucesso!"));
         exit();
     }
-}
+
+    }
 }
 // Lógica para carregar DADOS DE EDIÇÃO DE UMA SOLICITAÇÃO (GET)
 elseif (isset($_GET['editar'])) {
@@ -150,29 +170,41 @@ elseif (isset($_GET['excluir'])) {
     }
 }
 
-// Função para listar solicitações na interface (gera o HTML da tabela)
-function listarSolicitacoes(){
-    global $solicitacaoDao; // Acessa a instância global do DAO
-    $lista = $solicitacaoDao->read(); // Lê todas as solicitações da API Node.js
+function listarSolicitacoesPendentes(){
+    $api_url = "http://localhost:3000/solicitacoes?status=Pendente";
+    $response = @file_get_contents($api_url);
+    $solicitacoes = json_decode($response, true);
 
-    if (!empty($lista)) {
-        foreach($lista as $solicitacao){
-            echo "<tr> 
-                    <td>" . htmlspecialchars($solicitacao->getIdSolicitacao() ?? 'N/A') . "</td>
-                    <td>" . htmlspecialchars($solicitacao->getPacienteId() ?? 'N/A') . "</td>
-                    <td>" . htmlspecialchars($solicitacao->getDataSolicitacao() ?? 'N/A') . "</td>
-                    <td>" . htmlspecialchars($solicitacao->getDataPrevistaRealizacao() ?? 'N/A') . "</td>
-                    <td>" . htmlspecialchars($solicitacao->getSolicitanteNome() ?? 'N/A') . "</td>
-                    <td>" . htmlspecialchars($solicitacao->getStatus() ?? 'N/A') . "</td>
-                    <td> 
-                        <a href='solicitacao_form.php?editar=" . htmlspecialchars($solicitacao->getIdSolicitacao() ?? '') . "'>Editar</a>
-                        &nbsp; | &nbsp; 
-                        <a href='../controller/SolicitacaoController.php?excluir=" . htmlspecialchars($solicitacao->getIdSolicitacao() ?? '') . "' onclick=\"return confirm('Tem certeza que deseja excluir esta solicitação?')\">Excluir</a>
-                    </td>
-                </tr>";
-        }
-    } else {
-        echo "<tr><td colspan='7'>Nenhuma solicitação encontrada.</td></tr>"; // Ajuste o colspan
+    if ($response === false || !is_array($solicitacoes)) {
+        return [];
     }
+    return $solicitacoes;
 }
+
+
+// Função para listar solicitações na interface (gera o HTML da tabela)
+// function listarSolicitacoes(){
+//     global $solicitacaoDao; // Acessa a instância global do DAO
+//     $lista = $solicitacaoDao->read(); // Lê todas as solicitações da API Node.js
+
+//     if (!empty($lista)) {
+//         foreach($lista as $solicitacao){
+//             echo "<tr> 
+//                     <td>" . htmlspecialchars($solicitacao->getIdSolicitacao() ?? 'N/A') . "</td>
+//                     <td>" . htmlspecialchars($solicitacao->getPacienteId() ?? 'N/A') . "</td>
+//                     <td>" . htmlspecialchars($solicitacao->getDataSolicitacao() ?? 'N/A') . "</td>
+//                     <td>" . htmlspecialchars($solicitacao->getDataPrevistaRealizacao() ?? 'N/A') . "</td>
+//                     <td>" . htmlspecialchars($solicitacao->getSolicitanteNome() ?? 'N/A') . "</td>
+//                     <td>" . htmlspecialchars($solicitacao->getStatus() ?? 'N/A') . "</td>
+//                     <td> 
+//                         <a href='solicitacao_form.php?editar=" . htmlspecialchars($solicitacao->getIdSolicitacao() ?? '') . "'>Editar</a>
+//                         &nbsp; | &nbsp; 
+//                         <a href='../controller/SolicitacaoController.php?excluir=" . htmlspecialchars($solicitacao->getIdSolicitacao() ?? '') . "' onclick=\"return confirm('Tem certeza que deseja excluir esta solicitação?')\">Excluir</a>
+//                     </td>
+//                 </tr>";
+//         }
+//     } else {
+//         echo "<tr><td colspan='7'>Nenhuma solicitação encontrada.</td></tr>"; // Ajuste o colspan
+//     }
+
 ?>

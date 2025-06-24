@@ -4,8 +4,8 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Inclui o controller para editar (se aplicável)
-require_once __DIR__ . '/../controller/SolicitacaoController.php'; 
+require_once '../controller/SolicitacaoController.php';
+$solicitacoes = listarSolicitacoesPendentes();
 
 // Variáveis para popular o formulário (edição ou novo)
 $titulo_pagina = "Solicitar Novo Exame";
@@ -28,6 +28,14 @@ if (isset($solicitacaoParaEdicao) && $solicitacaoParaEdicao instanceof Solicitac
 
     $solicitacao_id_form = $solicitacaoParaEdicao->getIdSolicitacao();
     $paciente_id_form = $solicitacaoParaEdicao->getPacienteId();
+
+    // *** Exemplo: preencher nome do paciente (ajuste conforme seu objeto) ***
+    if (method_exists($solicitacaoParaEdicao, 'getNomePaciente')) {
+        $nome_paciente_form = $solicitacaoParaEdicao->getNomePaciente();
+    } else {
+        // Caso não tenha método, deixe vazio ou preencha de outra forma
+        $nome_paciente_form = '';
+    }
     
     if ($solicitacaoParaEdicao->getDataPrevistaRealizacao()) {
         try {
@@ -45,6 +53,9 @@ if (isset($solicitacaoParaEdicao) && $solicitacaoParaEdicao instanceof Solicitac
         }
     }
 }
+
+// Laboratórios fixos
+$labs = ['Microbiologia', 'Parasitologia', 'Hematologia', 'Bioquimica', 'Urinálise'];
 ?>
 
 <!DOCTYPE html>
@@ -160,8 +171,6 @@ if (isset($solicitacaoParaEdicao) && $solicitacaoParaEdicao instanceof Solicitac
                     <p class="fw-bold mt-4">Laboratórios Solicitados:</p>
                     <div class="d-flex flex-wrap gap-3 mb-3">
                         <?php
-                        // Laboratórios fixos (você pode adaptar para gerar dinamicamente se quiser)
-                        $labs = ['Microbiologia', 'Parasitologia', 'Hematologia', 'Bioquimica', 'Urinálise'];
                         foreach ($labs as $lab):
                             $checked = isset($exames_solicitados_itens_para_form[$lab]) ? 'checked' : '';
                         ?>
@@ -180,25 +189,79 @@ if (isset($solicitacaoParaEdicao) && $solicitacaoParaEdicao instanceof Solicitac
                         <?php endforeach; ?>
                     </div>
 
-                    <!-- Exames detalhados - aqui você pode inserir o HTML completo para os sub-itens -->
-                    <!-- Exemplo para Microbiologia -->
+                    <!-- Sub-opções para Bioquímica -->
+                    <div id="opcoesBioquimica" class="sub-opcoes" style="display: none;">
+                        <h6>Exames de Bioquímica:</h6>
+                        <?php
+                        $examesBioquimicaSelecionados = $exames_solicitados_itens_para_form['Bioquimica'] ?? [];
+                        ?>
+                        <div class="form-check">
+                            <input
+                                type="checkbox"
+                                name="examesSolicitados[Bioquimica][]"
+                                value="Glicose"
+                                id="glicose"
+                                class="form-check-input"
+                                <?php echo in_array('Glicose', $examesBioquimicaSelecionados) ? 'checked' : ''; ?>
+                            />
+                            <label for="glicose" class="form-check-label">Glicose</label>
+                        </div>
+                        <div class="form-check">
+                            <input
+                                type="checkbox"
+                                name="examesSolicitados[Bioquimica][]"
+                                value="Colesterol"
+                                id="colesterol"
+                                class="form-check-input"
+                                <?php echo in_array('Colesterol', $examesBioquimicaSelecionados) ? 'checked' : ''; ?>
+                            />
+                            <label for="colesterol" class="form-check-label">Colesterol Total</label>
+                        </div>
+                        <!-- Adicione os outros exames aqui, seguindo o mesmo padrão -->
+                    </div>
+
+                    <!-- Sub-opções para Microbiologia -->
                     <div id="opcoesMicrobiologia" class="sub-opcoes" style="display: none;">
                         <h6>Exames de Microbiologia:</h6>
+                        <?php
+                        $examesMicrobiologiaSelecionados = $exames_solicitados_itens_para_form['Microbiologia'] ?? [];
+                        ?>
                         <div class="form-check">
-                            <input type="checkbox" name="examesSolicitados[Microbiologia][]" value="Urocultura com antibiograma" id="urocultura" class="form-check-input" />
+                            <input
+                                type="checkbox"
+                                name="examesSolicitados[Microbiologia][]"
+                                value="Urocultura com antibiograma"
+                                id="urocultura"
+                                class="form-check-input"
+                                <?php echo in_array('Urocultura com antibiograma', $examesMicrobiologiaSelecionados) ? 'checked' : ''; ?>
+                            />
                             <label for="urocultura" class="form-check-label">Urocultura com antibiograma</label>
                         </div>
                         <div class="form-check">
-                            <input type="checkbox" name="examesSolicitados[Microbiologia][]" value="Swab ocular" id="swab" class="form-check-input" />
+                            <input
+                                type="checkbox"
+                                name="examesSolicitados[Microbiologia][]"
+                                value="Swab ocular"
+                                id="swab"
+                                class="form-check-input"
+                                <?php echo in_array('Swab ocular', $examesMicrobiologiaSelecionados) ? 'checked' : ''; ?>
+                            />
                             <label for="swab" class="form-check-label">Swab ocular</label>
                         </div>
                         <div class="form-check">
-                            <input type="checkbox" name="examesSolicitados[Microbiologia][]" value="Escarro exame Micro" id="escarro" class="form-check-input" />
+                            <input
+                                type="checkbox"
+                                name="examesSolicitados[Microbiologia][]"
+                                value="Escarro exame Micro"
+                                id="escarro"
+                                class="form-check-input"
+                                <?php echo in_array('Escarro exame Micro', $examesMicrobiologiaSelecionados) ? 'checked' : ''; ?>
+                            />
                             <label for="escarro" class="form-check-label">Escarro para exame de Micobacterium tuberculosis</label>
                         </div>
                     </div>
 
-                    <!-- Repita o padrão acima para os outros laboratórios -->
+                    <!-- Repita o padrão acima para os outros laboratórios se desejar -->
 
                     <div class="text-center mt-4">
                         <button type="submit" name="<?php echo htmlspecialchars($botao_submit_nome); ?>" class="btn btn-dark">
@@ -211,21 +274,21 @@ if (isset($solicitacaoParaEdicao) && $solicitacaoParaEdicao instanceof Solicitac
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-        // Função para mostrar/esconder as sub-opções de exames
-        function toggleSubOptions(elementId, isChecked) {
-            const element = document.getElementById(elementId);
-            if (element) {
-                element.style.display = isChecked ? 'block' : 'none';
-            }
-        }
 
-        // Inicializa a visibilidade das sub-opções baseado nos checkboxes marcados
-        window.addEventListener('DOMContentLoaded', () => {
-            <?php foreach ($labs as $lab): ?>
-                toggleSubOptions('opcoes<?php echo $lab; ?>', <?php echo isset($exames_solicitados_itens_para_form[$lab]) ? 'true' : 'false'; ?>);
-            <?php endforeach; ?>
-        });
+    <script>
+    function toggleSubOptions(elementId, isChecked) {
+        const element = document.getElementById(elementId);
+        if (element) {
+            element.style.display = isChecked ? 'block' : 'none';
+        }
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+        <?php foreach ($labs as $lab): ?>
+            toggleSubOptions('opcoes<?php echo $lab; ?>', <?php echo isset($exames_solicitados_itens_para_form[$lab]) ? 'true' : 'false'; ?>);
+        <?php endforeach; ?>
+    });
     </script>
+
 </body>
 </html>
