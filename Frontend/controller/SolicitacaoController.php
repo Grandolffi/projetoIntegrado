@@ -69,37 +69,59 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
     }
-    elseif (isset($_POST['salvar_edicao_solicitacao'])) { // Flag para edição
-        $id_solicitacao = $_POST['id_solicitacao'] ?? null;
-        if (!$id_solicitacao) {
-            header("Location: ../views/_pendentes.php?status=error&message=" . urlencode("ID da solicitação não fornecido para atualização."));
-            exit();
-        }
-        $solicitacao = new Solicitacao();
-        $solicitacao->setIdSolicitacao((int)$id_solicitacao);
-        $solicitacao->setPacienteId((int)$_POST['idPac']);
-        if ($_POST['data_marcada_exame'] && strpos($_POST['data_marcada_exame'], 'T') !== false) {
-             $data_marcada_exame_edit = str_replace('T', ' ', $_POST['data_marcada_exame']) . ':00';
-        }
-        $solicitacao->setDataPrevistaRealizacao($data_marcada_exame_edit);
-        $solicitacao->setSolicitanteNome($_POST['solicitante_nome']);
-        $solicitacao->setStatus($_POST['status']);
-        $solicitacao->setObservacoes($_POST['observacoes']);
+    elseif (isset($_POST['salvar_edicao_solicitacao'])) {
+    $id = $_POST['id_solicitacao'] ?? null;
 
-        try {
-            $result = $solicitacaoDao->editar($solicitacao);
-            if (isset($result['success']) && $result['success']) {
-                header("Location: ../views/_pendentes.php?status=success&message=" . urlencode("Solicitação atualizada com sucesso!"));
-            } else {
-                header("Location: ../views/solicitacao_form.php?editar=" . $id_solicitacao . "&status=error&message=" . urlencode("Erro ao atualizar solicitação: " . ($result['erro'] ?? '')));
-            }
-            exit();
-        } catch (Exception $e) {
-            error_log("Erro ao processar POST de edição de solicitação: " . $e->getMessage());
-            header("Location: ../views/solicitacao_form.php?editar=" . $id_solicitacao . "&status=error&message=" . urlencode("Erro interno ao atualizar solicitação: " . $e->getMessage()));
-            exit();
+    if (!$id) {
+        header("Location: ../views/lista_de_exames.php?status=error&message=" . urlencode("ID da solicitação não informado."));
+        exit();
+    }
+
+    // Monta dados da solicitação
+    $dados = [
+        "pacienteId" => (int)($_POST['paciente_id'] ?? 0),
+        "dataSolicitacao" => $_POST['data_solicitacao'] ?? '',
+        "dataPrevistaRealizacao" => $_POST['data_prevista'] ?? '',
+        "solicitanteNome" => $_POST['solicitante_nome'] ?? '',
+        "status" => $_POST['status'] ?? 'Pendente',
+        "observacoes" => $_POST['observacoes'] ?? '',
+        "exames" => []
+    ];
+
+    // Se exames foram enviados
+    if (isset($_POST['exames_nome']) && is_array($_POST['exames_nome'])) {
+        foreach ($_POST['exames_nome'] as $i => $nome) {
+            $dados["exames"][] = [
+                "nomeExame" => $nome,
+                "tipoExameCategoria" => $_POST['exames_categoria'][$i] ?? '',
+                "valorReferenciaSolicitacao" => $_POST['exames_referencia'][$i] ?? '',
+                "statusItem" => $_POST['exames_status'][$i] ?? 'Pendente'
+            ];
         }
     }
+
+    // Envia PUT para a API
+    $api_url = "http://localhost:3000/solicitacoes/$id";
+
+    $options = [
+        "http" => [
+            "method"  => "PUT",
+            "header"  => "Content-Type: application/json\r\n",
+            "content" => json_encode($dados)
+        ]
+    ];
+
+    $context = stream_context_create($options);
+    $result = @file_get_contents($api_url, false, $context);
+
+    if ($result === false) {
+        header("Location: ../views/lista_de_exames.php?status=error&message=" . urlencode("Erro ao atualizar a solicitação na API."));
+        exit();
+    } else {
+        header("Location: ../views/lista_de_exames.php?status=success&message=" . urlencode("Solicitação atualizada com sucesso!"));
+        exit();
+    }
+}
 }
 // Lógica para carregar DADOS DE EDIÇÃO DE UMA SOLICITAÇÃO (GET)
 elseif (isset($_GET['editar'])) {

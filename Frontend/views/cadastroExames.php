@@ -17,7 +17,6 @@ $solicitacao_id = null;
 $errorMessage = null;
 $exameParaEdicao = null; // Objeto ResultadoExames para edição
 
-<?php
 $solicitacaoId = $_GET['solicitacao_id'] ?? null;
 $solicitacaoData = null;
 
@@ -28,7 +27,7 @@ if ($solicitacaoId) {
         $solicitacaoData = json_decode($response, true);
     }
 }
-?>
+
 
 
 // --- INÍCIO DA LÓGICA REESTRUTURADA ---
@@ -122,9 +121,13 @@ else {
                         <a href="lista_solicitacoes_pendentes.php" class="btn btn-secondary">Voltar para Solicitações</a>
                     <?php endif; ?>
                 <?php else: ?>
-                    <form action="cadastroExames.php" method="POST"> <?php if (isset($exameParaEdicao)): ?>
+                    <form action="../controller/SolicitacaoController.php" method="POST"> <?php if (isset($exameParaEdicao)): ?>
                             <input type="hidden" name="id" value="<?php echo htmlspecialchars($exameParaEdicao->getIdExame() ?? ''); ?>">
-                            <input type="hidden" name="salvar_edicao" value="true">
+                            <input type="hidden" name="salvar_edicao_solicitacao" value="true">
+                            <input type="hidden" name="nome_exame" value="<?php echo htmlspecialchars($exameParaEdicao->getNomeExame() ?? ''); ?>">
+                            <input type="hidden" name="tipo_exame" value="<?php echo htmlspecialchars($exameParaEdicao->getTipoExame() ?? ''); ?>">
+                            <input type="hidden" name="valor_referencia" value="<?php echo htmlspecialchars($exameParaEdicao->getValorReferencia() ?? ''); ?>">
+
                         <?php else: ?>
                             <input type="hidden" name="solicitacao_id" value="<?php echo htmlspecialchars($solicitacao_id ?? ''); ?>">
                             <input type="hidden" name="salvar_novo_laudo" value="true">
