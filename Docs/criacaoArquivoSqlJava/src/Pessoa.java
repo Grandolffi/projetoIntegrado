@@ -1,4 +1,6 @@
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 
 public class Pessoa {
 
@@ -20,6 +22,22 @@ public class Pessoa {
             this.nomemae = nomemae;
             this.numcelular = numcelular;
             this.genero = genero;
+    }
+
+    private String converteData(String data_ddMMyy) { //FEITO COM IA
+        try {
+            DateTimeFormatter formatterEntrada = DateTimeFormatter.ofPattern("ddMMyy");
+            LocalDate data = LocalDate.parse(data_ddMMyy, formatterEntrada);
+
+            // Ajusta o século para 1900 ou 2000 automaticamente
+            // Caso precise tratar especificamente, pode usar Year.of(2000 + ano) se precisar
+
+            DateTimeFormatter formatterSaida = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+            return data.format(formatterSaida);
+        } catch (DateTimeParseException e) {
+            System.err.println("Formato de data inválido: " + data_ddMMyy);
+            return null; // ou lance exceção, depende do seu fluxo
+        }
     }
 
     public String getNome() {
