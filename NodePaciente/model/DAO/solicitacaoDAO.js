@@ -138,4 +138,51 @@ async function deleteSolicitacao(id) {
     return false;
 }
 
-module.exports = {Solicitacao, SolicitacaoExameItem, insertSolicitacao, getSolicitacoes, getSolicitacaoById, updateSolicitacaoStatus, deleteSolicitacao};
+// UPDATE (atualizar toda a solicitação e seus itens de exame)
+async function updateSolicitacao(id, pacienteId, dataSolicitacao, dataPrevistaRealizacao, solicitanteNome, status, observacoes, exames) {
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+
+    // Atualizar dados da solicitação principal
+    await client.query(`
+      UPDATE solicitacoes
+      SET paciente_id = $1,
+          data_solicitacao = $2,
+          data_prevista_realizacao = $3,
+          solicitante_nome = $4,
+          status = $5,
+          observacoes = $6
+      WHERE id_solicitacao = $7
+    `, [pacienteId, dataSolicitacao, dataPrevistaRealizacao, solicitanteNome, status, observacoes, id]);
+
+    // Remover os itens de exame atuais para esta solicitação (para substituir pelos novos)
+    await client.query(`DELETE FROM solicitacao_exames_itens WHERE solicitacao_id = $1`, [id]);
+
+    // Inserir novos itens de exame
+    for (const exame of exames) {
+      await client.query(`
+        INSERT INTO solicitacao_exames_itens (solicitacao_id, nome_exame, tipo_exame_categoria, valor_referencia_solicitacao, status_item)
+        VALUES ($1, $2, $3, $4, $5)
+      `, [
+        id,
+        exame.nomeExame,
+        exame.tipoExameCategoria,
+        exame.valorReferenciaSolicitacao || null,
+        exame.statusItem || 'Pendente'
+      ]);
+    }
+
+    await client.query('COMMIT');
+    return true;
+  } catch (error) {
+    await client.query('ROLLBACK');
+    console.error("Erro ao atualizar solicitação:", error);
+    return false;
+  } finally {
+    client.release();
+  }
+}
+
+
+module.exports = {Solicitacao, SolicitacaoExameItem, insertSolicitacao, getSolicitacoes, getSolicitacaoById, updateSolicitacaoStatus, updateSolicitacao, deleteSolicitacao};

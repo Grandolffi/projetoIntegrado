@@ -1,0 +1,16 @@
+{
+    "pacienteId": 1,
+    "dataSolicitacao": "2025-06-24 03:04:05",
+    "dataPrevistaRealizacao": "2025-06-15 22:04:00",
+    "solicitanteNome": "Atendente BioDiagn\u00f3stico",
+    "status": "Pendente",
+    "observacoes": "Solicita\u00e7\u00e3o criada para paciente Lucas Almeida",
+    "exames": [
+        {
+            "nomeExame": "Urocultura com antibiograma",
+            "tipoExameCategoria": "Microbiologia",
+            "valorReferenciaSolicitacao": null,
+            "statusItem": "Pendente"
+        }
+    ]
+}

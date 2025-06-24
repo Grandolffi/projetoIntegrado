@@ -27,7 +27,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // Validação básica
         if (empty($paciente_id) || empty($data_marcada_exame) || empty($exames_solicitados_por_categoria)) {
-            header("Location: ../views/NewExamePaciente.php?status=error&message=" . urlencode("Dados incompletos para solicitar o exame."));
+            header("Location: ../views/solicitacao_form.php?status=error&message=" . urlencode("Dados incompletos para solicitar o exame."));
             exit();
         }
 
@@ -58,21 +58,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $result = $solicitacaoDao->inserir($solicitacao, $examesItens);
             if (isset($result['success']) && $result['success']) {
-                header("Location: ../views/lista_solicitacoes.php?status=success&message=" . urlencode("Solicitação de exame criada com sucesso! ID: " . $result['idSolicitacao']));
+                header("Location: ../views/lista_solicitacoes_pendentes.php?status=success&message=" . urlencode("Solicitação de exame criada com sucesso! ID: " . $result['idSolicitacao']));
             } else {
-                header("Location: ../views/NewExamePaciente.php?status=error&message=" . urlencode("Erro ao criar solicitação: " . ($result['erro'] ?? '')));
+                header("Location: ../views/solicitacao_form.php?status=error&message=" . urlencode("Erro ao criar solicitação: " . ($result['erro'] ?? '')));
             }
             exit();
         } catch (Exception $e) {
             error_log("Erro ao processar POST de solicitação: " . $e->getMessage());
-            header("Location: ../views/NewExamePaciente.php?status=error&message=" . urlencode("Erro interno ao criar solicitação: " . $e->getMessage()));
+            header("Location: ../views/solicitacao_form.php?status=error&message=" . urlencode("Erro interno ao criar solicitação: " . $e->getMessage()));
             exit();
         }
     }
     elseif (isset($_POST['salvar_edicao_solicitacao'])) { // Flag para edição
         $id_solicitacao = $_POST['id_solicitacao'] ?? null;
         if (!$id_solicitacao) {
-            header("Location: ../views/lista_solicitacoes.php?status=error&message=" . urlencode("ID da solicitação não fornecido para atualização."));
+            header("Location: ../views/_pendentes.php?status=error&message=" . urlencode("ID da solicitação não fornecido para atualização."));
             exit();
         }
         $solicitacao = new Solicitacao();
@@ -89,7 +89,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         try {
             $result = $solicitacaoDao->editar($solicitacao);
             if (isset($result['success']) && $result['success']) {
-                header("Location: ../views/lista_solicitacoes.php?status=success&message=" . urlencode("Solicitação atualizada com sucesso!"));
+                header("Location: ../views/_pendentes.php?status=success&message=" . urlencode("Solicitação atualizada com sucesso!"));
             } else {
                 header("Location: ../views/solicitacao_form.php?editar=" . $id_solicitacao . "&status=error&message=" . urlencode("Erro ao atualizar solicitação: " . ($result['erro'] ?? '')));
             }
@@ -106,7 +106,7 @@ elseif (isset($_GET['editar'])) {
     $idSolicitacao = $_GET['editar'];
     $solicitacaoParaEdicao = $solicitacaoDao->buscarPorId($idSolicitacao);
     if (!isset($solicitacaoParaEdicao) || $solicitacaoParaEdicao === false) {
-        header("Location: ../views/lista_solicitacoes.php?status=error&message=" . urlencode("Solicitação ID {$idSolicitacao} não encontrada ou erro ao buscar."));
+        header("Location: ../views/_pendentes.php?status=error&message=" . urlencode("Solicitação ID {$idSolicitacao} não encontrada ou erro ao buscar."));
         exit();
     }
 }
@@ -116,14 +116,14 @@ elseif (isset($_GET['excluir'])) {
     try {
         $result = $solicitacaoDao->excluir($id);
         if (isset($result['success']) && $result['success']) {
-             header("Location: ../views/lista_solicitacoes.php?status=success&message=" . urlencode("Solicitação excluída com sucesso!"));
+             header("Location: ../views/_pendentes.php?status=success&message=" . urlencode("Solicitação excluída com sucesso!"));
         } else {
-             header("Location: ../views/lista_solicitacoes.php?status=error&message=" . urlencode("Erro ao excluir solicitação: " . ($result['erro'] ?? '')));
+             header("Location: ../views/_pendentes.php?status=error&message=" . urlencode("Erro ao excluir solicitação: " . ($result['erro'] ?? '')));
         }
         exit();
     } catch (Exception $e) {
         error_log("Erro ao processar GET de exclusão de solicitação: " . $e->getMessage());
-        header("Location: ../views/lista_solicitacoes.php?status=error&message=" . urlencode("Erro interno ao excluir solicitação: " . $e->getMessage()));
+        header("Location: ../views/_pendentes.php?status=error&message=" . urlencode("Erro interno ao excluir solicitação: " . $e->getMessage()));
         exit();
     }
 }

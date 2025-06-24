@@ -19,11 +19,14 @@ class SolicitacaoDaoApi {
 
         $context = stream_context_create($options);
         $result = @file_get_contents($url, false, $context);
+        file_put_contents(__DIR__ . '/../log_api_resposta.txt', $result);
         
         if ($result === FALSE) {
             error_log("Erro na requisição {$method} para: " . $url . ". Verifique se a API Node.js está rodando.");
             return ["erro" => "Falha na requisição para a API Node.js"];
         }
+
+file_put_contents(__DIR__ . '/../log_api_resposta_bruta.txt', $result);
 
         $apiResponse = json_decode($result, true);
 
@@ -58,6 +61,7 @@ class SolicitacaoDaoApi {
             ];
         }
 
+        file_put_contents(__DIR__ . '/../log_dados_envio.txt', json_encode($dados, JSON_PRETTY_PRINT));
         return $this->callApi('POST', '/solicitacoes', $dados);
     }
 

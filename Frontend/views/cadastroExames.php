@@ -17,6 +17,20 @@ $solicitacao_id = null;
 $errorMessage = null;
 $exameParaEdicao = null; // Objeto ResultadoExames para edição
 
+<?php
+$solicitacaoId = $_GET['solicitacao_id'] ?? null;
+$solicitacaoData = null;
+
+if ($solicitacaoId) {
+    $api_url = "http://localhost:3000/solicitacoes/$solicitacaoId"; // GET /solicitacoes/:id
+    $response = @file_get_contents($api_url);
+    if ($response !== false) {
+        $solicitacaoData = json_decode($response, true);
+    }
+}
+?>
+
+
 // --- INÍCIO DA LÓGICA REESTRUTURADA ---
 
 // 1. Prioriza a EDIÇÃO DE UM EXAME INDIVIDUAL (se 'editar' está na URL)
