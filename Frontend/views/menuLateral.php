@@ -20,7 +20,7 @@ $linkSolicitarNovoExame = "solicitacao_form.php";
 // ALTERADO: O link "Cadastrar Resultado" agora aponta para a lista de solicitações pendentes
 $linkCadastrarResultadoExame = "lista_solicitacoes_pendentes.php"; // Novo nome da página
 
-$linkUsuario = "sua_pagina_de_usuarios.php"; // Certifique-se de criar esta página na pasta views
+$linkUsuario = "perfilUser.php"; // Certifique-se de criar esta página na pasta views
 $linkEstoque = "AcessarEstoque.php"; // Certifique-se de que esta página está na pasta views
 
 // Lógica para destacar o item "Exame" (pai) se qualquer página da seção Exame estiver ativa
