@@ -54,20 +54,43 @@ class LaudoDaoApi {
         return $this->callApi('POST', '/laudos', $dados);
     }
 
-    // Edita um Laudo existente através da API Node.js.
-    public function editar(Laudo $laudo) {
-        $dados = [
-            "solicitacao_id" => $laudo->getSolicitacaoId(),
-            "paciente_id" => $laudo->getPacienteId(),
-            "responsavel_tecnico" => $laudo->getResponsavelTecnico(),
-            "observacoes" => $laudo->getObservacoes(),
-            "data_finalizacao" => $laudo->getDataFinalizacao()
-            // Se a API Node.js espera que a edição de laudo também edite exames,
-            // você precisaria passar um array de exames aqui também.
-        ];
-        // O endpoint para editar laudos, ex: PUT http://localhost:3000/laudos/:id
-        return $this->callApi('PUT', "/laudos/" . urlencode($laudo->getId()), $dados);
+public function editar(Laudo $laudo) {
+    $id = $laudo->getId();
+    if (!$id) {
+        throw new Exception("ID do laudo é obrigatório para editar.");
     }
+
+    $url = $this->apiBaseUrl . "/laudos/{$id}";
+    $data = [
+        'solicitacaoId' => $laudo->getSolicitacaoId(),
+        'pacienteId' => $laudo->getPacienteId(),
+        'responsavelTecnico' => $laudo->getResponsavelTecnico(),
+        'dataFinalizacao' => $laudo->getDataFinalizacao(),
+        'observacoes' => $laudo->getObservacoes()
+    ];
+
+    $options = [
+        "http" => [
+            "method" => "PUT",
+            "header" => "Content-Type: application/json\r\n",
+            "content" => json_encode($data)
+        ]
+    ];
+
+    $context = stream_context_create($options);
+    $result = file_get_contents($url, false, $context);
+    if ($result === false) {
+        throw new Exception("Erro ao atualizar o laudo via API.");
+    }
+
+    // Você pode fazer decode do resultado para verificar sucesso
+    $response = json_decode($result, true);
+    if (!$response || isset($response['error'])) {
+        throw new Exception("Resposta de erro da API ao editar o laudo.");
+    }
+
+    return $response;
+}
 
     // Exclui um Laudo através da API Node.js.
     public function excluir($id) {

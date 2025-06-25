@@ -49,22 +49,29 @@ router.post("/laudos", async (req, res) => {
     }
 });
 
-// UPDATE - ajuste os parâmetros e a chamada da função
-router.put("/laudos/:id", async (req, res) => { // Rota mais RESTful: /laudos/:id
-const {solicitacao_id, paciente_id, responsavel_tecnico, data_finalizacao, observacoes, resultadosExames} = req.body
-const id = parseInt(req.params.idpaciente);
-const laudos = await getTodosLaudos(); //chamando a função que exibe paciente
-const laudo = laudos.find(a => a.id === id); // busca real por id
-    
-if (!laudo) {
-        return res.status(404).send("paciente não encontrado");
-    }
+router.put("/laudos/:id", async (req, res) => {
+    const { solicitacaoId, pacienteId, responsavelTecnico, dataFinalizacao, observacoes } = req.body;
+    const id = parseInt(req.params.id);
 
-const result = await editPaciente(solicitacao_id, paciente_id, responsavel_tecnico, data_finalizacao, observacoes, resultadosExames);
-console.log("abc: ", solicitacao_id, paciente_id, responsavel_tecnico, data_finalizacao, observacoes, resultadosExames)
-   
-if(result){
-        res.status(200).send("paciente Editado");
+    try {
+        const laudos = await getTodosLaudos();
+        const laudo = laudos.find(a => a.id === id);
+
+        if (!laudo) {
+            return res.status(404).send("Laudo não encontrado");
+        }
+
+        const result = await updateLaudo(solicitacaoId, pacienteId, responsavelTecnico, dataFinalizacao, observacoes);
+
+        if (result) {
+            res.status(200).send("Laudo atualizado com sucesso");
+        } else {
+            res.status(500).send("Erro ao atualizar o laudo");
+        }
+
+    } catch (error) {
+        console.error("Erro no PUT /laudos/:id", error);
+        res.status(500).send("Erro interno no servidor");
     }
 });
 
