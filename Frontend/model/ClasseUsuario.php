@@ -1,8 +1,14 @@
 <?php
+debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
+if (class_exists('Usuario')) {
+    return;
+}
+if (!class_exists('Usuario')) {
 class Usuario {
     private $id;
     private $nome;
     private $email;
+    private $senha; // senha armazenada como hash
     private $tipo;
 
     public function getId() {
@@ -26,11 +32,19 @@ class Usuario {
         $this->email = $email;
     }
 
+    public function getSenha() {
+        return $this->senha;
+    }
+    public function setSenha($senha) {
+        $this->senha = $senha;
+    }
+
     public function getTipo() {
         return $this->tipo;
     }
     public function setTipo($tipo) {
         $this->tipo = $tipo;
     }
+}
 }
 ?>

@@ -1,6 +1,6 @@
 <?php
 session_start();
-require_once __DIR__ . '/../dao//ConnectionFactory.php';
+require_once __DIR__ . '/../dao/ConnectionFactory.php';
 require_once __DIR__ . '/../dao/UserDao.php'; // Crie esse DAO com método de autenticação
 
 $erro = '';
@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $email = $_POST['email'] ?? '';
     $senha = $_POST['senha'] ?? '';
 
-    $dao = new UsuarioDao();
+    $dao = new UserDao();
     $usuario = $dao->autenticar($email, $senha);
 
     if ($usuario) {
@@ -17,7 +17,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['usuario_nome'] = $usuario->getNome();
         $_SESSION['usuario_tipo'] = $usuario->getTipo(); // Ex: 'medico' ou 'balconista'
 
-        header('Location: perfilUsuario.php');
+        header('Location: perfilUser.php');
         exit;
     } else {
         $erro = 'E-mail ou senha inválidos.';
