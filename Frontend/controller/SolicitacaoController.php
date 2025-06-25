@@ -1,5 +1,5 @@
 <?php
-// Para ver erros PHP
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
@@ -9,45 +9,49 @@ require_once __DIR__ . '/../model/Solicitacoes.php';
 require_once __DIR__ . '/../model/SolicitacaoExameItem.php';
 require_once __DIR__ . '/../dao/SolicitacaoDaoApi.php';
 
-// Instancia o DAO de Solicitação uma vez no escopo global
-$solicitacaoDao = new SolicitacaoDaoApi();
+class SolicitacaoController {
 
-// Variável para armazenar o objeto Solicitacao para edição, se aplicável
-$solicitacaoParaEdicao = null;
+    private static $solicitacaoDao;
 
-// --- Lógicas de Requisição (POST / GET) ---
+    // Garante que o DAO esteja pronto para uso
+    public static function init() {
+        if (self::$solicitacaoDao === null) {
+            self::$solicitacaoDao = new SolicitacaoDaoApi();
+        }
+    }
 
-// Lógica para Salvar Nova Solicitação ou Salvar Edição de Solicitação
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    if (isset($_POST['marcar_exame'])) { // Nome do botão de submit em NewExamePaciente.php
-        $paciente_id = filter_var($_POST['idPac'] ?? null, FILTER_VALIDATE_INT); //Assim, garante que o ID será um número inteiro ou null.
+    public static function marcarExame() {
+        self::init();
+
+        $paciente_id = filter_var($_POST['idPac'] ?? null, FILTER_VALIDATE_INT);
         $data_marcada_exame = $_POST['data_marcada_exame'] ?? null;
         $exames_solicitados_por_categoria = $_POST['examesSolicitados'] ?? [];
-        $nome_paciente_form = $_POST['nome'] ?? null; // Nome do paciente do formulário (para observações/solicitante)
+        $nome_paciente_form = $_POST['nome'] ?? null; // Apenas UMA VEZ aqui
 
-        // Validação básica
+        // Validação básica - Apenas UMA VEZ
         if (empty($paciente_id) || empty($data_marcada_exame) || empty($exames_solicitados_por_categoria)) {
-            header("Location: ../views/solicitacao_form.php?status=error&message=" . urlencode("Dados incompletos para solicitar o exame."));
+            header("Location: ../views/solicitacao_form.php?status=error&message=" . urlencode("Parece que faltou preencher algum campo essencial. Por favor, complete as informações para marcar o exame."));
             exit();
         }
 
         $solicitacao = new Solicitacao();
         $solicitacao->setPacienteId((int)$paciente_id);
-        $solicitacao->setDataSolicitacao(date('Y-m-d H:i:s')); // Data/hora atual da solicitação
-        // Adaptação da data/hora marcada para o formato esperado pelo banco (sem 'T')
+        $solicitacao->setDataSolicitacao(date('Y-m-d H:i:s'));
+        
+        // Ajusta o formato da data/hora para o banco de dados
         if ($data_marcada_exame && strpos($data_marcada_exame, 'T') !== false) {
-             $data_marcada_exame = str_replace('T', ' ', $data_marcada_exame) . ':00';
+            $data_marcada_exame = str_replace('T', ' ', $data_marcada_exame) . ':00';
         }
 
-        //Assim, evita que a pessoa envie uma data inválida ou com erro de formato.
+        // Validação da data - Apenas UMA VEZ
         $date = DateTime::createFromFormat('Y-m-d H:i:s', $data_marcada_exame);
         if (!$date) {
-            header("Location: ../views/solicitacao_form.php?status=error&message=" . urlencode("Data de realização inválida."));
+            header("Location: ../views/solicitacao_form.php?status=error&message=" . urlencode("A data e hora que você informou para o exame não são válidas. Poderia verificar e tentar de novo?"));
             exit();
         }
 
         $solicitacao->setDataPrevistaRealizacao($data_marcada_exame);
-        $solicitacao->setSolicitanteNome("Atendente BioDiagnóstico"); // Exemplo, pode vir da sessão
+        $solicitacao->setSolicitanteNome("Atendente BioDiagnóstico"); // Pode ser dinâmico, vindo da sessão de usuário logado
         $solicitacao->setStatus("Pendente");
         $solicitacao->setObservacoes("Solicitação criada para paciente " . htmlspecialchars($nome_paciente_form));
 
@@ -55,158 +59,213 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         foreach ($exames_solicitados_por_categoria as $categoria => $exames) {
             foreach ($exames as $nome_exame) {
                 $item = new SolicitacaoExameItem();
-                //impede injeção de código malicioso nesses campos.
+                // Impedindo injeção de código malicioso nesses campos - Apenas UMA VEZ
                 $item->setNomeExame(htmlspecialchars($nome_exame));
                 $item->setTipoExameCategoria(htmlspecialchars($categoria));
-
-                $item->setStatusItem("Pendente"); // Item de exame também pendente
-                // valor_referencia_solicitacao pode ser buscado aqui ou deixado nulo
+                $item->setStatusItem("Pendente");
                 $examesItens[] = $item;
             }
         }
 
         try {
-            $result = $solicitacaoDao->inserir($solicitacao, $examesItens);
+            $result = self::$solicitacaoDao->inserir($solicitacao, $examesItens);
             if (isset($result['success']) && $result['success']) {
-                header("Location: ../views/lista_solicitacoes_pendentes.php?status=success&message=" . urlencode("Solicitação de exame criada com sucesso! ID: " . $result['idSolicitacao']));
+                header("Location: ../views/lista_solicitacoes_pendentes.php?status=success&message=" . urlencode("Uhu! A solicitação de exame foi marcada com sucesso! ID: " . $result['idSolicitacao']));
             } else {
-                header("Location: ../views/solicitacao_form.php?status=error&message=" . urlencode("Erro ao criar solicitação: " . ($result['erro'] ?? '')));
+                header("Location: ../views/solicitacao_form.php?status=error&message=" . urlencode("Poxa, não conseguimos marcar a solicitação agora. " . ($result['erro'] ?? 'Um erro inesperado aconteceu. Tente novamente mais tarde.')));
             }
             exit();
         } catch (Exception $e) {
             error_log("Erro ao processar POST de solicitação: " . $e->getMessage());
-            header("Location: ../views/solicitacao_form.php?status=error&message=" . urlencode("Erro interno ao criar solicitação: " . $e->getMessage()));
+            header("Location: ../views/solicitacao_form.php?status=error&message=" . urlencode("Ah não! Ocorreu um problema técnico ao tentar marcar o exame. Por favor, tente novamente mais tarde."));
             exit();
         }
     }
-    elseif (isset($_POST['salvar_edicao_solicitacao'])) {
-    $id = $_POST['id_solicitacao'] ?? null;
 
-    if (!$id) {
-        header("Location: ../views/lista_de_exames.php?status=error&message=" . urlencode("ID da solicitação não informado."));
-        exit();
-    }
+    public static function salvarEdicaoSolicitacao() {
+        self::init();
 
-    // Monta dados da solicitação
-    $dados = [
-        "pacienteId" => (int)($_POST['paciente_id'] ?? 0),
-        "dataSolicitacao" => $_POST['data_solicitacao'] ?? '',
-        "dataPrevistaRealizacao" => $_POST['data_prevista'] ?? '',
-        "solicitanteNome" => $_POST['solicitante_nome'] ?? '',
-        "status" => $_POST['status'] ?? 'Pendente',
-        "observacoes" => $_POST['observacoes'] ?? '',
-        "exames" => []
-    ];
+        $id = $_POST['id_solicitacao'] ?? null;
 
-    // Se exames foram enviados
-    if (isset($_POST['exames_nome']) && is_array($_POST['exames_nome'])) {
-        foreach ($_POST['exames_nome'] as $i => $nome) {
-            $dados["exames"][] = [
-                "nomeExame" => $nome,
-                "tipoExameCategoria" => $_POST['exames_categoria'][$i] ?? '',
-                "valorReferenciaSolicitacao" => $_POST['exames_referencia'][$i] ?? '',
-                "statusItem" => $_POST['exames_status'][$i] ?? 'Pendente'
-            ];
+        if (!$id) {
+            header("Location: ../views/lista_de_exames.php?status=error&message=" . urlencode("Não foi possível identificar qual solicitação você tentou editar."));
+            exit();
         }
-    }
 
-    // Envia PUT para a API
-    $api_url = "http://localhost:3000/solicitacoes/$id";
+        $dados = [
+            "pacienteId" => (int)($_POST['paciente_id'] ?? 0),
+            "dataSolicitacao" => $_POST['data_solicitacao'] ?? '',
+            "dataPrevistaRealizacao" => $_POST['data_prevista'] ?? '',
+            "solicitanteNome" => $_POST['solicitante_nome'] ?? '',
+            "status" => $_POST['status'] ?? 'Pendente',
+            "observacoes" => $_POST['observacoes'] ?? '',
+            "exames" => []
+        ];
 
-    $options = [
-        "http" => [
-            "method"  => "PUT",
-            "header"  => "Content-Type: application/json\r\n",
-            "content" => json_encode($dados)
-        ]
-    ];
-
-    $context = stream_context_create($options);
-    $result = @file_get_contents($api_url, false, $context);
-
-// Captura o código de resposta HTTP
-    $responseCode = null;
-    foreach ($http_response_header as $header) {
-        if (preg_match('#HTTP/\d+\.\d+\s+(\d+)#', $header, $matches)) {
-            $responseCode = intval($matches[1]);
-            break;
+        // Normaliza a data para o formato esperado pela API (se vier de um input datetime-local)
+        if (!empty($dados['dataPrevistaRealizacao']) && strpos($dados['dataPrevistaRealizacao'], 'T') !== false) {
+            $dados['dataPrevistaRealizacao'] = str_replace('T', ' ', $dados['dataPrevistaRealizacao']) . ':00';
         }
-    }
 
-    if ($result === false || $responseCode >= 400) {
-        header("Location: ../views/lista_de_exames.php?status=error&message=" . urlencode("Erro ao atualizar a solicitação na API. Código: $responseCode"));
-        exit();
-    } else {
-        header("Location: ../views/lista_de_exames.php?status=success&message=" . urlencode("Solicitação atualizada com sucesso!"));
-        exit();
-    }
+        // Validação da data no modo de edição (se aplicável)
+        if (!empty($dados['dataPrevistaRealizacao'])) {
+            $date = DateTime::createFromFormat('Y-m-d H:i:s', $dados['dataPrevistaRealizacao']);
+            if (!$date) {
+                header("Location: ../views/solicitacao_form.php?status=error&message=" . urlencode("A data e hora para edição que você informou não são válidas. Por favor, verifique."));
+                exit();
+            }
+        }
 
-    }
-}
-// Lógica para carregar DADOS DE EDIÇÃO DE UMA SOLICITAÇÃO (GET)
-elseif (isset($_GET['editar'])) {
-    $idSolicitacao = $_GET['editar'];
-    $solicitacaoParaEdicao = $solicitacaoDao->buscarPorId($idSolicitacao);
-    if (!isset($solicitacaoParaEdicao) || $solicitacaoParaEdicao === false) {
-        header("Location: ../views/_pendentes.php?status=error&message=" . urlencode("Solicitação ID {$idSolicitacao} não encontrada ou erro ao buscar."));
-        exit();
-    }
-}
-// Lógica para EXCLUIR Solicitação (GET)
-elseif (isset($_GET['excluir'])) {
-    $id = $_GET['excluir'];
-    try {
-        $result = $solicitacaoDao->excluir($id);
-        if (isset($result['success']) && $result['success']) {
-             header("Location: ../views/_pendentes.php?status=success&message=" . urlencode("Solicitação excluída com sucesso!"));
+
+        if (isset($_POST['exames_nome']) && is_array($_POST['exames_nome'])) {
+            foreach ($_POST['exames_nome'] as $i => $nome) {
+                $dados["exames"][] = [
+                    "nomeExame" => $nome,
+                    "tipoExameCategoria" => $_POST['exames_categoria'][$i] ?? '',
+                    // Adicione estes campos se eles vierem do formulário de edição
+                    "valorReferenciaSolicitacao" => $_POST['exames_referencia'][$i] ?? '',
+                    "statusItem" => $_POST['exames_status'][$i] ?? 'Pendente'
+                ];
+            }
+        }
+
+        // Idealmente, esta lógica de PUT estaria encapsulada no SolicitacaoDaoApi
+        $api_url = "http://localhost:3000/solicitacoes/$id";
+
+        $options = [
+            "http" => [
+                "method"  => "PUT",
+                "header"  => "Content-Type: application/json\r\n",
+                "content" => json_encode($dados)
+            ]
+        ];
+
+        $context = stream_context_create($options);
+        $result = @file_get_contents($api_url, false, $context);
+
+        $responseCode = null;
+        if (isset($http_response_header)) { // Verifica se o cabeçalho HTTP existe
+            foreach ($http_response_header as $header) {
+                if (preg_match('#HTTP/\d+\.\d+\s+(\d+)#', $header, $matches)) {
+                    $responseCode = intval($matches[1]);
+                    break;
+                }
+            }
+        }
+        
+        if ($result === false || $responseCode >= 400) {
+            header("Location: ../views/lista_de_exames.php?status=error&message=" . urlencode("Parece que algo deu errado ao tentar salvar as alterações na solicitação. Por favor, tente novamente. Código: $responseCode"));
+            exit();
         } else {
-             header("Location: ../views/_pendentes.php?status=error&message=" . urlencode("Erro ao excluir solicitação: " . ($result['erro'] ?? '')));
+            header("Location: ../views/lista_de_exames.php?status=success&message=" . urlencode("Sucesso! A solicitação foi atualizada com sucesso!"));
+            exit();
         }
-        exit();
-    } catch (Exception $e) {
-        error_log("Erro ao processar GET de exclusão de solicitação: " . $e->getMessage());
-        header("Location: ../views/_pendentes.php?status=error&message=" . urlencode("Erro interno ao excluir solicitação: " . $e->getMessage()));
-        exit();
+    }
+
+    public static function buscarSolicitacaoParaEdicao($idSolicitacao) {
+        self::init();
+        $solicitacao = self::$solicitacaoDao->buscarPorId($idSolicitacao);
+        // O SolicitacaoDaoApi já deve retornar um objeto Solicitacao ou null/false
+        if (!$solicitacao) { // Verifica se não é nulo ou false
+            // Redirecionamento movido para a view, pois o controller deve apenas retornar o dado.
+            // A view decide o que fazer se o dado não for encontrado.
+            return null; // Retorna null para a view indicar que não encontrou
+        }
+        return $solicitacao;
+    }
+
+    public static function excluirSolicitacao($id) {
+        self::init();
+        try {
+            $result = self::$solicitacaoDao->excluir($id);
+            if (isset($result['success']) && $result['success']) {
+                header("Location: ../views/lista_solicitacoes_pendentes.php?status=success&message=" . urlencode("A solicitação foi excluída com sucesso!")); // Ajustado para lista_solicitacoes_pendentes.php
+            } else {
+                header("Location: ../views/lista_solicitacoes_pendentes.php?status=error&message=" . urlencode("Putz! Não foi possível excluir a solicitação. " . ($result['erro'] ?? 'Talvez ela já tenha sido removida.'))); // Ajustado para lista_solicitacoes_pendentes.php
+            }
+            exit();
+        } catch (Exception $e) {
+            error_log("Erro ao processar GET de exclusão de solicitação: " . $e->getMessage());
+            header("Location: ../views/lista_solicitacoes_pendentes.php?status=error&message=" . urlencode("Ocorreu um erro interno ao tentar remover a solicitação. Por favor, tente mais tarde.")); // Ajustado para lista_solicitacoes_pendentes.php
+            exit();
+        }
+    }
+
+    // Retorna uma lista de objetos Solicitacao para exibição
+    public static function listarSolicitacoesPendentes(){
+        self::init();
+        $api_url = "http://localhost:3000/solicitacoes?status=Pendente";
+        $response = @file_get_contents($api_url);
+        $solicitacoes = json_decode($response, true);
+
+        if ($response === false || !is_array($solicitacoes)) {
+            error_log("Erro ao buscar solicitações pendentes da API: " . ($response === false ? 'Falha na conexão ou resposta vazia' : 'Resposta não é um array válido.'));
+            return [];
+        }
+        
+        $listaObjetosSolicitacao = [];
+        if (!empty($solicitacoes)) {
+            foreach ($solicitacoes as $solData) {
+                $solicitacao = new Solicitacao();
+                // Assumindo que os setters em Solicitacoes.php correspondem aos nomes da API
+                $solicitacao->setIdSolicitacao($solData['id'] ?? null);
+                $solicitacao->setPacienteId($solData['pacienteId'] ?? null);
+                $solicitacao->setDataSolicitacao($solData['dataSolicitacao'] ?? null);
+                $solicitacao->setDataPrevistaRealizacao($solData['dataPrevistaRealizacao'] ?? null);
+                $solicitacao->setSolicitanteNome($solData['solicitanteNome'] ?? null);
+                $solicitacao->setStatus($solData['status'] ?? null);
+                $solicitacao->setObservacoes($solData['observacoes'] ?? null);
+
+                if (isset($solData['exames']) && is_array($solData['exames'])) {
+                    $examesItens = [];
+                    foreach ($solData['exames'] as $itemData) {
+                        $item = new SolicitacaoExameItem();
+                        $item->setId($itemData['id'] ?? null);
+                        $item->setNomeExame($itemData['nomeExame'] ?? null);
+                        $item->setTipoExameCategoria($itemData['tipoExameCategoria'] ?? null);
+                        $item->setValorReferenciaSolicitacao($itemData['valorReferenciaSolicitacao'] ?? null);
+                        $item->setStatusItem($itemData['statusItem'] ?? null);
+                        $examesItens[] = $item;
+                    }
+                    $solicitacao->setExamesItens($examesItens);
+                }
+                $listaObjetosSolicitacao[] = $solicitacao;
+            }
+        }
+        return $listaObjetosSolicitacao;
     }
 }
 
-// Em SolicitacaoController.php
-function listarSolicitacoesPendentes(){
-    $api_url = "http://localhost:3000/solicitacoes?status=Pendente";
-    $response = @file_get_contents($api_url); // O '@' esconde erros, mas a mensagem genérica aparece
-    $solicitacoes = json_decode($response, true);
+// Este bloco é para processar requisições HTTP DIRETAS para este controller.
+// Ele age como um "roteador" para os métodos estáticos da classe.
+if (basename($_SERVER['PHP_SELF']) === 'SolicitacaoController.php') {
+    SolicitacaoController::init(); // Inicializa o DAO para este contexto de requisição direta
 
-    if ($response === false || !is_array($solicitacoes)) { // Esta condição captura o erro
-        // Aqui é onde o erro "Erro ao conectar..." seria gerado ou propagado
-        return []; // Retorna array vazio, levando à mensagem de erro na view
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if (isset($_POST['marcar_exame'])) {
+            SolicitacaoController::marcarExame();
+        } elseif (isset($_POST['salvar_edicao_solicitacao'])) {
+            SolicitacaoController::salvarEdicaoSolicitacao();
+        }
+    } elseif ($_SERVER['REQUEST_METHOD'] === 'GET') {
+        if (isset($_GET['excluir'])) {
+            SolicitacaoController::excluirSolicitacao($_GET['excluir']);
+        }
     }
-    return $solicitacoes;
 }
 
-
-// Função para listar solicitações na interface (gera o HTML da tabela)
-// function listarSolicitacoes(){
-//     global $solicitacaoDao; // Acessa a instância global do DAO
-//     $lista = $solicitacaoDao->read(); // Lê todas as solicitações da API Node.js
-
-//     if (!empty($lista)) {
-//         foreach($lista as $solicitacao){
-//             echo "<tr> 
-//                     <td>" . htmlspecialchars($solicitacao->getIdSolicitacao() ?? 'N/A') . "</td>
-//                     <td>" . htmlspecialchars($solicitacao->getPacienteId() ?? 'N/A') . "</td>
-//                     <td>" . htmlspecialchars($solicitacao->getDataSolicitacao() ?? 'N/A') . "</td>
-//                     <td>" . htmlspecialchars($solicitacao->getDataPrevistaRealizacao() ?? 'N/A') . "</td>
-//                     <td>" . htmlspecialchars($solicitacao->getSolicitanteNome() ?? 'N/A') . "</td>
-//                     <td>" . htmlspecialchars($solicitacao->getStatus() ?? 'N/A') . "</td>
-//                     <td> 
-//                         <a href='solicitacao_form.php?editar=" . htmlspecialchars($solicitacao->getIdSolicitacao() ?? '') . "'>Editar</a>
-//                         &nbsp; | &nbsp; 
-//                         <a href='../controller/SolicitacaoController.php?excluir=" . htmlspecialchars($solicitacao->getIdSolicitacao() ?? '') . "' onclick=\"return confirm('Tem certeza que deseja excluir esta solicitação?')\">Excluir</a>
-//                     </td>
-//                 </tr>";
-//         }
-//     } else {
-//         echo "<tr><td colspan='7'>Nenhuma solicitação encontrada.</td></tr>"; // Ajuste o colspan
-//     }
+// Variável para a view de edição, caso ela precise popular o formulário
+// Essa variável não é tratada pelo bloco de roteamento direto acima,
+// mas sim pela própria view que inclui este controller.
+$solicitacaoParaEdicao = null; // Reinicializa para garantir que está limpa antes de ser usada
+if (isset($_GET['editar']) && !isset($_POST['salvar_edicao_solicitacao'])) {
+    $idSolicitacao = $_GET['editar'];
+    $solicitacaoParaEdicao = SolicitacaoController::buscarSolicitacaoParaEdicao($idSolicitacao);
+    // Se a solicitação não for encontrada, redireciona aqui na view, não no controller
+    if (!$solicitacaoParaEdicao) {
+        header("Location: ../views/lista_solicitacoes_pendentes.php?status=error&message=" . urlencode("Não conseguimos encontrar a solicitação (ID: {$idSolicitacao}) para edição. Ela pode não existir mais."));
+        exit();
+    }
+}
 
 ?>

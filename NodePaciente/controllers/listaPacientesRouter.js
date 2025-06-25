@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const fetch = require("node-fetch"); // ou axios, se preferir
+//const fetch = require("node-fetch"); // ou axios, se preferir
 
 // Rota para exibir a view HTML com a lista de pacientes
 router.get("/lista_pacientes", async (req, res) => {

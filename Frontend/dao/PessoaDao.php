@@ -15,7 +15,7 @@ class PessoaDao{
             "numCelular" => $pessoa->getnumCelular(),
             "genero" => $pessoa->getGenero()
         ];
-
+        
         $options = [
             "http" => [
                 "header"  => "Content-Type: application/json\r\n",
