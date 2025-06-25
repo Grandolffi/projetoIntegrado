@@ -13,6 +13,7 @@ $avatarUsuarioLogin = "https://via.placeholder.com/50/1A2A3A/FFFFFF?Text=F";
 $linkDashboard = "dashboard.php";
 $linkCadastroPaciente = 'CadastroPaciente.php';
 $linkListaPaciente = 'ListarPaciente.php';
+$linkUsuario1 = "perfilUser.php";
 
 // Links da seção Exame
 $linkListaExames = "lista_de_exames.php";
@@ -22,6 +23,7 @@ $linkCadastrarResultadoExame = "lista_solicitacoes_pendentes.php"; // Novo nome 
 
 $linkUsuario = "perfilUser.php"; // Certifique-se de criar esta página na pasta views
 $linkEstoque = "AcessarEstoque.php"; // Certifique-se de que esta página está na pasta views
+
 
 // Lógica para destacar o item "Exame" (pai) se qualquer página da seção Exame estiver ativa
 $secaoExameAtiva = (
