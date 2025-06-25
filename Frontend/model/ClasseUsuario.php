@@ -1,5 +1,4 @@
 <?php
-debug_print_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS);
 if (class_exists('Usuario')) {
     return;
 }

@@ -1,6 +1,6 @@
 <?php
 
-require_once realpath(__DIR__ . '/../model/ClasseUsuario.php');
+require_once __DIR__ . '/../model/ClasseUsuario.php';
 
 
 
