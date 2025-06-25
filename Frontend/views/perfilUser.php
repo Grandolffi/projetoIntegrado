@@ -17,28 +17,30 @@ require_once __DIR__ . '/../model/ClasseUsuario.php';
 $UserDao = new UserDao();
 
 $tipo = $_SESSION['usuario_tipo']; // ex: 'medico', 'balconista'
-$temPermissaoEditar = $tipo === 'medico';
+// A permissão para editar os próprios dados, se necessário, pode ser controlada aqui
+// No seu original, o tipo de usuário médico podia editar, vamos manter a flag.
+$temPermissaoEditar = $tipo === 'medico'; // Usuários com tipo 'medico' podem ver os campos habilitados
 
 $idUsuario = $_SESSION['usuario_id'];
-$usuario = $UserDao->buscaPorId($idUsuario);
+$usuario = $UserDao->buscaPorId($idUsuario); // Dados do usuário logado
 
-// Processa submissão do formulário de edição
+$msgSucesso = '';
+
+// --- INÍCIO DO BLOCO PHP PARA PROCESSAR O FORMULÁRIO DE EDIÇÃO (MANTIDO DO SEU ORIGINAL) ---
+// Este bloco processa a submissão do formulário "Meus Dados"
+// NOTA: Com o botão de submit removido, este bloco não será mais acionado por este formulário.
+// Se você ainda precisa de uma forma de salvar as alterações de Nome/Email, precisará de outro botão de submit.
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $temPermissaoEditar) {
     $nome = trim($_POST['nome'] ?? '');
     $email = trim($_POST['email'] ?? '');
-    $senha = trim($_POST['senha'] ?? '');
+    // O campo de senha foi removido do HTML, então $senha não virá do POST aqui.
+    // Se precisar de alteração de senha, será outra funcionalidade.
     $tipoForm = $_POST['tipo'] ?? '';
-
-    // Validar dados básicos aqui (pode melhorar depois)
 
     // Atualiza usuário
     $usuario->setNome($nome);
     $usuario->setEmail($email);
-    if (!empty($senha)) {
-        // Atualiza a senha só se for preenchida
-        $usuario->setSenha(password_hash($senha, PASSWORD_DEFAULT));
-    }
-    $usuario->setTipo($tipoForm);
+    $usuario->setTipo($tipoForm); // Atualiza o tipo, se permitido
 
     $UserDao->atualizar($usuario);
 
@@ -51,8 +53,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $temPermissaoEditar) {
 
     $msgSucesso = "Dados atualizados com sucesso!";
 }
+// --- FIM DO BLOCO PHP PARA PROCESSAR O FORMULÁRIO DE EDIÇÃO ---
 
-// Se médico, busca todos usuários para listagem
+// Se médico, busca todos usuários para listagem (mantido do seu original)
 $usuariosListagem = [];
 if ($tipo === 'medico') {
     $usuariosListagem = $UserDao->listarTodos();
@@ -67,7 +70,7 @@ if ($tipo === 'medico') {
     <title>Perfil do Usuário</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="../public/css/Style.css" />
-</head>
+    </head>
 <body class="corpo-dashboard">
     <div class="container-dashboard">
         <?php include_once __DIR__ . '/menuLateral.php'; ?>
@@ -76,7 +79,7 @@ if ($tipo === 'medico') {
             <header class="cabecalho-principal">
                 <h1>Perfil do Usuário</h1>
                 <?php include_once __DIR__ . '/info_cabecalho.php'; ?>
-            </header>
+                </header>
 
             <div class="form-container">
 
@@ -96,28 +99,23 @@ if ($tipo === 'medico') {
                             <label for="email" class="form-label">E-mail</label>
                             <input type="email" name="email" id="email" class="form-control" value="<?= htmlspecialchars($usuario->getEmail()); ?>" <?= $temPermissaoEditar ? '' : 'readonly' ?> required>
                         </div>
-                        <div class="mb-3">
-                            <label for="senha" class="form-label">Senha (preencha para alterar)</label>
-                            <input type="password" name="senha" id="senha" class="form-control" placeholder="Nova senha">
-                        </div>
                         <?php if ($temPermissaoEditar): ?>
                         <div class="mb-3">
                             <label for="tipo" class="form-label">Tipo de usuário</label>
                             <select name="tipo" id="tipo" class="form-select" required>
                                 <option value="medico" <?= $usuario->getTipo() === 'medico' ? 'selected' : '' ?>>Médico</option>
                                 <option value="balconista" <?= $usuario->getTipo() === 'balconista' ? 'selected' : '' ?>>Balconista</option>
-                                <!-- Outros tipos se houver -->
-                            </select>
+                                </select>
                         </div>
                         <?php else: ?>
                             <input type="hidden" name="tipo" value="<?= htmlspecialchars($usuario->getTipo()) ?>">
                         <?php endif; ?>
 
-                        <?php if ($temPermissaoEditar): ?>
                         <div class="text-center">
-                            <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+                            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmLogoutModal">
+                                Sair
+                            </button>
                         </div>
-                        <?php endif; ?>
                     </form>
                 </div>
 
@@ -143,8 +141,7 @@ if ($tipo === 'medico') {
                                     <td><?= htmlspecialchars($u->getTipo()) ?></td>
                                     <td>
                                         <a href="editarUsuario.php?id=<?= $u->getId() ?>" class="btn btn-warning btn-sm">Editar</a>
-                                        <!-- Pode adicionar botão excluir aqui -->
-                                    </td>
+                                        </td>
                                 </tr>
                             <?php endforeach; ?>
                             <?php if (empty($usuariosListagem)) : ?>
@@ -157,6 +154,24 @@ if ($tipo === 'medico') {
 
             </div>
         </main>
+    </div>
+
+    <div class="modal fade" id="confirmLogoutModal" tabindex="-1" aria-labelledby="confirmLogoutModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="confirmLogoutModalLabel">Confirmação de Logout</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    Você tem certeza que deseja sair?
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <a href="logout.php" class="btn btn-primary">Sair</a>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
