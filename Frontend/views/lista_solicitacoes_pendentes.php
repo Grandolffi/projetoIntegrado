@@ -23,6 +23,21 @@ if ($response === false) {
     $solicitacoes = $solicitacoes_data;
 }
 
+session_start();
+
+// Verifica se está logado
+if (!isset($_SESSION['usuario_id'])) {
+    header("Location: login.php");
+    exit;
+}
+
+// Verifica se é médico (tipo = 'medico' ou id = 1, dependendo do que você usa)
+if ($_SESSION['usuario_tipo'] !== 'medico') {
+    echo "<h3>Acesso negado. Você não tem permissão para acessar esta página.</h3>";
+    exit;
+}
+
+
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
