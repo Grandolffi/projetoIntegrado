@@ -37,10 +37,12 @@ class ExameDaoApi {
     }
 
     // update
-    public function editar(ResultadoExames $exame) { // <-- ESTE É O PROBLEMA! NOME DUPLICADO
+    public function editar(ResultadoExames $exame) {
+
         // Endpoint da API Node.js para edição de exames (PUT).
         // Ajuste esta URL se seu endpoint for diferente (ex: http://localhost:3000/api/exames/)
-        $url = "http://localhost:3000/editarexame/" . urlencode($exame->getIdExame());
+        $url = "http://localhost:3000/exames/" . urlencode($exame->getIdExame());
+       // $url = "http://localhost:3000/editarexame/" . urlencode($exame->getIdExame());
         
         // Dados do exame a serem enviados para atualização.
         $dados = [
@@ -49,11 +51,10 @@ class ExameDaoApi {
             "tipo_exame" => $exame->getTipoExame(),
             "valor_absoluto" => $exame->getValorAbsoluto(),
             "valor_referencia" => $exame->getValorReferencia(),
-            "paciente_registro" => $exame->getPacienteRegistro(), // Atenção: aqui ainda usa paciente_registro
             "data_hora_exame" => $exame->getDataHora()
         ];
+    
 
-        // Opções para a requisição HTTP (método PUT, cabeçalho JSON, conteúdo JSON).
         $options = [
             "http" => [
                 "header"  => "Content-Type: application/json\r\n",
@@ -62,13 +63,12 @@ class ExameDaoApi {
             ]
         ];
 
-        // Cria o contexto de stream.
         $context = stream_context_create($options);
-        // Faz a requisição.
-        $result = file_get_contents($url, false, $context);
-        
-       if ($result === FALSE) {
-            return ["erro" => "Falha na requisição PATCH"];
+        $result = @file_get_contents($url, false, $context);
+
+        if ($result === FALSE) {
+            error_log("Falha na requisição PUT para editar exame. URL: $url");
+            return ["erro" => "Falha na requisição PUT"];
         }
 
         return json_decode($result, true);

@@ -2,7 +2,7 @@
 const express = require("express");
 const router = express.Router();
 
-const { insertSolicitacao, getSolicitacoes, getSolicitacaoById, updateSolicitacao, deleteSolicitacao, updateSolicitacaoStatus } = require("../model/DAO/solicitacaoDAO"); // Garante que updateSolicitacaoStatus está importado
+const {insertSolicitacao, getSolicitacoes, getSolicitacaoById, updateSolicitacao, deleteSolicitacao, updateSolicitacaoStatus} = require("../model/DAO/solicitacaoDAO"); // Garante que updateSolicitacaoStatus está importado
 
 // --- ROTAS PARA SOLICITAÇÕES (Montadas em /solicitacoes no app.js/server.js) ---
 

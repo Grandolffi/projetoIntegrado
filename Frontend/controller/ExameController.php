@@ -119,6 +119,11 @@ function listarExames(){
     global $exameDao;
     $lista = $exameDao->read();
 
+      // Debug
+    echo "<pre>";
+    print_r($lista);
+    echo "</pre>";
+
     if (!empty($lista)) {
         foreach($lista as $exame) {
             echo "<tr> 

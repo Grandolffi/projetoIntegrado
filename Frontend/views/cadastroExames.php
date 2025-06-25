@@ -11,69 +11,56 @@ require_once __DIR__ . '/../model/ResultadoExames.php';
 
 // Variáveis de controle para o formulário
 $exames_solicitados_para_preencher = [];
-// Alterei aqui: Variável para ID do paciente no formulário, consistente com o que será exibido
-$paciente_id_formulario = null; 
-$data_laudo_prevista = null; // Usado para a data/hora do input no modo de preenchimento de solicitação
+$paciente_id_formulario = null;
+$data_laudo_prevista = null;
 $solicitacao_id = null;
 $errorMessage = null;
-$exameParaEdicao = null; // Objeto ResultadoExames para edição
+$exameParaEdicao = null;
 $solicitacaoId = $_GET['solicitacao_id'] ?? null;
 $solicitacaoData = null;
 
-if ($solicitacaoId) {
-    $api_url = "http://localhost:3000/solicitacoes/$solicitacaoId"; // GET /solicitacoes/:id
-    $response = @file_get_contents($api_url);
-    if ($response !== false) {
-        $solicitacaoData = json_decode($response, true);
-    }
+// ✅ Garante que o exame seja buscado corretamente no modo edição
+if (isset($_GET['editar'])) {
+    $exameDaoTemp = new ExameDaoApi();
+    $exame = $exameDaoTemp->buscarPorId($_GET['editar']);
 }
 
 // --- INÍCIO DA LÓGICA REESTRUTURADA ---
 
-// 1. Prioriza a EDIÇÃO DE UM EXAME INDIVIDUAL (se 'editar' está na URL)
+// 1. Prioriza a EDIÇÃO DE UM EXAME INDIVIDUAL
 if (isset($_GET['editar'])) {
     $idExameParaEditar = $_GET['editar'];
-
-    // A variável $exame (definida globalmente no ExameController.php) já deve conter o objeto
-    // após a inclusão de ExameController.php e o processamento de seu GET 'editar'.
-    global $exame; // Acesse a variável global $exame do ExameController.php
+    global $exame;
     $exameParaEdicao = $exame;
 
-    if (!isset($exameParaEdicao) || $exameParaEdicao === false) { // Verifica se o exame foi encontrado
+    if (!$exameParaEdicao) {
         $errorMessage = "Exame não encontrado para edição (ID: " . htmlspecialchars($idExameParaEditar) . ").";
     } else {
-        // Alterei aqui: Preenche campos com o pacienteIdFk do exame para edição
-        $paciente_id_formulario = $exameParaEdicao->getPacienteIdFk(); // Usar getPacienteIdFk()
-        // Para a data/hora, use a do exame, formatando para datetime-local
+        $paciente_id_formulario = $exameParaEdicao->getPacienteIdFk();
         if ($exameParaEdicao->getDataHora()) {
             try {
                 $dt = new DateTime($exameParaEdicao->getDataHora());
-                $data_laudo_prevista = $dt->format('Y-m-d\TH:i'); // Formato datetime-local
-            } catch (Exception $e) { /* fallback */ }
+                $data_laudo_prevista = $dt->format('Y-m-d\TH:i');
+            } catch (Exception $e) { }
         }
     }
 }
-// 2. Senão, verifica se é um PREENCHIMENTO DE LAUDO PARA UMA SOLICITAÇÃO (se 'solicitacao_id' está na URL)
+// 2. Caso seja preenchimento de laudo via solicitação
 elseif (isset($_GET['solicitacao_id'])) {
     $solicitacao_id = $_GET['solicitacao_id'];
-    // Ajuste o endpoint conforme sua API Node.js (sem /api/)
     $api_url_solicitacao = "http://localhost:3000/solicitacoes/" . urlencode($solicitacao_id);
-
     $response = @file_get_contents($api_url_solicitacao);
     $solicitacao_data = json_decode($response, true);
 
     if ($response === false) {
         $errorMessage = "Erro ao conectar com a API para carregar detalhes da solicitação.";
     } elseif ($solicitacao_data && isset($solicitacao_data['exames'])) {
-        // Alterei aqui: Pega o paciente_id da solicitação para o campo do formulário
-        $paciente_id_formulario = $solicitacao_data['paciente_id'] ?? 'N/A'; 
-        // Adapte data_laudo_prevista para o formato datetime-local
+        $paciente_id_formulario = $solicitacao_data['paciente_id'] ?? 'N/A';
         if (isset($solicitacao_data['data_prevista_realizacao'])) {
             try {
                 $dt = new DateTime($solicitacao_data['data_prevista_realizacao']);
                 $data_laudo_prevista = $dt->format('Y-m-d\TH:i');
             } catch (Exception $e) {
-                // Tenta pegar apenas a parte da data e hora se não for um formato completo
                 $data_laudo_prevista = substr($solicitacao_data['data_prevista_realizacao'], 0, 16);
             }
         }
@@ -82,6 +69,7 @@ elseif (isset($_GET['solicitacao_id'])) {
         $errorMessage = "Solicitação não encontrada ou erro ao carregar dados.";
     }
 }
+
 // 3. Caso não haja nem 'editar' nem 'solicitacao_id' (página acessada sem parâmetros)
 else {
     $errorMessage = "Nenhum ID de solicitação ou exame fornecido para preenchimento/edição. Por favor, selecione uma solicitação ou exame na lista.";

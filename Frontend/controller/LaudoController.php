@@ -107,7 +107,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     elseif (isset($_POST['salvar_edicao_laudo'])) {
         $id_laudo = $_POST['id_laudo'] ?? null;
         if (!$id_laudo) {
-            header("Location: ../views/lista_de_laudos.php?status=error&message=" . urlencode("ID do laudo não fornecido para atualização."));
+            header("Location: ../views/lista_de_exames.php?status=error&message=" . urlencode("ID do laudo não fornecido para atualização."));
             exit();
         }
 
@@ -121,7 +121,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         try {
             $laudoDao->editar($laudo);
-            header("Location: ../views/lista_de_laudos.php?status=success&message=" . urlencode("Laudo atualizado com sucesso!"));
+            header("Location: ../views/lista_de_exames.php?status=success&message=" . urlencode("Laudo atualizado com sucesso!"));
             exit();
         } catch (Exception $e) {
             header("Location: ../views/editar_laudo.php?id={$id_laudo}&status=error&message=" . urlencode("Erro ao atualizar laudo: " . $e->getMessage()));
@@ -150,10 +150,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $id = $_GET['excluir'];
         try {
             $laudoDao->excluir($id);
-            header("Location: ../views/lista_de_laudos.php?status=success&message=" . urlencode("Laudo excluído com sucesso!"));
+            header("Location: ../views/lista_de_exames.php?status=success&message=" . urlencode("Laudo excluído com sucesso!"));
             exit();
         } catch (Exception $e) {
-            header("Location: ../views/lista_de_laudos.php?status=error&message=" . urlencode($e->getMessage()));
+            header("Location: ../views/lista_de_exames.php?status=error&message=" . urlencode($e->getMessage()));
             exit();
         }
     }

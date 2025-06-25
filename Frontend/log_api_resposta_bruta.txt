@@ -1,1 +1,1 @@
-{"success":true,"idSolicitacao":9}
+{"success":true,"message":"Status da solicitação atualizado com sucesso.","solicitacao":{"id_solicitacao":3,"paciente_id":3,"data_solicitacao":"2025-06-22T14:00:00.000Z","data_prevista_realizacao":"2025-06-25T17:00:00.000Z","solicitante_nome":"Dra. Sofia","status":"Concluída","observacoes":"Avaliação clínica"}}
