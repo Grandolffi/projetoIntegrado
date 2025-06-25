@@ -19,6 +19,8 @@ const solicitacoesRouter = require('./solicitacoesRouter.js');
 const laudosRouter = require('./laudosRouter.js'); 
 const listaPacientesRouter = require("./listaPacientesRouter");
 const listaExamesRouter = require("./listaExamesRouter");
+const listaLaudosRouter = require("./listaLaudosRouter");
+const listaSolicitacoesRouter = require("./listaSolicitacoesRouter");
 
 // Registra as rotas com prefixos para evitar conflitos
 app.use(pacientesRouter);
@@ -27,6 +29,9 @@ app.use('/solicitacoes', solicitacoesRouter);// E as rotas em solicitacoesRouter
 app.use(laudosRouter); // E as rotas em laudosRouter começarão com /laudos
 app.use(listaPacientesRouter);
 app.use(listaExamesRouter);
+app.use(listaLaudosRouter);
+app.use(listaSolicitacoesRouter);
+
 
 app.listen(3000, 'localhost', () => {
     console.log("Servidor rodando na porta 3000");
