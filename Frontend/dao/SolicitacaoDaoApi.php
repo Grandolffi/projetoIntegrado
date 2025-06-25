@@ -87,6 +87,18 @@ file_put_contents(__DIR__ . '/../log_api_resposta_bruta.txt', $result);
         return null;
     }
 
+    // Dentro da classe SolicitacaoDaoApi
+public function updateSolicitacaoStatus($id, $newStatus) {
+    $data = [
+        "status" => $newStatus
+    ];
+    // O endpoint PUT em SolicitacaoRouter.js para atualização de status seria /solicitacoes/:id/status
+    // OU, se seu updateSolicitacao no Node.js puder receber apenas o status, você pode usar ele.
+    // Pelo seu solicitacaoDAO.js, há um updateSolicitacaoStatus que parece ser um endpoint específico.
+    // Assumo um endpoint PUT /solicitacoes/:id/status
+    return $this->callApi('PUT', "/solicitacoes/" . urlencode($id) . "/status", $data); 
+}
+
     // Método para editar uma Solicitação (PUT)
     public function editar(Solicitacao $solicitacao) {
         $dados = [

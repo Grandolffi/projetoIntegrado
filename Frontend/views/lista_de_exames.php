@@ -6,7 +6,7 @@ error_reporting(E_ALL);
 
 /*if ($temPermissaoEditar): ?>
     <a href="editarResultados.php" class="btn btn-success">Editar Resultados</a>
-<?php endif; ?>*/
+<?php endif;*/
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
@@ -41,7 +41,7 @@ error_reporting(E_ALL);
                         <thead class="table-light">
                             <tr>
                                 <th scope="col">ID Laudo</th> 
-                                <th scope="col">Nº Registro Paciente</th>
+                                <th scope="col">ID Paciente</th> 
                                 <th scope="col">Nome Exame</th> 
                                 <th scope="col">Valor Absoluto</th>
                                 <th scope="col">Valor Referência</th>

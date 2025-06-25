@@ -20,7 +20,6 @@ $status_form = 'Pendente';
 $observacoes_form = '';
 $exames_solicitados_itens_para_form = [];
 
-// Se estiver editando (exemplo: vindo do controller)
 if (isset($solicitacaoParaEdicao) && $solicitacaoParaEdicao instanceof Solicitacao) {
     $titulo_pagina = "Editar Solicitação de Exame";
     $botao_submit_nome = "salvar_edicao_solicitacao";
@@ -29,14 +28,10 @@ if (isset($solicitacaoParaEdicao) && $solicitacaoParaEdicao instanceof Solicitac
     $solicitacao_id_form = $solicitacaoParaEdicao->getIdSolicitacao();
     $paciente_id_form = $solicitacaoParaEdicao->getPacienteId();
 
-    // *** Exemplo: preencher nome do paciente (ajuste conforme seu objeto) ***
     if (method_exists($solicitacaoParaEdicao, 'getNomePaciente')) {
         $nome_paciente_form = $solicitacaoParaEdicao->getNomePaciente();
-    } else {
-        // Caso não tenha método, deixe vazio ou preencha de outra forma
-        $nome_paciente_form = '';
     }
-    
+
     if ($solicitacaoParaEdicao->getDataPrevistaRealizacao()) {
         try {
             $dt = new DateTime($solicitacaoParaEdicao->getDataPrevistaRealizacao());
@@ -54,7 +49,6 @@ if (isset($solicitacaoParaEdicao) && $solicitacaoParaEdicao instanceof Solicitac
     }
 }
 
-// Laboratórios fixos
 $labs = ['Microbiologia', 'Parasitologia', 'Hematologia', 'Bioquimica', 'Urinálise'];
 ?>
 
@@ -64,231 +58,156 @@ $labs = ['Microbiologia', 'Parasitologia', 'Hematologia', 'Bioquimica', 'Urinál
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title><?php echo htmlspecialchars($titulo_pagina); ?></title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
-        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="../public/css/Style.css" />
+    <style>
+        .sub-opcoes { margin-left: 20px; margin-bottom: 20px; }
+    </style>
 </head>
 <body class="corpo-dashboard">
-    <div class="container-dashboard">
-        <?php include __DIR__ . '/menuLateral.php'; ?>
+<div class="container-dashboard">
+    <?php include __DIR__ . '/menuLateral.php'; ?>
 
-        <main class="conteudo-principal">
-            <header class="cabecalho-principal">
-                <h2><?php echo htmlspecialchars($titulo_pagina); ?></h2>
-                <?php include __DIR__ . '/info_cabecalho.php'; ?>
-            </header>
+    <main class="conteudo-principal">
+        <header class="cabecalho-principal">
+            <h2><?php echo htmlspecialchars($titulo_pagina); ?></h2>
+            <?php include __DIR__ . '/info_cabecalho.php'; ?>
+        </header>
 
-            <div class="form-container">
-                <?php if (isset($_GET['status'])): ?>
-                    <?php if ($_GET['status'] === 'success'): ?>
-                        <div class="alert alert-success" role="alert">
-                            <?php echo htmlspecialchars($_GET['message'] ?? 'Solicitação realizada com sucesso!'); ?>
-                        </div>
-                    <?php elseif ($_GET['status'] === 'error'): ?>
-                        <div class="alert alert-danger" role="alert">
-                            <?php echo htmlspecialchars($_GET['message'] ?? 'Erro ao processar solicitação.'); ?>
-                        </div>
-                    <?php endif; ?>
+        <div class="form-container">
+            <form action="../controller/SolicitacaoController.php" method="POST" novalidate>
+                <?php if ($solicitacao_id_form): ?>
+                    <input type="hidden" name="id_solicitacao" value="<?php echo htmlspecialchars($solicitacao_id_form); ?>" />
                 <?php endif; ?>
 
-                <form action="../controller/SolicitacaoController.php" method="POST" novalidate>
-                    <?php if ($solicitacao_id_form): ?>
-                        <input type="hidden" name="id_solicitacao" value="<?php echo htmlspecialchars($solicitacao_id_form); ?>" />
-                    <?php endif; ?>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label for="nome" class="form-label">Nome do Paciente</label>
+                        <input type="text" name="nome" id="nome" class="form-control" value="<?php echo htmlspecialchars($nome_paciente_form); ?>" required />
+                    </div>
+                    <div class="col-md-6">
+                        <label for="idPac" class="form-label">ID do Paciente</label>
+                        <input type="text" name="idPac" id="idPac" class="form-control" value="<?php echo htmlspecialchars($paciente_id_form); ?>" required />
+                    </div>
+                </div>
 
+                <div class="mb-3">
+                    <label for="data_marcada_exame" class="form-label">Data e Hora para Marcação do Exame</label>
+                    <input type="datetime-local" class="form-control" name="data_marcada_exame" id="data_marcada_exame" value="<?php echo htmlspecialchars($data_marcada_exame_form); ?>" required />
+                </div>
+
+                <?php if ($solicitacao_id_form): ?>
                     <div class="row mb-3">
                         <div class="col-md-6">
-                            <label for="nome" class="form-label">Nome do Paciente</label>
-                            <input
-                                type="text"
-                                name="nome"
-                                id="nome"
-                                class="form-control"
-                                value="<?php echo htmlspecialchars($nome_paciente_form); ?>"
-                                required
-                            />
+                            <label for="solicitante_nome" class="form-label">Nome do Solicitante</label>
+                            <input type="text" name="solicitante_nome" id="solicitante_nome" class="form-control" value="<?php echo htmlspecialchars($solicitante_nome_form); ?>" />
                         </div>
                         <div class="col-md-6">
-                            <label for="idPac" class="form-label">ID do Paciente</label>
-                            <input
-                                type="text"
-                                name="idPac"
-                                id="idPac"
-                                class="form-control"
-                                value="<?php echo htmlspecialchars($paciente_id_form); ?>"
-                                required
-                            />
+                            <label for="status" class="form-label">Status da Solicitação</label>
+                            <select name="status" id="status" class="form-select">
+                                <option value="Pendente" <?php if ($status_form === 'Pendente') echo 'selected'; ?>>Pendente</option>
+                                <option value="Coletado" <?php if ($status_form === 'Coletado') echo 'selected'; ?>>Coletado</option>
+                                <option value="Em Análise" <?php if ($status_form === 'Em Análise') echo 'selected'; ?>>Em Análise</option>
+                                <option value="Concluído" <?php if ($status_form === 'Concluído') echo 'selected'; ?>>Concluído</option>
+                                <option value="Cancelado" <?php if ($status_form === 'Cancelado') echo 'selected'; ?>>Cancelado</option>
+                            </select>
                         </div>
                     </div>
 
                     <div class="mb-3">
-                        <label for="data_marcada_exame" class="form-label">Data e Hora para Marcação do Exame</label>
-                        <input
-                            type="datetime-local"
-                            class="form-control"
-                            name="data_marcada_exame"
-                            id="data_marcada_exame"
-                            value="<?php echo htmlspecialchars($data_marcada_exame_form); ?>"
-                            required
-                        />
+                        <label for="observacoes" class="form-label">Observações</label>
+                        <textarea name="observacoes" id="observacoes" class="form-control" rows="3"><?php echo htmlspecialchars($observacoes_form); ?></textarea>
                     </div>
+                <?php endif; ?>
 
-                    <?php if ($solicitacao_id_form): ?>
-                        <div class="row mb-3">
-                            <div class="col-md-6">
-                                <label for="solicitante_nome" class="form-label">Nome do Solicitante</label>
-                                <input
-                                    type="text"
-                                    name="solicitante_nome"
-                                    id="solicitante_nome"
-                                    class="form-control"
-                                    value="<?php echo htmlspecialchars($solicitante_nome_form); ?>"
-                                />
-                            </div>
-                            <div class="col-md-6">
-                                <label for="status" class="form-label">Status da Solicitação</label>
-                                <select name="status" id="status" class="form-select">
-                                    <option value="Pendente" <?php if ($status_form === 'Pendente') echo 'selected'; ?>>Pendente</option>
-                                    <option value="Coletado" <?php if ($status_form === 'Coletado') echo 'selected'; ?>>Coletado</option>
-                                    <option value="Em Análise" <?php if ($status_form === 'Em Análise') echo 'selected'; ?>>Em Análise</option>
-                                    <option value="Concluído" <?php if ($status_form === 'Concluído') echo 'selected'; ?>>Concluído</option>
-                                    <option value="Cancelado" <?php if ($status_form === 'Cancelado') echo 'selected'; ?>>Cancelado</option>
-                                </select>
-                            </div>
+                <p class="fw-bold mt-4">Laboratórios Solicitados:</p>
+                <div class="d-flex flex-wrap gap-3 mb-3">
+                    <?php foreach ($labs as $lab): ?>
+                        <div class="form-check">
+                            <input
+                                type="checkbox"
+                                name="laboratorioSolicitado[]"
+                                id="<?php echo $lab; ?>"
+                                value="<?php echo $lab; ?>"
+                                class="form-check-input"
+                                onchange="toggleSubOptions('opcoes<?php echo $lab; ?>', this.checked)"
+                                <?php echo isset($exames_solicitados_itens_para_form[$lab]) ? 'checked' : ''; ?>
+                            />
+                            <label for="<?php echo $lab; ?>" class="form-check-label"><?php echo $lab; ?></label>
                         </div>
+                    <?php endforeach; ?>
+                </div>
 
-                        <div class="mb-3">
-                            <label for="observacoes" class="form-label">Observações</label>
-                            <textarea
-                                name="observacoes"
-                                id="observacoes"
-                                class="form-control"
-                                rows="3"
-                            ><?php echo htmlspecialchars($observacoes_form); ?></textarea>
-                        </div>
-                    <?php endif; ?>
+                <!-- Sub-opções para cada laboratório -->
+                <?php
+                // Lista de exames por laboratório (exemplos)
+                $examesPorLab = [
+                    'Bioquimica' => [
+                        'Ácido úrico', 'Alfa amilase', 'Bilirrubina Total', 'Bilirrubina Direta',
+                        'Cálcio', 'Colesterol', 'HDL', 'Creatinina', 'Ferro Ferene', 'Fosfatase Alcalina',
+                        'Fosfato', 'Gama GT', 'Glicose', 'GOT (AST)', 'GTP (ALT)', 'Magnésio',
+                        'Proteína total', 'Triglicerídeos', 'Uréia'
+                    ],
+                    'Microbiologia' => [
+                        'Urocultura com antibiograma', 'Swab ocular', 'Escarro para Micobacterium tuberculosis'
+                    ],
+                    'Parasitologia' => [
+                        'Exame de fezes', 'Pesquisa de hematozoários', 'Pesquisa de protozoários intestinais'
+                    ],
+                    'Hematologia' => [
+                        'Hemograma completo', 'Reticulócitos', 'Tempo de sangramento', 'Tempo de coagulação'
+                    ],
+                    'Urinálise' => [
+                        'Exame físico', 'Exame químico', 'Exame microscópico'
+                    ]
+                ];
 
-                    <p class="fw-bold mt-4">Laboratórios Solicitados:</p>
-                    <div class="d-flex flex-wrap gap-3 mb-3">
-                        <?php
-                        foreach ($labs as $lab):
-                            $checked = isset($exames_solicitados_itens_para_form[$lab]) ? 'checked' : '';
+                foreach ($examesPorLab as $lab => $exames):
+                    $examesSelecionados = $exames_solicitados_itens_para_form[$lab] ?? [];
+                    ?>
+                    <div id="opcoes<?php echo $lab; ?>" class="sub-opcoes" style="display: none;">
+                        <h6>Exames de <?php echo $lab; ?>:</h6>
+                        <?php foreach ($exames as $exame): 
+                            $exameId = strtolower(preg_replace('/[^a-z0-9]/i', '', $exame));
                         ?>
                             <div class="form-check">
                                 <input
                                     type="checkbox"
-                                    name="laboratorioSolicitado[]"
-                                    id="<?php echo $lab; ?>"
-                                    value="<?php echo $lab; ?>"
+                                    name="examesSolicitados[<?php echo $lab; ?>][]"
+                                    value="<?php echo $exame; ?>"
+                                    id="<?php echo $exameId; ?>"
                                     class="form-check-input"
-                                    onchange="toggleSubOptions('opcoes<?php echo $lab; ?>', this.checked)"
-                                    <?php echo $checked; ?>
+                                    <?php echo in_array($exame, $examesSelecionados) ? 'checked' : ''; ?>
                                 />
-                                <label for="<?php echo $lab; ?>" class="form-check-label"><?php echo $lab; ?></label>
+                                <label for="<?php echo $exameId; ?>" class="form-check-label"><?php echo $exame; ?></label>
                             </div>
                         <?php endforeach; ?>
                     </div>
+                <?php endforeach; ?>
 
-                    <!-- Sub-opções para Bioquímica -->
-                    <div id="opcoesBioquimica" class="sub-opcoes" style="display: none;">
-                        <h6>Exames de Bioquímica:</h6>
-                        <?php
-                        $examesBioquimicaSelecionados = $exames_solicitados_itens_para_form['Bioquimica'] ?? [];
-                        ?>
-                        <div class="form-check">
-                            <input
-                                type="checkbox"
-                                name="examesSolicitados[Bioquimica][]"
-                                value="Glicose"
-                                id="glicose"
-                                class="form-check-input"
-                                <?php echo in_array('Glicose', $examesBioquimicaSelecionados) ? 'checked' : ''; ?>
-                            />
-                            <label for="glicose" class="form-check-label">Glicose</label>
-                        </div>
-                        <div class="form-check">
-                            <input
-                                type="checkbox"
-                                name="examesSolicitados[Bioquimica][]"
-                                value="Colesterol"
-                                id="colesterol"
-                                class="form-check-input"
-                                <?php echo in_array('Colesterol', $examesBioquimicaSelecionados) ? 'checked' : ''; ?>
-                            />
-                            <label for="colesterol" class="form-check-label">Colesterol Total</label>
-                        </div>
-                        <!-- Adicione os outros exames aqui, seguindo o mesmo padrão -->
-                    </div>
+                <div class="text-center mt-4">
+                    <button type="submit" name="<?php echo htmlspecialchars($botao_submit_nome); ?>" class="btn btn-dark">
+                        <?php echo htmlspecialchars($botao_submit_texto); ?>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
 
-                    <!-- Sub-opções para Microbiologia -->
-                    <div id="opcoesMicrobiologia" class="sub-opcoes" style="display: none;">
-                        <h6>Exames de Microbiologia:</h6>
-                        <?php
-                        $examesMicrobiologiaSelecionados = $exames_solicitados_itens_para_form['Microbiologia'] ?? [];
-                        ?>
-                        <div class="form-check">
-                            <input
-                                type="checkbox"
-                                name="examesSolicitados[Microbiologia][]"
-                                value="Urocultura com antibiograma"
-                                id="urocultura"
-                                class="form-check-input"
-                                <?php echo in_array('Urocultura com antibiograma', $examesMicrobiologiaSelecionados) ? 'checked' : ''; ?>
-                            />
-                            <label for="urocultura" class="form-check-label">Urocultura com antibiograma</label>
-                        </div>
-                        <div class="form-check">
-                            <input
-                                type="checkbox"
-                                name="examesSolicitados[Microbiologia][]"
-                                value="Swab ocular"
-                                id="swab"
-                                class="form-check-input"
-                                <?php echo in_array('Swab ocular', $examesMicrobiologiaSelecionados) ? 'checked' : ''; ?>
-                            />
-                            <label for="swab" class="form-check-label">Swab ocular</label>
-                        </div>
-                        <div class="form-check">
-                            <input
-                                type="checkbox"
-                                name="examesSolicitados[Microbiologia][]"
-                                value="Escarro exame Micro"
-                                id="escarro"
-                                class="form-check-input"
-                                <?php echo in_array('Escarro exame Micro', $examesMicrobiologiaSelecionados) ? 'checked' : ''; ?>
-                            />
-                            <label for="escarro" class="form-check-label">Escarro para exame de Micobacterium tuberculosis</label>
-                        </div>
-                    </div>
-
-                    <!-- Repita o padrão acima para os outros laboratórios se desejar -->
-
-                    <div class="text-center mt-4">
-                        <button type="submit" name="<?php echo htmlspecialchars($botao_submit_nome); ?>" class="btn btn-dark">
-                            <?php echo htmlspecialchars($botao_submit_texto); ?>
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </main>
-    </div>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-
-    <script>
-    function toggleSubOptions(elementId, isChecked) {
-        const element = document.getElementById(elementId);
-        if (element) {
-            element.style.display = isChecked ? 'block' : 'none';
-        }
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function toggleSubOptions(elementId, isChecked) {
+    const element = document.getElementById(elementId);
+    if (element) {
+        element.style.display = isChecked ? 'block' : 'none';
     }
-
-    window.addEventListener('DOMContentLoaded', () => {
-        <?php foreach ($labs as $lab): ?>
-            toggleSubOptions('opcoes<?php echo $lab; ?>', <?php echo isset($exames_solicitados_itens_para_form[$lab]) ? 'true' : 'false'; ?>);
-        <?php endforeach; ?>
-    });
-    </script>
-
+}
+window.addEventListener('DOMContentLoaded', () => {
+    <?php foreach ($labs as $lab): ?>
+        toggleSubOptions('opcoes<?php echo $lab; ?>', <?php echo isset($exames_solicitados_itens_para_form[$lab]) ? 'true' : 'false'; ?>);
+    <?php endforeach; ?>
+});
+</script>
 </body>
 </html>

@@ -1,4 +1,6 @@
 const pool = require('./db');
+// é muito importante ter esta importação aqui, pois ela q trouxe o exame pendente p/ a lista de exames
+const { insertResultadoExame } = require('./exameDAO'); 
 
 class Laudo {
   constructor(id_laudo, solicitacao_id, paciente_id, responsavel_tecnico, observacoes, data_finalizacao) {
@@ -10,12 +12,11 @@ class Laudo {
     this.data_finalizacao = data_finalizacao;
   }
 }
-
 // CREATE
 async function insertLaudo(solicitacaoId, pacienteId, responsavelTecnico, dataFinalizacao, observacoes, resultadosExames) {
-    const client = await pool.connect();
+    const client = await pool.connect(); 
     try {
-        await client.query('BEGIN');
+        await client.query('BEGIN'); 
 
         const laudoResult = await client.query(`
             INSERT INTO laudos (solicitacao_id, paciente_id, responsavel_tecnico, observacoes, data_finalizacao)
@@ -24,35 +25,79 @@ async function insertLaudo(solicitacaoId, pacienteId, responsavelTecnico, dataFi
             [solicitacaoId, pacienteId, responsavelTecnico, observacoes, dataFinalizacao]
         );
         const novoLaudoId = laudoResult.rows[0].id_laudo;
-        const {insertResultadoExame} = require('./exameDAO'); // Importar o DAO de exames
+        
+        console.log("Laudo recém-inserido ID:", novoLaudoId); 
 
         if (resultadosExames && resultadosExames.length > 0) {
             for (const exameData of resultadosExames) {
-                // Chame a função de inserção de exame
+                // Alterei aqui: A chamada a insertResultadoExame AGORA ESTÁ VISÍVEL E CORRETA
                 await insertResultadoExame(
+                    client, // Passando o client da transação
                     novoLaudoId, // laudo_id
                     exameData.nomeExame,
                     exameData.tipoExame,
                     exameData.valorAbsoluto,
                     exameData.valorReferencia,
-                    exameData.pacienteRegistro, // ou pacienteId, dependendo do que `paciente_registro` guarda
+                    exameData.pacienteRegistro, 
                     exameData.dataHoraExame,
-                    pacienteId // paciente_id_fk OBRIGATÓRIO
+                    exameData.pacienteIdFk 
                 );
             }
         }
 
-        await client.query('COMMIT');
-        console.log("Resultado do insert Laudo: ", { idLaudo: novoLaudoId });
+        await client.query('COMMIT'); 
+        console.log("Resultado do insert Laudo (COMMIT): ", { idLaudo: novoLaudoId });
         return { success: true, idLaudo: novoLaudoId };
     } catch (error) {
-        await client.query('ROLLBACK');
-        console.error("Erro ao inserir laudo e exames:", error);
-        throw error;
+        await client.query('ROLLBACK'); 
+        console.error("Erro ao inserir laudo e exames (ROLLBACK):", error); 
+        throw error; // É importante lançar o erro para que o PHP possa capturá-lo
     } finally {
-        client.release();
+        client.release(); 
     }
 }
+// CREATE
+// async function insertLaudo(solicitacaoId, pacienteId, responsavelTecnico, dataFinalizacao, observacoes, resultadosExames) {
+//     const client = await pool.connect();
+//     try {
+//         await client.query('BEGIN');
+
+//         const laudoResult = await client.query(`
+//             INSERT INTO laudos (solicitacao_id, paciente_id, responsavel_tecnico, observacoes, data_finalizacao)
+//             VALUES ($1, $2, $3, $4, $5)
+//             RETURNING id_laudo`,
+//             [solicitacaoId, pacienteId, responsavelTecnico, observacoes, dataFinalizacao]
+//         );
+//         const novoLaudoId = laudoResult.rows[0].id_laudo;
+//         const {insertResultadoExame} = require('./exameDAO'); // Importar o DAO de exames
+
+//         if (resultadosExames && resultadosExames.length > 0) {
+//             for (const exameData of resultadosExames) {
+//                 // Chame a função de inserção de exame
+//                 await insertResultadoExame(
+//                     novoLaudoId, // laudo_id
+//                     exameData.nomeExame,
+//                     exameData.tipoExame,
+//                     exameData.valorAbsoluto,
+//                     exameData.valorReferencia,
+//                     exameData.pacienteRegistro, // ou pacienteId, dependendo do que `paciente_registro` guarda
+//                     exameData.dataHoraExame,
+//                     pacienteId // paciente_id_fk OBRIGATÓRIO
+//                 );
+//             }
+//         }
+
+//         await client.query('COMMIT');
+//         console.log("Resultado do insert Laudo: ", { idLaudo: novoLaudoId });
+//         return { success: true, idLaudo: novoLaudoId };
+//     } catch (error) {
+//         await client.query('ROLLBACK');
+//         console.error("Erro ao inserir laudo e exames:", error);
+//         throw error;
+//     } finally {
+//         client.release();
+//     }
+// }
 
 // READ todos
 async function getTodosLaudos() { // Renomeado para evitar conflito com 'Exame'

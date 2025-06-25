@@ -170,13 +170,15 @@ elseif (isset($_GET['excluir'])) {
     }
 }
 
+// Em SolicitacaoController.php
 function listarSolicitacoesPendentes(){
     $api_url = "http://localhost:3000/solicitacoes?status=Pendente";
-    $response = @file_get_contents($api_url);
+    $response = @file_get_contents($api_url); // O '@' esconde erros, mas a mensagem genérica aparece
     $solicitacoes = json_decode($response, true);
 
-    if ($response === false || !is_array($solicitacoes)) {
-        return [];
+    if ($response === false || !is_array($solicitacoes)) { // Esta condição captura o erro
+        // Aqui é onde o erro "Erro ao conectar..." seria gerado ou propagado
+        return []; // Retorna array vazio, levando à mensagem de erro na view
     }
     return $solicitacoes;
 }

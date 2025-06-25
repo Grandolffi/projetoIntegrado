@@ -35,7 +35,8 @@ $exameDao = new ExameDaoApi();
 $exame = null;
 
 // === CREATE - Inserir novo exame ===
-if (isset($_POST['salvar_novo_laudo'])) {
+// Este bloco é para criar um ResultadoExames individual
+if (isset($_POST['salvar_novo_laudo'])) { // Apesar do nome, este bloco em ExameController lida com um único ResultadoExames
     $exame = new ResultadoExames();
     $exame->setLaudoId($_POST['laudo_id'] ?? null);
     $exame->setNomeExame($_POST['nome_exame'] ?? null);
@@ -43,7 +44,8 @@ if (isset($_POST['salvar_novo_laudo'])) {
     $exame->setTipoExame($tipoExameKey);
     $exame->setValorReferencia($definicoesExames[$tipoExameKey][1] ?? null);
     $exame->setValorAbsoluto($_POST['valor_absoluto'] ?? null);
-    $exame->setPacienteRegistro($_POST['paciente_registro'] ?? null);
+    // Usando paciente_id do POST para setar pacienteIdFk
+    $exame->setPacienteIdFk((int)$_POST['paciente_id'] ?? null); 
     
     $dataHoraExame = $_POST['data_hora_exame'] ?? date('Y-m-d H:i:s');
     if ($dataHoraExame && strpos($dataHoraExame, 'T') !== false) {
@@ -80,7 +82,8 @@ if (isset($_POST['salvar_edicao'])) {
     $exame->setTipoExame($_POST['tipo_exame'] ?? null);
     $exame->setValorReferencia($_POST['valor_referencia'] ?? null);
     $exame->setValorAbsoluto($_POST['valor_absoluto'] ?? null);
-    $exame->setPacienteRegistro($_POST['paciente_registro'] ?? null);
+    // Usando paciente_id do POST para setar pacienteIdFk na edição
+    $exame->setPacienteIdFk((int)$_POST['paciente_id'] ?? null); 
     
     $dataHoraExame = $_POST['data_hora_exame'] ?? null;
     if ($dataHoraExame && strpos($dataHoraExame, 'T') !== false) {
@@ -120,7 +123,7 @@ function listarExames(){
         foreach($lista as $exame) {
             echo "<tr> 
                     <td>" . htmlspecialchars($exame->getLaudoId() ?? 'N/A') . "</td>
-                    <td>" . htmlspecialchars($exame->getPacienteRegistro() ?? 'N/A') . "</td>
+                    <td>" . htmlspecialchars($exame->getPacienteIdFk() ?? 'N/A') . "</td>
                     <td>" . htmlspecialchars($exame->getNomeExame() ?? 'N/A') . "</td>
                     <td>" . htmlspecialchars($exame->getValorAbsoluto() ?? 'N/A') . "</td>
                     <td>" . htmlspecialchars($exame->getValorReferencia() ?? 'N/A') . "</td>
@@ -135,3 +138,5 @@ function listarExames(){
         echo "<tr><td colspan='7'>Nenhum exame encontrado.</td></tr>";
     }
 }
+
+?>

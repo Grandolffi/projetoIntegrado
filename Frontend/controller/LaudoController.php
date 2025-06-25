@@ -5,6 +5,8 @@ error_reporting(E_ALL);
 // Inclua os DAOs necessários para interagir diretamente com o banco de dados
 require_once __DIR__ . '/../dao/LaudoDaoApi.php'; // O DAO para Laudo que usa a API Node.js
 require_once __DIR__ . '/../dao/ExameDaoApi.php'; // O DAO para Exame que usa a API Node.js (se precisar aqui)
+// Alterei aqui: Incluído o DAO da Solicitação para poder atualizar o status
+require_once __DIR__ . '/../dao/SolicitacaoDaoApi.php'; 
 
 // Inclua os modelos necessários
 require_once __DIR__ . '/../model/ResultadoExames.php';
@@ -12,6 +14,8 @@ require_once __DIR__ . '/../model/Laudo.php';
 
 // Instanciar o DAO do Laudo
 $laudoDao = new LaudoDaoApi();
+// Alterei aqui: Instanciado o DAO da Solicitação
+$solicitacaoDao = new SolicitacaoDaoApi(); 
 
 // Array de definições de exames (útil para preencher detalhes como tipo ou valor de referência)
 $definicoesExames = [
@@ -39,39 +43,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['solicitacao_id']) && !isset($_POST['salvar_edicao_laudo'])) { // Identifica a ação de salvar um novo laudo
         $solicitacao_id = $_POST['solicitacao_id'] ?? null;
         $resultados_preenchidos = $_POST['resultados'] ?? []; // Array. Ex: ['Glicose' => '99', 'Ureia' => '40']
-        $paciente_registro = $_POST['numero_registro'] ?? null;
+        $paciente_id = $_POST['paciente_id'] ?? null; // Alterado para paciente_id
         $data_laudo_prevista = $_POST['data_laudo'] ?? date('Y-m-d'); // Data do laudo, usar data atual se não fornecida
 
         // Supondo que você pegue o nome do técnico da sessão de login
         $responsavel_tecnico = "Fernanda (Técnica)"; // Substitua pela lógica real
 
-        if (empty($solicitacao_id) || empty($resultados_preenchidos) || empty($paciente_registro)) {
+        if (empty($solicitacao_id) || empty($resultados_preenchidos) || empty($paciente_id)) { // Alterado para paciente_id
             header("Location: ../views/cadastroExames.php?solicitacao_id={$solicitacao_id}&error=" . urlencode("Dados incompletos para salvar o laudo."));
             exit();
         }
 
-         $laudo = new Laudo();
+        $laudo = new Laudo();
         $laudo->setSolicitacaoId((int)$solicitacao_id);
-        $laudo->setPacienteId((int)$paciente_registro); // << Adicionar setPacienteId ao modelo Laudo
+        $laudo->setPacienteId((int)$paciente_id); // Alterado para paciente_id
         $laudo->setResponsavelTecnico($responsavel_tecnico);
         $laudo->setDataFinalizacao(date('Y-m-d H:i:s'));
         $laudo->setObservacoes("Laudo finalizado para solicitação {$solicitacao_id}.");
 
 
         $examesParaLaudo = [];
-        foreach ($resultados_preenchidos as $nomeDoExame => $valorDoResultado) {
+        foreach ($resultados_preenchidos as $nomeDoExame => $dadosDoResultado) { // Alterei para $dadosDoResultado para acessar o array completo
+            $valorDoResultado = $dadosDoResultado['valor_absoluto'] ?? null; // Pega o valor absoluto específico do item do formulário
+
             if (!empty($valorDoResultado)) {
                 // Tente obter o tipo_exame e valor_referencia das definições, se aplicável
-                $tipo_exame = array_key_exists($nomeDoExame, $definicoesExames) ? $definicoesExames[$nomeDoExame][0] : $nomeDoExame; // Ou alguma lógica para obter o tipo
-                $valor_referencia = array_key_exists($nomeDoExame, $definicoesExames) ? $definicoesExames[$nomeDoExame][1] : '';
+                $tipo_exame = $dadosDoResultado['tipo_exame'] ?? (array_key_exists($nomeDoExame, $definicoesExames) ? $definicoesExames[$nomeDoExame][0] : $nomeDoExame); 
+                $valor_referencia = $dadosDoResultado['valor_referencia'] ?? (array_key_exists($nomeDoExame, $definicoesExames) ? $definicoesExames[$nomeDoExame][1] : '');
 
                 $examesParaLaudo[] = [
                     'nomeExame' => $nomeDoExame,
                     'valorAbsoluto' => $valorDoResultado,
                     'tipoExame' => $tipo_exame,
                     'valorReferencia' => $valor_referencia,
-                    'dataHoraExame' => $data_laudo_prevista . " 00:00:00",// Use a data prevista do laudo
-                    'pacienteIdFk' => (int)$paciente_registro
+                    'dataHoraExame' => $_POST['data_hora_exame'] . ":00", // Alterei aqui: Use a data e hora completa do input principal, e adicione segundos
+                    'pacienteIdFk' => (int)$paciente_id
                 ];
             }
         }
@@ -80,9 +86,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             // O método inserir do LaudoDao é responsável por salvar o laudo e seus exames associados
             $laudoDao->inserir($laudo, $examesParaLaudo);
 
-            header("Location: ../views/lista_de_exames.php?status=success&message=" . urlencode("Laudo e exames salvos com sucesso!"));
+            // Alterei aqui: Atualiza o status da solicitação original para "Concluída"
+            // Isso garante que a solicitação não apareça mais na lista de pendentes
+            $updateStatusResult = $solicitacaoDao->updateSolicitacaoStatus((int)$solicitacao_id, "Concluída"); // O método updateSolicitacaoStatus está em SolicitacaoDaoApi.php
+
+            if (isset($updateStatusResult['erro'])) {
+                error_log("Erro ao atualizar status da solicitação {$solicitacao_id}: " . $updateStatusResult['erro']);
+                // Pode adicionar uma mensagem de erro ao usuário sobre o status, mas o laudo foi salvo.
+            }
+
+            header("Location: ../views/lista_de_exames.php?status=success&message=" . urlencode("Laudo e exames salvos com sucesso! Solicitação atualizada."));
             exit();
         } catch (Exception $e) {
+            error_log("Erro ao salvar laudo no LaudoController: " . $e->getMessage()); // Log mais detalhado
             header("Location: ../views/cadastroExames.php?solicitacao_id={$solicitacao_id}&error=" . urlencode("Erro ao salvar laudo: " . $e->getMessage()));
             exit();
         }
@@ -163,7 +179,7 @@ function listarLaudos(){
             echo "<tr> 
                     <td>" . htmlspecialchars($laudo->getId() ?? 'N/A') . "</td>
                     <td>" . htmlspecialchars($laudo->getSolicitacaoId() ?? 'N/A') . "</td>
-                    <td>" . htmlspecialchars($laudo->getPacienteId() ?? 'N/A') . "</td>
+                    <td>" . htmlspecialchars($laudo->getPacienteId() ?? 'N/A') . "</td> 
                     <td>" . htmlspecialchars($laudo->getResponsavelTecnico() ?? 'N/A') . "</td>
                     <td>" . htmlspecialchars($laudo->getDataFinalizacao() ?? 'N/A') . "</td>
                     <td>" . htmlspecialchars($laudo->getObservacoes() ?? 'N/A') . "</td>

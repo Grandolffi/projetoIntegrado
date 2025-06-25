@@ -11,7 +11,8 @@ require_once __DIR__ . '/../model/ResultadoExames.php';
 
 // Variáveis de controle para o formulário
 $exames_solicitados_para_preencher = [];
-$paciente_registro_formulario = null;
+// Alterei aqui: Variável para ID do paciente no formulário, consistente com o que será exibido
+$paciente_id_formulario = null; 
 $data_laudo_prevista = null; // Usado para a data/hora do input no modo de preenchimento de solicitação
 $solicitacao_id = null;
 $errorMessage = null;
@@ -27,8 +28,6 @@ if ($solicitacaoId) {
     }
 }
 
-
-
 // --- INÍCIO DA LÓGICA REESTRUTURADA ---
 
 // 1. Prioriza a EDIÇÃO DE UM EXAME INDIVIDUAL (se 'editar' está na URL)
@@ -43,8 +42,8 @@ if (isset($_GET['editar'])) {
     if (!isset($exameParaEdicao) || $exameParaEdicao === false) { // Verifica se o exame foi encontrado
         $errorMessage = "Exame não encontrado para edição (ID: " . htmlspecialchars($idExameParaEditar) . ").";
     } else {
-        // Preenche campos comuns com dados do exame para edição
-        $paciente_registro_formulario = $exameParaEdicao->getPacienteRegistro();
+        // Alterei aqui: Preenche campos com o pacienteIdFk do exame para edição
+        $paciente_id_formulario = $exameParaEdicao->getPacienteIdFk(); // Usar getPacienteIdFk()
         // Para a data/hora, use a do exame, formatando para datetime-local
         if ($exameParaEdicao->getDataHora()) {
             try {
@@ -52,7 +51,6 @@ if (isset($_GET['editar'])) {
                 $data_laudo_prevista = $dt->format('Y-m-d\TH:i'); // Formato datetime-local
             } catch (Exception $e) { /* fallback */ }
         }
-        // No modo edição de exame individual, o array de exames solicitados não é usado.
     }
 }
 // 2. Senão, verifica se é um PREENCHIMENTO DE LAUDO PARA UMA SOLICITAÇÃO (se 'solicitacao_id' está na URL)
@@ -67,8 +65,8 @@ elseif (isset($_GET['solicitacao_id'])) {
     if ($response === false) {
         $errorMessage = "Erro ao conectar com a API para carregar detalhes da solicitação.";
     } elseif ($solicitacao_data && isset($solicitacao_data['exames'])) {
-        // Use snake_case conforme o retorno do seu solicitacaoDAO.js
-        $paciente_registro_formulario = $solicitacao_data['paciente_id'] ?? 'N/A';
+        // Alterei aqui: Pega o paciente_id da solicitação para o campo do formulário
+        $paciente_id_formulario = $solicitacao_data['paciente_id'] ?? 'N/A'; 
         // Adapte data_laudo_prevista para o formato datetime-local
         if (isset($solicitacao_data['data_prevista_realizacao'])) {
             try {
@@ -120,23 +118,36 @@ else {
                         <a href="lista_solicitacoes_pendentes.php" class="btn btn-secondary">Voltar para Solicitações</a>
                     <?php endif; ?>
                 <?php else: ?>
-                    <form action="../controller/SolicitacaoController.php" method="POST"> <?php if (isset($exameParaEdicao)): ?>
+                    <form action="<?php 
+                        if (isset($exameParaEdicao)) { // Se estiver editando um exame individual
+                            echo '../controller/ExameController.php'; 
+                        } elseif (isset($_GET['solicitacao_id'])) { // Se estiver preenchendo resultados para uma solicitação
+                            echo '../controller/LaudoController.php'; 
+                        } else {
+                            // Caso de fallback, não deveria ocorrer se o acesso for sempre via lista
+                            echo '#'; 
+                        }
+                    ?>" method="POST"> 
+                        <?php if (isset($exameParaEdicao)): ?>
                             <input type="hidden" name="id" value="<?php echo htmlspecialchars($exameParaEdicao->getIdExame() ?? ''); ?>">
-                            <input type="hidden" name="salvar_edicao_solicitacao" value="true">
+                            <input type="hidden" name="salvar_edicao" value="true">
                             <input type="hidden" name="nome_exame" value="<?php echo htmlspecialchars($exameParaEdicao->getNomeExame() ?? ''); ?>">
                             <input type="hidden" name="tipo_exame" value="<?php echo htmlspecialchars($exameParaEdicao->getTipoExame() ?? ''); ?>">
                             <input type="hidden" name="valor_referencia" value="<?php echo htmlspecialchars($exameParaEdicao->getValorReferencia() ?? ''); ?>">
+                            <input type="hidden" name="laudo_id" value="<?php echo htmlspecialchars($exameParaEdicao->getLaudoId() ?? ''); ?>">
 
-                        <?php else: ?>
+                        <?php elseif (isset($_GET['solicitacao_id'])): ?>
                             <input type="hidden" name="solicitacao_id" value="<?php echo htmlspecialchars($solicitacao_id ?? ''); ?>">
                             <input type="hidden" name="salvar_novo_laudo" value="true">
+                            <input type="hidden" name="paciente_id" value="<?php echo htmlspecialchars($paciente_id_formulario ?? ''); ?>">
+                            <input type="hidden" name="data_laudo" value="<?php echo htmlspecialchars(substr($data_laudo_prevista ?? '', 0, 10)); ?>">
                         <?php endif; ?>
 
                         <div class="row mb-4">
                             <div class="col-md-4">
-                                <label for="paciente_registro_input" class="form-label">Nº do Registro do Paciente</label>
-                                <input type="text" class="form-control" name="paciente_registro" id="paciente_registro_input"
-                                       value="<?php echo htmlspecialchars($paciente_registro_formulario ?? ''); ?>" required>
+                                <label for="paciente_id_input" class="form-label">ID do Paciente</label>
+                                <input type="text" class="form-control" name="paciente_id" id="paciente_id_input"
+                                       value="<?php echo htmlspecialchars($paciente_id_formulario ?? ''); ?>" required>
                             </div>
                             <div class="col-md-4">
                                 <label for="data_realizacao_input" class="form-label">Data e Hora da Realização do Exame</label>

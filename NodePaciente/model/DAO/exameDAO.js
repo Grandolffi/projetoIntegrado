@@ -14,9 +14,13 @@ class Exame {
   }
 }
 
-async function insertResultadoExame(laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame, paciente_id_fk){
+async function insertResultadoExame(client, laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame, paciente_id_fk){
+    // Alterei aqui: Use diretamente o 'client' que foi passado.
+    // Isso garante que esta inserção faça parte da transação iniciada pelo laudoDAO.
+    const dbClient = client; 
+
     if (nome_exame && tipo_exame && data_hora_exame && paciente_id_fk) {
-        const result = await pool.query(`
+        const result = await dbClient.query(` 
             INSERT INTO resultados_exames(
                 laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia,
                 paciente_registro, data_hora_exame, paciente_id_fk
@@ -29,14 +33,14 @@ async function insertResultadoExame(laudo_id, nome_exame, tipo_exame, valor_abso
                 tipo_exame,
                 valor_absoluto,
                 valor_referencia,
-                paciente_registro, // Pode ser null se não for obrigatório
+                paciente_registro, 
                 data_hora_exame,
-                paciente_id_fk     // OBRIGATÓRIO (NOT NULL)
+                paciente_id_fk     
             ]
         );
-        console.log("Resultado do insert: ", result.rows[0]);
+        console.log("Resultado do insert em resultados_exames: ", result.rows[0]);
         if (result.rows.length > 0) {
-            return result.rows[0]; // Retorna o objeto inserido com id_exame e data_cadastro
+            return result.rows[0]; 
         }
         return false;
     }

@@ -15,11 +15,8 @@ class ExameDaoApi {
             "tipo_exame" => $exame->getTipoExame(),
             "valor_absoluto" => $exame->getValorAbsoluto(),
             "valor_referencia" => $exame->getValorReferencia(),
-            "paciente_registro" => $exame->getPacienteRegistro(),
-            // É crucial também enviar paciente_id_fk que é a FK INT NOT NULL na sua DB
-            // Você precisa que o modelo ResultadoExames tenha um getter para o id do paciente (FK)
-            // E que esse ID seja passado para o ExameController na hora de criar o objeto ResultadoExames
-            "paciente_id_fk" => $exame->getPacienteIdFk() ?? null, 
+             "paciente_id_fk" => $exame->getPacienteIdFk(), 
+            //"paciente_id_fk" => $exame->getPacienteIdFk() ?? null, 
             "data_hora_exame" => $exame->getDataHora() 
         ];
 
@@ -40,7 +37,7 @@ class ExameDaoApi {
     }
 
     // update
-    public function editar(ResultadoExames $exame) {
+    public function editar(ResultadoExames $exame) { // <-- ESTE É O PROBLEMA! NOME DUPLICADO
         // Endpoint da API Node.js para edição de exames (PUT).
         // Ajuste esta URL se seu endpoint for diferente (ex: http://localhost:3000/api/exames/)
         $url = "http://localhost:3000/editarexame/" . urlencode($exame->getIdExame());
@@ -52,7 +49,7 @@ class ExameDaoApi {
             "tipo_exame" => $exame->getTipoExame(),
             "valor_absoluto" => $exame->getValorAbsoluto(),
             "valor_referencia" => $exame->getValorReferencia(),
-            "paciente_registro" => $exame->getPacienteRegistro(),
+            "paciente_registro" => $exame->getPacienteRegistro(), // Atenção: aqui ainda usa paciente_registro
             "data_hora_exame" => $exame->getDataHora()
         ];
 
@@ -76,7 +73,7 @@ class ExameDaoApi {
 
         return json_decode($result, true);
     }
-    
+
     // read
     public function read(){
         // Endpoint da API Node.js para listar exames (GET).
@@ -121,7 +118,7 @@ class ExameDaoApi {
         $exame->setTipoExame($row['tipo_exame'] ?? null);
         $exame->setValorAbsoluto($row['valor_absoluto'] ?? null);
         $exame->setValorReferencia($row['valor_referencia'] ?? null);
-        $exame->setPacienteRegistro($row['paciente_registro'] ?? null); // Use setPacienteRegistro (novo no modelo)
+        $exame->setPacienteIdFk($row['paciente_id_fk'] ?? null); 
         $exame->setDataHora($row['data_hora_exame'] ?? null); // Mude para setDataHora
         // Se `paciente_id_fk` vier da API Node e for um campo no seu modelo ResultadoExames, adicione:
         // $exame->setPacienteIdFk($row['paciente_id_fk'] ?? null); 
