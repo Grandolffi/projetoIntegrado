@@ -1,1 +1,1 @@
-{"success":true,"idSolicitacao":17}
+{"success":true,"message":"Status da solicitação atualizado com sucesso.","solicitacao":{"id_solicitacao":18,"paciente_id":1,"data_solicitacao":"2025-06-26T03:44:49.000Z","data_prevista_realizacao":"2025-06-27T10:00:00.000Z","solicitante_nome":"Atendente BioDiagnóstico","status":"Concluída","observacoes":"Solicitação criada para paciente Lucas Almeida"}}
