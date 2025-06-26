@@ -1,14 +1,14 @@
 {
     "pacienteId": 1,
-    "dataSolicitacao": "2025-06-26 00:44:49",
-    "dataPrevistaRealizacao": "2025-06-27 07:00:00",
+    "dataSolicitacao": "2025-06-26 20:22:25",
+    "dataPrevistaRealizacao": "2025-06-11 15:22:00",
     "solicitanteNome": "Atendente BioDiagn\u00f3stico",
     "status": "Pendente",
     "observacoes": "Solicita\u00e7\u00e3o criada para paciente Lucas Almeida",
     "exames": [
         {
-            "nomeExame": "\u00c1cido \u00farico",
-            "tipoExameCategoria": "Bioquimica",
+            "nomeExame": "Pesquisa de hematozo\u00e1rios",
+            "tipoExameCategoria": "Parasitologia",
             "valorReferenciaSolicitacao": null,
             "statusItem": "Pendente"
         }

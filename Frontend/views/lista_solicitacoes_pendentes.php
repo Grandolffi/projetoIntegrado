@@ -32,12 +32,12 @@ if (!isset($_SESSION['usuario_id'])) {
 }
 
 // Verifica se é médico (tipo = 'medico' ou id = 1, dependendo do que você usa)
-if ($_SESSION['usuario_tipo'] !== 'medico') {
-    echo "<h3>Acesso negado. Você não tem permissão para acessar esta página.</h3>";
-    exit;
+if (!isset($_SESSION['usuario']) || $_SESSION['usuario']['tipo'] != 1) {
+    header("Location: acesso_negado.php");
+    exit();
 }
 
-
+    
 ?>
 <!DOCTYPE html>
 <html lang="pt-BR">
