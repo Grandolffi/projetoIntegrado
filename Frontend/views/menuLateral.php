@@ -13,6 +13,7 @@ $avatarUsuarioLogin = "https://via.placeholder.com/50/1A2A3A/FFFFFF?Text=F";
 $linkDashboard = "dashboard.php";
 $linkCadastroPaciente = 'CadastroPaciente.php';
 $linkListaPaciente = 'ListarPaciente.php';
+$linkColetaAmostras = 'coletaDeAmostras.php';
 $linkUsuario1 = "perfilUser.php";
 
 // Links da seção Exame
@@ -52,6 +53,10 @@ $secaoExameAtiva = (
             </li>
             <li class="<?php if ($paginaAtual == basename($linkCadastroPaciente)) echo 'item-ativo'; ?>">
                 <a href="<?php echo $linkCadastroPaciente; ?>">Cadastrar Paciente</a>
+            </li>
+
+            <li class="<?php if ($paginaAtual == basename($linkColetaAmostras)) echo 'item-ativo'; ?>">
+                <a href="<?php echo $linkColetaAmostras; ?>">Coleta de Amostras</a>
             </li>
 
             <li class="tem-submenu <?php if ($secaoExameAtiva) echo 'item-ativo'; ?>" id="menuPaiExame">

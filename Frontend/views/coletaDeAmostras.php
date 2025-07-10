@@ -33,16 +33,16 @@ if (isset($_GET['status'])) {
     <title>Coleta de Amostras</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <link rel="stylesheet" href="Style.css">
+    <link rel="stylesheet" href="../public/css/Style.css">
 </head>
 <body class="corpo-dashboard">
     <div class="container-dashboard">
-        <?php include 'menuLateral.php'; ?>
+        <?php include_once __DIR__ . '/menuLateral.php';?>
 
         <main class="conteudo-principal">
             <header class="cabecalho-principal">
                 <h2>Mapa de Bioquímica - Coleta de Amostras</h2>
-                <?php include 'info_cabecalho.php'; ?>
+                <?php include_once __DIR__ . '/info_cabecalho.php';?>
             </header>
 
             <div class="form-container">
