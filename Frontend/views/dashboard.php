@@ -9,7 +9,7 @@ error_reporting(E_ALL);
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BioDiagnóstico - Dashboard</title>
+    <title>BioDiagnóstico - Menu Principal</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="../public/css/Style.css">
 <body class="corpo-dashboard">
@@ -18,7 +18,7 @@ error_reporting(E_ALL);
 
         <main class="conteudo-principal">
             <header class="cabecalho-principal">
-                <h2>Dashboard</h2>
+                <h2>Menu Principal</h2>
                 <?php include 'info_cabecalho.php'; // Inclui a saudação, data e hora ?>
             </header>
 

@@ -49,7 +49,7 @@ $secaoExameAtiva = (
     <nav class="navegacao-menu">
         <ul>
             <li class="<?php if ($paginaAtual == basename($linkDashboard)) echo 'item-ativo'; ?>">
-                <a href="<?php echo $linkDashboard; ?>">Dashboard</a>
+                <a href="<?php echo $linkDashboard; ?>">Menu Principal</a>
             </li>
             <li class="<?php if ($paginaAtual == basename($linkCadastroPaciente)) echo 'item-ativo'; ?>">
                 <a href="<?php echo $linkCadastroPaciente; ?>">Cadastrar Paciente</a>
