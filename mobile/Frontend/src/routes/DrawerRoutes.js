@@ -4,7 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-// Importe APENAS as telas que você já criou (Home e NovoExame).
+// Importe APENAS as telas que já criamos (Home e NovoExame).
 import Home from '../pages/Home';
 import NovoExame from '../pages/NovoExame'; 
 
