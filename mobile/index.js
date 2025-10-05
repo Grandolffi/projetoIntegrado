@@ -1,6 +1,7 @@
 import { registerRootComponent } from 'expo';
 
-import NovoExame from './pages/NovoExame/index.js';
+import NovoExame from './Frontend/src/pages/NovoExame';
+
 
 // registerRootComponent calls AppRegistry.registerComponent('main', () => App);
 // It also ensures that whether you load the app in Expo Go or in a native build,
