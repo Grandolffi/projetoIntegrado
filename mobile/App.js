@@ -1,21 +1,15 @@
-import { StatusBar } from 'expo-status-bar';
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StatusBar } from 'expo-status-bar';
+import DrawerRoutes from './Frontend/src/routes/DrawerRoutes'; // Ajuste o caminho conforme sua estrutura
 
 export default function App() {
   return (
-    <View style={styles.container}>
-      <Text>Open up App.js to start working on your app!</Text>
+    <>
+      {/* Renderiza o componente principal de rotas (DrawerRoutes).
+        Toda a interface do usuário será renderizada a partir daqui.
+      */}
+      <DrawerRoutes /> 
       <StatusBar style="auto" />
-    </View>
+    </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
