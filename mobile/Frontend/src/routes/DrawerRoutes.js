@@ -9,6 +9,9 @@ import Home from '../pages/Home';
 import NovoExame from '../pages/NovoExame'; 
 import CadastroPaciente from '../pages/CadastroPaciente';
 import ListaPacientes from '../pages/ListagemPacientes';
+import ResultadoExame from '../pages/ResultadoExame/resultadoExames';
+import ListaSolicitacoes from '../pages/ListaSolicitacoes/solicitacoesPendentes';
+import ListaLaudos from '../pages/ListaLaudos/listaLaudo';
 
 
 const Drawer = createDrawerNavigator();
@@ -75,6 +78,39 @@ export default function DrawerRoutes() {
                         <Feather name="users" color={color} size={size} /> // 💡 Sugestão de ícone para listagem de pessoas
                     )
                 }}
+            />
+
+            <Drawer.Screen
+              name='ResultadoExame'
+              component={ResultadoExame}
+              options={{
+                drawerLabel: "Resultado de Exame",
+                drawerIcon: ({ color, size }) => (
+                  <Feather name='exame' color={color} size={size} />
+                )
+              }}
+            />
+
+            <Drawer.Screen 
+              name='Soliciatacoes'
+              component={ListaSolicitacoes}
+              options={{
+                drawerLabel: "Solicitacao Exame",
+                drawerIcon: ({ color, size }) => (
+                  <Feather name='solicitacao' color={color} size={size} />
+                )
+              }}
+            />
+
+            <Drawer.Screen
+              name='Laudos'
+              component={ListaLaudos}
+              options={{
+                drawerLabel: "Lista Laudo",
+                drawerIcon: ({ color, size }) => (
+                  <Feather name='laudo' color={color} size={size} />
+                )
+              }}
             />
           
           
