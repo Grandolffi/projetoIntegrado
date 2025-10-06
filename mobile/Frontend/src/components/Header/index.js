@@ -51,13 +51,13 @@ const Estilo = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         paddingHorizontal: 16, // Usando padding geral
-        paddingBottom: 44
+        paddingBottom: 20
     },
     title: {
         fontSize: 26,
         color: '#fff',
         fontWeight: 'bold',
-        marginTop: 30,
+        marginTop: 0,
         // Alinhamento centralizado se houver placeholders iguais
         flex: 1, 
         textAlign: 'center' 
@@ -73,12 +73,12 @@ const Estilo = StyleSheet.create({
         // Define um espaço fixo para o botão de menu (hambúrguer)
         width: 40, 
         height: 40,
-        marginTop: 30,
+        marginTop: 5,
     },
      menuButtonContainer: {
     // Posiciona o ícone do menu de forma absoluta sobre o Header
     position: 'absolute',
-    top: 50, 
+    top: statusBarHeight,
     left: 10,
     zIndex: 10, 
     padding: 10,

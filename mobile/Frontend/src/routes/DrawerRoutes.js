@@ -7,6 +7,9 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 // Importe APENAS as telas que já criamos (Home e NovoExame).
 import Home from '../pages/Home';
 import NovoExame from '../pages/NovoExame'; 
+import CadastroPaciente from '../pages/CadastroPaciente';
+import ListaPacientes from '../pages/ListagemPacientes';
+
 
 const Drawer = createDrawerNavigator();
 
@@ -53,7 +56,29 @@ export default function DrawerRoutes() {
               )
             }}
           />
+          <Drawer.Screen 
+              name="CadastroPaciente" 
+              component={CadastroPaciente} 
+              options={{
+                  drawerLabel: "Cadastrar Novo Paciente",
+                  drawerIcon: ({ color, size }) => (
+                      <Feather name="user-plus" color={color} size={size} /> // 💡 Sugestão de ícone mais específico
+                  )
+              }}
+          />
+          <Drawer.Screen 
+                name="ListaPacientes" 
+                component={ListaPacientes} 
+                options={{
+                    drawerLabel: "Listagem de Pacientes",
+                    drawerIcon: ({ color, size }) => (
+                        <Feather name="users" color={color} size={size} /> // 💡 Sugestão de ícone para listagem de pessoas
+                    )
+                }}
+            />
           
+          
+
         {/*
         * ROTAS FUTURAS: 
         * Adicione as seguintes rotas SOMENTE depois de criar o respectivo arquivo index.js:

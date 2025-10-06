@@ -12,11 +12,11 @@ export default function PageAtual({Pageatual = "Não identificado"}){
 
 const Estilo = StyleSheet.create({
     container: {
-        backgroundColor: '#02C195',
-        paddingTop: 28,
+        backgroundColor: '#00C092',
+        paddingTop: 15,
         paddingStart: 16,
         paddingEnd: 16,
-        paddingBottom: 44
+        paddingBottom: 15
     },
     content: {
         flexDirection: 'row',
@@ -24,7 +24,7 @@ const Estilo = StyleSheet.create({
         alignItems: 'center'
     },
     title: {
-        fontSize: 28,
+        fontSize: 22,
         color: '#fff',
         fontWeight: 'bold',
         
