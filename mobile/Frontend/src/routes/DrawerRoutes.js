@@ -7,6 +7,12 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 // Importe APENAS as telas que já criamos (Home e NovoExame).
 import Home from '../pages/Home';
 import NovoExame from '../pages/NovoExame'; 
+import CadastroPaciente from '../pages/CadastroPaciente';
+import ListaPacientes from '../pages/ListagemPacientes';
+import ResultadoExame from '../pages/ResultadoExame/resultadoExames';
+import ListaSolicitacoes from '../pages/ListaSolicitacoes/solicitacoesPendentes';
+import ListaLaudos from '../pages/ListaLaudos/listaLaudo';
+
 
 const Drawer = createDrawerNavigator();
 
@@ -53,7 +59,62 @@ export default function DrawerRoutes() {
               )
             }}
           />
+          <Drawer.Screen 
+              name="CadastroPaciente" 
+              component={CadastroPaciente} 
+              options={{
+                  drawerLabel: "Cadastrar Novo Paciente",
+                  drawerIcon: ({ color, size }) => (
+                      <Feather name="user-plus" color={color} size={size} /> // 💡 Sugestão de ícone mais específico
+                  )
+              }}
+          />
+          <Drawer.Screen 
+                name="ListaPacientes" 
+                component={ListaPacientes} 
+                options={{
+                    drawerLabel: "Listagem de Pacientes",
+                    drawerIcon: ({ color, size }) => (
+                        <Feather name="users" color={color} size={size} /> // 💡 Sugestão de ícone para listagem de pessoas
+                    )
+                }}
+            />
+
+            <Drawer.Screen
+              name='ResultadoExame'
+              component={ResultadoExame}
+              options={{
+                drawerLabel: "Resultado de Exame",
+                drawerIcon: ({ color, size }) => (
+                  <Feather name='exame' color={color} size={size} />
+                )
+              }}
+            />
+
+            <Drawer.Screen 
+              name='Soliciatacoes'
+              component={ListaSolicitacoes}
+              options={{
+                drawerLabel: "Solicitacao Exame",
+                drawerIcon: ({ color, size }) => (
+                  <Feather name='solicitacao' color={color} size={size} />
+                )
+              }}
+            />
+
+            <Drawer.Screen
+              name='Laudos'
+              component={ListaLaudos}
+              options={{
+                drawerLabel: "Lista Laudo",
+                drawerIcon: ({ color, size }) => (
+                  <Feather name='laudo' color={color} size={size} />
+                )
+              }}
+            />
           
+          
+
         {/*
         * ROTAS FUTURAS: 
         * Adicione as seguintes rotas SOMENTE depois de criar o respectivo arquivo index.js:

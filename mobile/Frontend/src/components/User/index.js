@@ -27,10 +27,10 @@ const Estilo = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         backgroundColor: '#0A212F',
-        paddingTop: 30,
+        paddingTop: 10,
         paddingStart: 16,
         paddingEnd: 16,
-        paddingBottom: 40
+        paddingBottom: 20
     },
     content: {
         flexDirection: 'row',
@@ -60,9 +60,9 @@ const Estilo = StyleSheet.create({
         flexDirection: 'column',
     },
     Subtitle: {
-        marginTop: 10,
+        marginTop: 5,
         fontSize: 14,
-        color: '#fff',
+        color: '#ccc',
         paddingStart: 20
     }
 })
