@@ -3,7 +3,6 @@ import { View, StyleSheet, Text, SafeAreaView, ScrollView } from 'react-native';
 
 import Header from '../../components/Header';
 import User from '../../components/User';
-import PageAtual from '../../components/PageAtual';
 
 // Componente de botão de menu customizado (Hamburguer)
 
@@ -14,13 +13,8 @@ export default function Home() {
         <Header />
   
       <ScrollView style={Estilo.scrollView}>
-        {/* 1. Bloco de Informações do Usuário */}
         <User nomeUsuario="Fernanda" />
-        
-        {/* 2. Bloco da Página Atual: "MENU" (Banner verde) */}
-        <PageAtual Pageatual="MENU" />
 
-        {/* 3. Área principal para o Conteúdo da Home */}
         <View style={Estilo.contentContainer}>
           <Text style={Estilo.welcomeTitle}>Bem-vindo(a) ao BIO Diagnóstico</Text>
           <Text style={Estilo.instructions}>
@@ -58,5 +52,21 @@ const Estilo = StyleSheet.create({
     color: '#586A76',
     textAlign: 'center',
     lineHeight: 24,
-  }
+  },
+  contentContainer: {
+        marginHorizontal: 20, 
+        padding: 20,
+        backgroundColor: '#fff', 
+        borderRadius: 10,
+        
+        // Estilos de sombra para dar efeito "flutuante"
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3.84,
+        elevation: 5,
+        
+        alignItems: 'center',
+        marginTop: 15, 
+    },
 });

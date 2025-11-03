@@ -2,6 +2,8 @@ import { Text, View, StyleSheet, Touchable, TouchableOpacity } from "react-nativ
 
 import {Feather} from '@expo/vector-icons';
 
+const COR_DESTAQUE = '#1ABC9C';
+const COR_FUNDO_ESCURO = '#0A212F';
 
 export default function User({nomeUsuario = "Não identificado"}){
     return(
@@ -26,10 +28,10 @@ const Estilo = StyleSheet.create({
     container: {
         flexDirection: 'row',
         justifyContent: 'space-between',
-        backgroundColor: '#0A212F',
+        backgroundColor: COR_FUNDO_ESCURO,
         paddingTop: 10,
-        paddingStart: 16,
-        paddingEnd: 16,
+        paddingStart: 20,
+        paddingEnd: 20,
         paddingBottom: 20
     },
     content: {
@@ -41,15 +43,14 @@ const Estilo = StyleSheet.create({
         fontSize: 18,
         color: '#fff',
         fontWeight: 'bold',
-        paddingStart: 20
+        paddingStart: 15
     },
     buttonUser: {
-        width: 44,
-        height: 44,
-        backgroundColor: 'rgba(255, 255, 255, 0.5)',
+        width: 50,
+        height: 50,
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 44 / 2
+        borderRadius: 50 / 2
     },
     buttonMore: {
         width: 54,
@@ -60,9 +61,9 @@ const Estilo = StyleSheet.create({
         flexDirection: 'column',
     },
     Subtitle: {
-        marginTop: 5,
+        marginTop: 2,
         fontSize: 14,
         color: '#ccc',
-        paddingStart: 20
+        paddingStart: 15
     }
 })

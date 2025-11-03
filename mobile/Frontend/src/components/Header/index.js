@@ -5,6 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 // Pega a altura da barra de status + um padding superior
 const statusBarHeight = StatusBar.currentHeight ? StatusBar.currentHeight + 22 : 64;
 
+const COR_DESTAQUE = '#1ABC9C';
+const COR_FUNDO_ESCURO = '#0A212F';
 
 const MenuButton = ({ onPress }) => (
   <View style={Estilo.menuButtonContainer}>
@@ -63,7 +65,7 @@ const Estilo = StyleSheet.create({
         textAlign: 'center' 
     },
     coloredText: {
-        color: '#00C092'
+        color: COR_DESTAQUE
     },
     divider: {
         borderBottomColor: '#586A76', 
