@@ -10,15 +10,15 @@ export default function CadastroPaciente(){
     // 1. Definição dos Estados para os campos de texto e seleção
     const [nomeCompleto, setNomeCompleto] = useState('');
     const [cpf, setCpf] = useState('');
-    const [dataNascimento, setDataNascimento] = useState('');
+    const [dtnasc, setdtnasc] = useState('');
     const [email, setEmail] = useState('');
     const [nomeMae, setNomeMae] = useState('');
-    const [celular, setCelular] = useState('');
+    const [numCelular, setnumCelular] = useState('');
     const [genero, setGenero] = useState('Masculino'); // Valor inicial
 
     const handleCadastro = () => {
         // Lógica de envio de dados aqui
-        console.log({ nomeCompleto, cpf, dataNascimento, email, nomeMae, celular, genero });
+        console.log({ nomeCompleto, cpf, dtnasc, email, nomeMae, numCelular, genero });
         alert('Cadastro de Paciente Enviado com Sucesso!');
     };
     
@@ -67,8 +67,8 @@ export default function CadastroPaciente(){
                             placeholderTextColor="#999"
                             keyboardType="numeric"
                             maxLength={10} 
-                            value={dataNascimento}
-                            onChangeText={setDataNascimento}
+                            value={dtnasc}
+                            onChangeText={setdtnasc}
                         />
                          {/* Ícone de calendário */}
                         <Feather name="calendar" size={24} color="#999" style={Estilo.iconeInput} /> 
@@ -103,8 +103,8 @@ export default function CadastroPaciente(){
                         placeholderTextColor="#999"
                         keyboardType="phone-pad"
                         maxLength={15}
-                        value={celular}
-                        onChangeText={setCelular}
+                        value={numCelular}
+                        onChangeText={setnumCelular}
                     />
 
                     {/* Gênero (Usando Picker) */}

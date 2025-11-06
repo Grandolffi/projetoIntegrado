@@ -20,7 +20,7 @@ router.post("/pacientes", async (req, res) =>{
     console.log(`nome: ${nome} cpf: ${cpf}, dtnasc: ${dtnasc}, nomeMae: ${nomeMae}, numCelular ${numCelular}, genero ${genero}`);
     const result = await insertPaciente(nome, cpf, dtnasc, email, nomeMae, numCelular, genero);
     if(result){
-        return res.status(202).json({success: true});
+        return res.status(201).json({success: true});
     }
     return res.status(404).json({success: false});
 })

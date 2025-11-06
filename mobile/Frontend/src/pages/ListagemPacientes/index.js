@@ -1,37 +1,43 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text, ScrollView, TouchableOpacity, Modal, SafeAreaView } from "react-native";
 import { Feather } from '@expo/vector-icons';
 import Header from "../../components/Header";
 import User from "../../components/User";
 import PageAtual from "../../components/PageAtual";
 
-// --- DADOS DE TESTE (Para simular a API) ---
-const DADOS_PACIENTES = [
-    { 
-        id: 1, 
-        nome: "João Silva", 
-        cpf: "12345678901", 
-        nasc: "1990-03-12", 
-        email: "joao.silva@teste.com",
-        nomeMae: "Maria Silva", 
-        telefone: "11987654321", 
-        genero: "Masculino" 
-    },
-    { 
-        id: 2, 
-        nome: "Ana Costa", 
-        cpf: "98765432109", 
-        nasc: "1995-06-15", 
-        email: "ana.costa@teste.com",
-        nomeMae: "Helena Costa", 
-        telefone: "21999887766", 
-        genero: "Feminino" 
-    },
-];
+const BASE_URL = "http://localhost:3000/";
+
+const AUTH_HEADER = {
+  "Content-Type": "application/json",
+  //"Authorization": `Bearer ${TOKEN}`
+}
+
 
 export default function ListaPacientes(){
+    const [paciente, setPaciente] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [pacienteSelecionado, setPacienteSelecionado] = useState(null);
+
+    useEffect(()=>{
+        getPacientes();
+    }, []);
+
+    const getPacientes = async () => {
+    try{
+      console.log("Iniciando a conexão com a API...");
+      const response = await fetch(`${BASE_URL}pacientes`, {
+        method: "GET",
+        headers: AUTH_HEADER 
+      });
+      console.log("Conteudo de Response: ", response);
+      
+      const json = await response.json();
+      console.log("Conteudo do JSON: ", json);
+      setPaciente(json);
+    }catch(error){
+      console.error("Erro ao realizar requisiçaão GET: ", error);
+    }
+  }
 
     const openModal = (paciente) => {
         setPacienteSelecionado(paciente);
@@ -50,41 +56,39 @@ export default function ListaPacientes(){
     const LARGURA_ACAO = 40;
 
     // --- RENDERIZAÇÃO DA TABELA (Uma linha) ---
-    const renderRow = (item) => (
-        // Linha da Tabela
-        <View key={item.id} style={Estilo.linhaTabela}>
-            
-            {/* O Cartão de Dados principal (Nome e CPF) - FIXO */}
-            <View style={[Estilo.celulaPrincipal, { width: LARGURA_NOME }]}>
-                <Text style={Estilo.celulaTextoBold}>{item.nome}</Text>
-                <Text style={Estilo.celulaSubTexto}>CPF: {item.cpf}</Text>
-            </View>
+    const renderRow = (item, index) => (
+  <View key={index} style={Estilo.linhaTabela}>
+    {/* Nome do paciente (coluna fixa) */}
+    <View style={[Estilo.cabecalhoTextoContainer, { width: LARGURA_NOME }]}>
+      <Text style={Estilo.textoLinha}>{item.nome}</Text>
+    </View>
 
-            {/* O CONTEÚDO SCROLLÁVEL HORIZONTALMENTE */}
-            <ScrollView 
-                horizontal={true} 
-                showsHorizontalScrollIndicator={false} 
-                contentContainerStyle={Estilo.scrollHorizontalContent}
-            >
-                <View style={Estilo.dadosSecundarios}>
-                    <Text style={[Estilo.celulaTexto, { width: LARGURA_COLUNA }]}>{item.nasc}</Text>
-                    <Text style={[Estilo.celulaTexto, { width: LARGURA_EMAIL }]}>{item.email}</Text>
-                    <Text style={[Estilo.celulaTexto, { width: LARGURA_COLUNA }]}>{item.nomeMae}</Text>
-                    <Text style={[Estilo.celulaTexto, { width: LARGURA_COLUNA }]}>{item.telefone}</Text>
-                    <Text style={[Estilo.celulaTexto, { width: LARGURA_COLUNA }]}>{item.genero}</Text>
-                </View>
-            </ScrollView>
+    {/* Dados secundários (scroll horizontal) */}
+    <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={Estilo.scrollHorizontalContent}>
+      <View style={Estilo.dadosSecundarios}>
+        <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>
+          {new Date(item.dtnasc).toLocaleDateString('pt-BR')}
+        </Text>
+        <Text style={[Estilo.textoLinha, { width: LARGURA_EMAIL }]}>{item.email}</Text>
+        <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>{item.nomemae}</Text>
+        <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>{item.numcelular}</Text>
+        <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>{item.genero}</Text>
+      </View>
+    </ScrollView>
 
-            {/* Botão de Ações (Fixo à direita) */}
-            <TouchableOpacity 
-                style={[Estilo.botaoAcoes, { width: LARGURA_ACAO }]}
-                onPress={() => openModal(item)}
-            >
-                <Feather name="more-vertical" size={20} color="#0A212F" />
-            </TouchableOpacity>
+    {/* Espaço para ações */}
+    <TouchableOpacity
+      style={{ width: LARGURA_ACAO, alignItems: 'center', justifyContent: 'center' }}
+      onPress={() => {
+        setPacienteSelecionado(item);
+        setModalVisible(true);
+      }}
+    >
+      <Feather name="more-vertical" size={20} color="#333" />
+    </TouchableOpacity>
+  </View>
+);
 
-        </View>
-    );
 
     return(
         <SafeAreaView style={Estilo.container}>
@@ -117,7 +121,7 @@ export default function ListaPacientes(){
 
                     {/* Renderiza as Linhas de Pacientes */}
                     <View style={Estilo.listaConteudo}>
-                        {DADOS_PACIENTES.map(renderRow)}
+                        {paciente.map(renderRow)}
                     </View>
 
                 </View>
