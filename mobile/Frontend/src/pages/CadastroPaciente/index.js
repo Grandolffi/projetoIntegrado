@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { View, StyleSheet, Text, TextInput, TouchableOpacity, ScrollView } from "react-native";
+import { View, StyleSheet, Text, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
 import { Picker } from '@react-native-picker/picker'; // 👈 Importar o Picker
 import { Feather } from '@expo/vector-icons'; // Para o ícone de calendário
 import Header from "../../components/Header";
 import User from "../../components/User";
 import PageAtual from "../../components/PageAtual"; // Vamos usar este componente para o título
+import { CreatePacientesFromAPI } from '../../API/Pacientes';
 
 export default function CadastroPaciente(){
     // 1. Definição dos Estados para os campos de texto e seleção
@@ -16,11 +17,23 @@ export default function CadastroPaciente(){
     const [numCelular, setnumCelular] = useState('');
     const [genero, setGenero] = useState('Masculino'); // Valor inicial
 
-    const handleCadastro = () => {
-        // Lógica de envio de dados aqui
-        console.log({ nomeCompleto, cpf, dtnasc, email, nomeMae, numCelular, genero });
-        alert('Cadastro de Paciente Enviado com Sucesso!');
-    };
+    async function handleCadastro(){
+    try{
+      Alert.alert('Cadastrando paciente!');
+      if(nomeCompleto && cpf && dtnasc && email && nomeMae && numCelular && genero){
+        await CreatePacientesFromAPI({nome: nomeCompleto, cpf: cpf, dtnasc: dtnasc, email: email, nomeMae: nomeMae, numCelular: numCelular, genero:genero });
+        setNomeCompleto("");
+        setCpf("");
+        setdtnasc("");
+        setEmail("");
+        setNomeMae("");
+        setnumCelular("");
+        Alert.alert("Sucesso", "Paciente cadastrado!");
+      }
+    }catch(error){
+      Alert.alert("Erro", "Paciente não inserido!");
+    }
+  }
     
     return(
         <View style={Estilo.container}>

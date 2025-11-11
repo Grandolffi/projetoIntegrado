@@ -4,13 +4,10 @@ import { Feather } from '@expo/vector-icons';
 import Header from "../../components/Header";
 import User from "../../components/User";
 import PageAtual from "../../components/PageAtual";
+import { LoadPacientesFromAPI } from '../../API/Pacientes';
 
-const BASE_URL = "http://localhost:3000/";
 
-const AUTH_HEADER = {
-  "Content-Type": "application/json",
-  //"Authorization": `Bearer ${TOKEN}`
-}
+
 
 
 export default function ListaPacientes(){
@@ -23,21 +20,13 @@ export default function ListaPacientes(){
     }, []);
 
     const getPacientes = async () => {
-    try{
-      console.log("Iniciando a conexão com a API...");
-      const response = await fetch(`${BASE_URL}pacientes`, {
-        method: "GET",
-        headers: AUTH_HEADER 
-      });
-      console.log("Conteudo de Response: ", response);
-      
-      const json = await response.json();
-      console.log("Conteudo do JSON: ", json);
-      setPaciente(json);
-    }catch(error){
-      console.error("Erro ao realizar requisiçaão GET: ", error);
+        const pacientes = await LoadPacientesFromAPI();
+        if (pacientes){
+            setPaciente(pacientes)
+        }else{
+            setPaciente([])
+        }
     }
-  }
 
     const openModal = (paciente) => {
         setPacienteSelecionado(paciente);
@@ -99,9 +88,8 @@ export default function ListaPacientes(){
             {/* ScrollView Principal (Vertical) para todo o conteúdo abaixo do PageAtual */}
             <ScrollView contentContainerStyle={Estilo.scrollVerticalContent}>
                 
-                <View style={Estilo.listaCard}> {/* ESTE É O NOVO CARD QUE REPLICA O CAMPO CONTAINER */}
+                <View style={Estilo.listaCard}> 
 
-                    {/* Títulos da Tabela (Fixo no topo da lista) */}
                     <View style={Estilo.cabecalhoTabela}>
                         <View style={[Estilo.cabecalhoTextoContainer, { width: LARGURA_NOME }]}>
                             <Text style={Estilo.cabecalhoTexto}>Paciente</Text>
