@@ -11,7 +11,7 @@ async function loadFetch() {
 
 router.get("/lista_laudos", async (req, res) => {
     try {
-        await loadFetch(); // Adição necessária para carregar 'fetch' corretamente
+        await loadFetch(); 
         const response = await fetch("http://localhost:3000/laudos");
         const laudos = await response.json();
         res.render("lista_laudos", { laudos });

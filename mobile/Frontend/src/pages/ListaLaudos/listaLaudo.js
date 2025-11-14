@@ -1,41 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text, ScrollView, TouchableOpacity, TextInput, SafeAreaView } from "react-native";
 import { Feather } from '@expo/vector-icons';
 import Header from "../../components/Header";
 import User from "../../components/User";
 import PageAtual from "../../components/PageAtual";
+import { LoadLaudosFromAPI } from '../../API/Laudos';
 
-// --- DADOS DE TESTE (Simulando uma lista de Laudos) ---
-const DADOS_LAUDOS = [
-    { 
-        idLaudo: 'LDR-001', 
-        idPaciente: 1, 
-        nomeExame: "Hemograma Completo", 
-        dataRealizacao: "2025-10-01", 
-        valorAbsoluto: "Normal", 
-        status: "Concluído" 
-    },
-    { 
-        idLaudo: 'LDR-002', 
-        idPaciente: 2, 
-        nomeExame: "Glicemia de Jejum", 
-        dataRealizacao: "2025-09-28", 
-        valorAbsoluto: "85 mg/dL", 
-        status: "Concluído" 
-    },
-    { 
-        idLaudo: 'LDR-003', 
-        idPaciente: 3, 
-        nomeExame: "Urocultura", 
-        dataRealizacao: "2025-10-05", 
-        valorAbsoluto: "Pendente", 
-        status: "Em Análise" 
-    },
-];
 
-export default function ListaLaudos({ navigation }){ // Adicione 'navigation' se usar o React Navigation
+
+export default function ListaLaudos(){ // Adicione 'navigation' se usar o React Navigation
     const [searchText, setSearchText] = useState('');
-    const [laudosFiltrados, setLaudosFiltrados] = useState(DADOS_LAUDOS);
+    const [laudo, setLaudo] = useState([]);
+
+    useEffect(()=>{
+         getListaLaudo();
+    }, []);
+
+    const getListaLaudo = async () => {
+        const laudos = await LoadLaudosFromAPI();
+        if (laudos){
+            setLaudo(laudos)
+        }else{
+            setLaudo([])
+        }
+    }
 
     // Função que seria chamada ao clicar na linha
     const handleViewDetails = (laudo) => {
@@ -52,13 +40,14 @@ export default function ListaLaudos({ navigation }){ // Adicione 'navigation' se
 
     // --- RENDERIZAÇÃO DA TABELA (Uma linha) ---
     const renderRow = (item) => (
+        console.log("olha", item ),
         // Linha da Tabela
-        <View key={item.idLaudo} style={Estilo.linhaTabela}>
+        <View key={String(item.id_laudo)} style={Estilo.linhaTabela}>
             
             {/* ID do Laudo (FIXO à esquerda) */}
             <View style={[Estilo.celulaPrincipal, { width: LARGURA_ID_LAUDO }]}>
-                <Text style={Estilo.celulaTextoBold}>{item.idLaudo}</Text>
-                <Text style={Estilo.celulaSubTexto}>Paciente: {item.idPaciente}</Text>
+                <Text style={Estilo.celulaTextoBold}>{item.id_Laudo}</Text>
+                <Text style={Estilo.celulaSubTexto}>Paciente: {item.paciente_id}</Text>
             </View>
 
             {/* O CONTEÚDO SCROLLÁVEL HORIZONTALMENTE */}
@@ -70,12 +59,12 @@ export default function ListaLaudos({ navigation }){ // Adicione 'navigation' se
                 <View style={Estilo.dadosSecundarios}>
                     {/* Nome do Exame */}
                     <Text style={[Estilo.celulaTexto, { width: LARGURA_NOME_EXAME, textAlign: 'left' }]}>
-                        {item.nomeExame}
+                        {/*item.nomeExame*/}
                     </Text>
                     {/* Data de Realização */}
-                    <Text style={[Estilo.celulaTexto, { width: LARGURA_COLUNA }]}>{item.dataRealizacao}</Text>
+                    <Text style={[Estilo.celulaTexto, { width: LARGURA_COLUNA }]}>{item.data_finalizacao}</Text>
                     {/* Valor Absoluto / Resultado */}
-                    <Text style={[Estilo.celulaTexto, { width: LARGURA_COLUNA }]}>{item.valorAbsoluto}</Text>
+                    <Text style={[Estilo.celulaTexto, { width: LARGURA_COLUNA }]}>{item.observacoes}</Text>
                     {/* Status */}
                     <Text style={[Estilo.celulaTexto, { width: LARGURA_COLUNA }]}>{item.status}</Text>
                 </View>
@@ -134,7 +123,7 @@ export default function ListaLaudos({ navigation }){ // Adicione 'navigation' se
                             <View style={Estilo.dadosSecundarios}>
                                 <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_NOME_EXAME, textAlign: 'left' }]}>Exame</Text>
                                 <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_COLUNA }]}>Realização</Text>
-                                <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_COLUNA }]}>Resultado</Text>
+                                <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_COLUNA }]}>Observações</Text>
                                 <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_COLUNA }]}>Status</Text>
                             </View>
                         </ScrollView>
@@ -143,7 +132,7 @@ export default function ListaLaudos({ navigation }){ // Adicione 'navigation' se
 
                     {/* Renderiza as Linhas dos Laudos */}
                     <View style={Estilo.listaConteudo}>
-                        {laudosFiltrados.map(renderRow)}
+                        {laudo.map(renderRow)}
                     </View>
 
                 </View>
