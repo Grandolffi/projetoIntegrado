@@ -1,228 +1,283 @@
-import React from 'react';
-import { View, StyleSheet, Text, ScrollView, SafeAreaView, TouchableOpacity } from "react-native";
+import React, { useState } from 'react';
+import { View, StyleSheet, Text, TextInput, TouchableOpacity, ScrollView, Alert, ActivityIndicator, Dimensions } from "react-native";
 import { Feather } from '@expo/vector-icons';
 import Header from "../../components/Header";
 import User from "../../components/User";
 import PageAtual from "../../components/PageAtual";
+import { CreateResultadoFromAPI } from '../../API/ResultadoExames';
 
-// --- DADOS DE TESTE (Baseado na sua classe PHP ResultadoExames) ---
-const DADOS_EXAME = {
-    idExame: 105,
-    nomeExame: "Glicemia de Jejum",
-    tipoExame: "Bioquímica",
-    valorAbsoluto: "85",
-    valorReferencia: "70 - 99",
-    pacienteNome: "João Silva", // Adicionado para exibição
-    cpf: "123.456.789-01", // Adicionado para exibição
-    dataHora: "2025-10-05 09:30",
-    laudoId: "LAUDO-2025-001",
-    // Observação: Adicionar o campo "Unidade de Medida" (ex: mg/dL) seria útil na vida real.
+const COR_DESTAQUE = '#1ABC9C';
+const COR_FUNDO_ESCURO = '#0A212F';
+
+const SIMULACAO_SOLICITACAO = {
+    idSolicitacao: '12345',
+    pacienteId: 99,
+    solicitanteNome: "Dr. André",
+    exames: [
+        { idSolicitacaoItem: 1, nomeExame: "Glicemia de Jejum", valorReferencia: "70 - 99 mg/dL" },
+        { idSolicitacaoItem: 2, nomeExame: "Colesterol Total", valorReferencia: "< 190 mg/dL" },
+        { idSolicitacaoItem: 3, nomeExame: "Creatinina", valorReferencia: "0.5 - 1.2 mg/dL" },
+    ],
 };
 
-// Componente auxiliar para exibir um item de detalhe
-const DetalheItem = ({ label, valor, isDestaque = false }) => (
-    <View style={Estilo.detalheLinha}>
-        <Text style={Estilo.detalheLabel}>{label}:</Text>
-        <Text style={[Estilo.detalheValor, isDestaque && Estilo.detalheDestaque]}>
-            {valor}
-        </Text>
-    </View>
-);
-
 export default function ResultadoExame() {
+    const [solicitacaoId, setSolicitacaoId] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [solicitacaoAtual, setSolicitacaoAtual] = useState(null);
+    const [valorAbsoluto, setValorAbsoluto] = useState('');
+    const [exameSelecionado, setExameSelecionado] = useState(null);
 
-    const handleImprimir = () => {
-        alert('Funcionalidade de Impressão (PDF) em desenvolvimento.');
+    const buscarSolicitacao = async (id) => {
+        if (!id) return;
+
+        setIsLoading(true);
+        setSolicitacaoAtual(null);
+        setExameSelecionado(null);
+
+        try {
+            if (id === '12345' || id === '15' || id === '20') {
+                setSolicitacaoAtual(SIMULACAO_SOLICITACAO);
+            } else {
+                Alert.alert("Erro", "Solicitação não encontrada.");
+            }
+        } catch {
+            Alert.alert("Erro", "Falha ao buscar solicitação.");
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    const handleSalvarResultado = async () => {
+        if (!exameSelecionado || !valorAbsoluto) {
+            Alert.alert("Atenção", "Selecione um exame e preencha o valor.");
+            return;
+        }
+
+        try {
+            Alert.alert("Enviado!", `Resultado: ${valorAbsoluto}`);
+
+            const resultado = {
+                idSolicitacao: solicitacaoAtual.idSolicitacao,
+                pacienteId: solicitacaoAtual.pacienteId,
+                idSolicitacaoItem: exameSelecionado.idSolicitacaoItem,
+                nomeExame: exameSelecionado.nomeExame,
+                valorAbsoluto,
+                valorReferencia: exameSelecionado.valorReferencia,
+                dataHora: new Date().toISOString(),
+            };
+
+            const response = await CreateResultadoFromAPI(resultado);
+
+            if (response.success === false) throw new Error("Falha no servidor");
+
+            setValorAbsoluto("");
+            setExameSelecionado(null);
+
+        } catch (e) {
+            Alert.alert("Erro", "Não foi possível enviar o resultado.");
+        }
     };
 
     return (
-        <SafeAreaView style={Estilo.container}>
+        <View style={Estilo.container}>
             <Header />
             <User nomeUsuario="Fernanda" />
-            <PageAtual Pageatual="Detalhes do Exame" />
+            <PageAtual Pageatual="Preencher Resultado" />
 
-            <ScrollView contentContainerStyle={Estilo.scrollVerticalContent}>
-                
-                {/* 1. CARD DE INFORMAÇÕES BÁSICAS */}
-                <View style={Estilo.infoCard}>
-                    <Text style={Estilo.cardTitulo}>{DADOS_EXAME.nomeExame}</Text>
-                    
-                    <DetalheItem label="ID do Laudo" valor={DADOS_EXAME.laudoId} isDestaque={true} />
-                    <DetalheItem label="Data e Hora" valor={DADOS_EXAME.dataHora.replace(' ', ' às ')} />
-                    <DetalheItem label="Tipo de Exame" valor={DADOS_EXAME.tipoExame} />
-                </View>
+            <ScrollView contentContainerStyle={Estilo.formContent}>
 
-                {/* 2. CARD DO PACIENTE */}
-                <View style={Estilo.infoCard}>
-                    <Text style={Estilo.cardTitulo}>Informações do Paciente</Text>
-                    <DetalheItem label="Nome" valor={DADOS_EXAME.pacienteNome} />
-                    <DetalheItem label="CPF" valor={DADOS_EXAME.cpf} />
-                    <DetalheItem label="Registro Interno" valor={`#${DADOS_EXAME.idExame - 100}`} />
-                </View>
-
-
-                {/* 3. CARD DO RESULTADO */}
-                <View style={[Estilo.infoCard, Estilo.resultadoCard]}>
-                    <Text style={Estilo.cardTitulo}>Resultado Encontrado</Text>
-                    
-                    <View style={Estilo.resultadoValores}>
-                        <View style={Estilo.valorContainer}>
-                            <Text style={Estilo.valorLabel}>VALOR ABSOLUTO</Text>
-                            {/* Destaque para o valor principal */}
-                            <Text style={Estilo.valorAbsoluto}>{DADOS_EXAME.valorAbsoluto}</Text> 
-                        </View>
-                        
-                        <View style={Estilo.referenciaContainer}>
-                            <Text style={Estilo.referenciaLabel}>VALOR DE REFERÊNCIA</Text>
-                            <Text style={Estilo.referenciaValor}>{DADOS_EXAME.valorReferencia}</Text>
-                        </View>
+                <View style={Estilo.campoContainer}>
+                    {/* BUSCA */}
+                    <Text style={Estilo.label}>ID da Solicitação</Text>
+                    <View style={Estilo.inputComBotao}>
+                        <TextInput
+                            style={[Estilo.input, Estilo.inputBusca]}
+                            placeholder="Ex: 12345"
+                            placeholderTextColor="#999"
+                            keyboardType="numeric"
+                            value={solicitacaoId}
+                            onChangeText={setSolicitacaoId}
+                        />
+                        <TouchableOpacity
+                            style={Estilo.botaoBusca}
+                            onPress={() => buscarSolicitacao(solicitacaoId)}
+                        >
+                            {isLoading ? <ActivityIndicator color="#fff" /> : <Feather name="search" size={20} color="#fff" />}
+                        </TouchableOpacity>
                     </View>
+
+                    {/* SOLICITAÇÃO */}
+                    {solicitacaoAtual && (
+                        <>
+                            <View style={Estilo.infoBox}>
+                                <Text style={Estilo.infoText}>Solicitação Nº: {solicitacaoAtual.idSolicitacao}</Text>
+                                <Text style={Estilo.infoText}>Solicitante: {solicitacaoAtual.solicitanteNome}</Text>
+                            </View>
+
+                            <Text style={Estilo.label}>Exames Pendentes</Text>
+                            <View style={Estilo.checkboxList}>
+                                {solicitacaoAtual.exames.map(item => (
+                                    <TouchableOpacity
+                                        key={item.idSolicitacaoItem}
+                                        style={Estilo.checkboxItem}
+                                        onPress={() => {
+                                            setExameSelecionado(item);
+                                            setValorAbsoluto('');
+                                        }}
+                                    >
+                                        <View style={Estilo.radioOuter}>
+                                            {exameSelecionado?.idSolicitacaoItem === item.idSolicitacaoItem && (
+                                                <View style={Estilo.radioInner} />
+                                            )}
+                                        </View>
+
+                                        <View>
+                                            <Text style={Estilo.checkboxLabel}>{item.nomeExame}</Text>
+                                            <Text style={Estilo.ref}>{item.valorReferencia}</Text>
+                                        </View>
+                                    </TouchableOpacity>
+                                ))}
+                            </View>
+                        </>
+                    )}
+
+                    {exameSelecionado && (
+                        <View>
+                            <View style={Estilo.linha} />
+                            <Text style={[Estilo.label, Estilo.labelDestaque]}>
+                                Valor de Referência – {exameSelecionado.nomeExame}
+                            </Text>
+                            <Text style={Estilo.subLabelRef}>
+                                {exameSelecionado.valorReferencia}
+                            </Text>
+                            <TextInput
+                                style={[Estilo.input, Estilo.inputValor]}
+                                placeholder="Digite o valor..."
+                                keyboardType="numeric"
+                                value={valorAbsoluto}
+                                onChangeText={setValorAbsoluto}
+                            />
+                        </View>
+                    )}
                 </View>
             </ScrollView>
 
-            {/* Botão Fixo no Rodapé: Imprimir */}
             <View style={Estilo.botaoFixoContainer}>
-                <TouchableOpacity 
-                    style={Estilo.botao} 
-                    activeOpacity={0.8} 
-                    onPress={handleImprimir}
+                <TouchableOpacity
+                    style={Estilo.botao}
+                    onPress={handleSalvarResultado}
                 >
-                    <Feather name="printer" size={24} color="#fff" style={{ marginRight: 10 }} />
-                    <Text style={Estilo.textoBotao}>Imprimir Laudo</Text>
+                    <Text style={Estilo.textoBotao}>Salvar Resultado</Text>
                 </TouchableOpacity>
             </View>
-        </SafeAreaView>
+        </View>
     );
 }
 
 const Estilo = StyleSheet.create({
-    container: {
-        flex: 1, 
-        backgroundColor: '#f0f0f0'
-    },
-    scrollVerticalContent: {
-        paddingHorizontal: 20,
-        paddingBottom: 100, // Espaço para não cobrir o botão fixo
-    },
-    
-    // --- ESTILO CARD PRINCIPAL (baseado em listaCard/campoContainer) ---
-    infoCard: {
-        backgroundColor: '#fff',
-        padding: 20, 
+    container: { flex: 1, backgroundColor: "#f5f5f5" },
+    formContent: { padding: 20, paddingBottom: 120 },
+
+    campoContainer: {
+        backgroundColor: "#fff",
+        padding: 20,
         borderRadius: 10,
-        marginTop: 15, 
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3.84,
-        elevation: 5,
+        elevation: 3
     },
-    cardTitulo: {
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#0A212F',
-        marginBottom: 15,
-        borderBottomWidth: 1,
-        borderBottomColor: '#eee',
-        paddingBottom: 10,
-    },
-
-    // --- ESTILO DETALHE ITEM (Linhas de Informação) ---
-    detalheLinha: {
-        flexDirection: 'row',
-        marginBottom: 10,
-    },
-    detalheLabel: {
+    label: {
         fontSize: 15,
-        color: '#555',
-        fontWeight: '600',
-        width: 140, // Largura fixa para alinhar os valores
+        fontWeight: "bold",
+        marginBottom: 8,
+        color: "#333"
     },
-    detalheValor: {
+    inputComBotao: {
+        flexDirection: "row",
+        borderWidth: 1,
+        borderColor: "#bbb",
+        borderRadius: 6,
+        overflow: "hidden",
+        marginBottom: 20,
+        height: 40
+    },
+    inputBusca: {
         flex: 1,
-        fontSize: 15,
-        color: '#333',
+        paddingHorizontal: 10,
+        fontSize: 14,
+        borderBottomWidth: 0,
+        marginBottom: 0
     },
-    detalheDestaque: {
-        fontWeight: 'bold',
-        color: '#0A212F',
+    botaoBusca: {
+        width: 45,
+        backgroundColor: COR_FUNDO_ESCURO,
+        justifyContent: "center",
+        alignItems: "center"
     },
-
-    // --- CARD DE RESULTADO (Destaque) ---
-    resultadoCard: {
-        borderLeftWidth: 5, // Borda lateral para dar um visual de destaque
-        borderLeftColor: '#0A212F',
-    },
-    resultadoValores: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
+    infoBox: {
         marginTop: 10,
+        backgroundColor: "#f1f1f1",
+        padding: 12,
+        borderRadius: 6
     },
-    valorContainer: {
-        flex: 1,
-        alignItems: 'center',
-        borderRightWidth: 1,
-        borderRightColor: '#eee',
-        paddingRight: 10,
+    infoText: { fontSize: 14, color: "#444" },
+    checkboxList: { marginTop: 10 },
+    checkboxItem: {
+        flexDirection: "row",
+        alignItems: "flex-start",
+        paddingVertical: 10
     },
-    referenciaContainer: {
-        flex: 1,
-        alignItems: 'center',
-        paddingLeft: 10,
+    radioOuter: {
+        height: 16,
+        width: 16,
+        borderRadius: 8,
+        borderWidth: 2,
+        borderColor: COR_FUNDO_ESCURO,
+        marginRight: 10,
+        marginTop: 4,
+        justifyContent: "center",
+        alignItems: "center"
     },
-    valorLabel: {
+    radioInner: {
+        height: 8,
+        width: 8,
+        borderRadius: 4,
+        backgroundColor: COR_DESTAQUE,
+    },
+    checkboxLabel: { fontSize: 15, color: "#333" },
+    ref: { fontSize: 13, color: COR_DESTAQUE },
+    linha: {
+        height: 1,
+        backgroundColor: "#ddd",
+        marginVertical: 15
+    },
+    labelValor: { fontSize: 16, fontWeight: "bold", color: "#000" },
+    inputValor: {
         fontSize: 14,
-        color: '#999',
-        marginBottom: 5,
+        fontWeight: "600",
+        borderColor: COR_DESTAQUE,
+        height: 40,
+        paddingHorizontal: 8
     },
-    valorAbsoluto: {
-        fontSize: 36,
-        fontWeight: 'bold',
-        color: '#28A745', // Verde para indicar resultado normal (simulação)
-        // Você usaria lógica aqui para mudar para vermelho (ex: '#DC3545') se fosse anormal
-    },
-    referenciaLabel: {
+    input: {
+        height: 40,
+        borderBottomWidth: 1,
+        borderColor: "#ccc",
         fontSize: 14,
-        color: '#999',
-        marginBottom: 5,
+        marginBottom: 16
     },
-    referenciaValor: {
-        fontSize: 16,
-        color: '#333',
-        fontWeight: 'bold',
-    },
-
-    // --- BOTÃO FIXO (BOTTOM BAR - Copiado de CadastroPaciente) ---
     botaoFixoContainer: {
-        position: 'absolute',
+        position: "absolute",
         bottom: 0,
         left: 0,
         right: 0,
-        paddingHorizontal: 20,
-        paddingVertical: 15,
-        alignItems: 'center',
-        backgroundColor: '#f0f0f0',
-        borderTopWidth: 1,
-        borderTopColor: '#eee',
-        zIndex: 10,
+        padding: 15,
+        backgroundColor: "#fff",
+        elevation: 15
     },
     botao: {
-        flexDirection: 'row',
-        backgroundColor: '#0A212F',
-        borderRadius: 12,
-        width: '100%',
-        paddingVertical: 18,
-        alignItems: 'center',
-        justifyContent: 'center', // Centraliza o texto e o ícone
-        shadowColor: "#000",
-        shadowOffset: { width: 0, height: 4 },
-        shadowOpacity: 0.3,
-        shadowRadius: 5.46,
-        elevation: 9,
-    }, 
-    textoBotao: {
-        color: '#fff',
-        fontSize: 18,
-        fontWeight: 'bold',
-    }
+        backgroundColor: COR_DESTAQUE,
+        paddingVertical: 15,
+        borderRadius: 10,
+        alignItems: "center"
+    },
+    textoBotao: { color: "#fff", fontSize: 17, fontWeight: "bold" },
 });
