@@ -45,38 +45,42 @@ export default function ListaPacientes(){
     const LARGURA_ACAO = 40;
 
     // --- RENDERIZAÇÃO DA TABELA (Uma linha) ---
-    const renderRow = (item, index) => (
-  <View key={index} style={Estilo.linhaTabela}>
-    {/* Nome do paciente (coluna fixa) */}
-    <View style={[Estilo.cabecalhoTextoContainer, { width: LARGURA_NOME }]}>
-      <Text style={Estilo.textoLinha}>{item.nome}</Text>
-    </View>
+    const renderRow = ({ item, index }) => (
+        <View key={index} style={Estilo.linhaTabela}>
+            
+            {/* Coluna fixa */}
+            <View style={[Estilo.celula, { width: LARGURA_NOME }]}>
+                <Text style={Estilo.textoLinha}>{item.nome}</Text>
+            </View>
 
-    {/* Dados secundários (scroll horizontal) */}
-    <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={Estilo.scrollHorizontalContent}>
-      <View style={Estilo.dadosSecundarios}>
-        <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>
-          {new Date(item.dtnasc).toLocaleDateString('pt-BR')}
-        </Text>
-        <Text style={[Estilo.textoLinha, { width: LARGURA_EMAIL }]}>{item.email}</Text>
-        <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>{item.nomemae}</Text>
-        <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>{item.numcelular}</Text>
-        <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>{item.genero}</Text>
-      </View>
-    </ScrollView>
+            {/* Scroll dos dados secundários */}
+            <ScrollView 
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={Estilo.scrollHorizontalContent}
+            >
+                <View style={Estilo.dadosSecundarios}>
+                    <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>
+                        {new Date(item.dtnasc).toLocaleDateString('pt-BR')}
+                    </Text>
+                    <Text style={[Estilo.textoLinha, { width: LARGURA_EMAIL }]}>{item.email}</Text>
+                    <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>{item.nomemae}</Text>
+                    <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>{item.numcelular}</Text>
+                    <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>{item.genero}</Text>
+                </View>
+            </ScrollView>
 
-    {/* Espaço para ações */}
-    <TouchableOpacity
-      style={{ width: LARGURA_ACAO, alignItems: 'center', justifyContent: 'center' }}
-      onPress={() => {
-        setPacienteSelecionado(item);
-        setModalVisible(true);
-      }}
-    >
-      <Feather name="more-vertical" size={20} color="#333" />
-    </TouchableOpacity>
-  </View>
-);
+            {/* Botão de ação */}
+            <TouchableOpacity
+                style={Estilo.celulaAcoes}
+                onPress={() => openModal(item)}
+            >
+                <Feather name="more-vertical" size={20} color="#666" />
+            </TouchableOpacity>
+
+        </View>
+    );
+
 
 
     return(
@@ -86,35 +90,71 @@ export default function ListaPacientes(){
             <PageAtual Pageatual="Listagem de Pacientes" />
 
             {/* ScrollView Principal (Vertical) para todo o conteúdo abaixo do PageAtual */}
-            <ScrollView contentContainerStyle={Estilo.scrollVerticalContent}>
-                
-                <View style={Estilo.listaCard}> 
+            <View style={[Estilo.listaCard, { flex: 1 }]}>
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16 }}>
 
-                    <View style={Estilo.cabecalhoTabela}>
-                        <View style={[Estilo.cabecalhoTextoContainer, { width: LARGURA_NOME }]}>
-                            <Text style={Estilo.cabecalhoTexto}>Paciente</Text>
-                        </View>
-                        
-                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={Estilo.scrollHorizontalContent}>
-                            <View style={Estilo.dadosSecundarios}>
+                        <View>
+
+                            {/* CABEÇALHO */}
+                            <View style={Estilo.cabecalhoTabela}>
+
+                                <View style={[Estilo.cabecalhoTextoContainer, { width: LARGURA_NOME }]}>
+                                    <Text style={Estilo.cabecalhoTexto}>Paciente</Text>
+                                </View>
+
                                 <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_COLUNA }]}>Nascimento</Text>
                                 <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_EMAIL }]}>Email</Text>
                                 <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_COLUNA }]}>Mãe</Text>
                                 <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_COLUNA }]}>Telefone</Text>
                                 <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_COLUNA }]}>Gênero</Text>
+
+                                <View style={{ width: LARGURA_ACAO }} />
                             </View>
-                        </ScrollView>
-                        <View style={{ width: LARGURA_ACAO }} /> {/* Espaço para o ícone de Ações */}
-                    </View>
 
-                    {/* Renderiza as Linhas de Pacientes */}
-                    <View style={Estilo.listaConteudo}>
-                        {paciente.map(renderRow)}
-                    </View>
+                            {/* LINHAS */}
+                            {paciente.map((item, index) => (
+                                <View key={index} style={Estilo.linhaTabela}>
 
-                </View>
+                                    <View style={[Estilo.celula, { width: LARGURA_NOME }]}>
+                                        <Text style={Estilo.textoLinha}>{item.nome}</Text>
+                                    </View>
 
-            </ScrollView>
+                                    <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>
+                                        {new Date(item.dtnasc).toLocaleDateString('pt-BR')}
+                                    </Text>
+
+                                    <Text style={[Estilo.textoLinha, { width: LARGURA_EMAIL }]}>
+                                        {item.email}
+                                    </Text>
+
+                                    <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>
+                                        {item.nomemae}
+                                    </Text>
+
+                                    <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>
+                                        {item.numcelular}
+                                    </Text>
+
+                                    <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>
+                                        {item.genero}
+                                    </Text>
+
+                                    {/* BOTÃO DE AÇÕES */}
+                                    <TouchableOpacity 
+                                        style={[Estilo.celulaAcoes, { width: LARGURA_ACAO }]}
+                                        onPress={() => openModal(item)}
+                                    >
+                                        <Feather name="more-vertical" size={20} color="#666" />
+                                    </TouchableOpacity>
+
+                                </View>
+                            ))}
+
+                        </View>
+                    </ScrollView>
+                </ScrollView>
+            </View>
 
 
             {/* Modal de Ações (Editar/Excluir) */}
@@ -144,125 +184,116 @@ export default function ListaPacientes(){
     );
 }
 
-const Estilo = StyleSheet.create({
+    const Estilo = StyleSheet.create({
+
     container: {
-        flex: 1, 
-        backgroundColor: '#f0f0f0'
+        flex: 1,
+        backgroundColor: '#f3f3f3',
     },
 
-    // 💡 NOVO: Container do ScrollView Vertical
     scrollVerticalContent: {
-        paddingHorizontal: 20,
-        paddingBottom: 20, 
+        paddingHorizontal: 16,
+        paddingBottom: 30,
     },
-    
-    // 💡 NOVO: ESTILO DO CARD PRINCIPAL (REPLICAÇÃO do campoContainer)
+
+    // CARD PRINCIPAL
     listaCard: {
         backgroundColor: '#fff',
-        borderRadius: 10,
-        // 💡 Margem de 10px para separar do PageAtual
-        marginTop: 10, 
-        shadowColor: "#000",
+        marginTop: 12,
+        borderRadius: 12,
+        paddingBottom: 8,
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3.84,
-        elevation: 5,
-        overflow: 'hidden', // Importante para as bordas arredondadas funcionarem
-    },
-    listaConteudo: {
-        // Conteúdo da lista após o cabeçalho
+        shadowOpacity: 0.08,
+        shadowRadius: 6,
+        elevation: 4,
     },
 
-    // --- CABEÇALHO DA TABELA (Títulos das Colunas) ---
+    // CABEÇALHO
     cabecalhoTabela: {
         flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: '#EAEAEA', // Cor mais clara para o cabeçalho da tabela
-        paddingVertical: 10,
-    },
-    cabecalhoTextoContainer: {
-        paddingLeft: 20, // Padding da célula principal
-    },
-    cabecalhoTexto: {
-        fontWeight: 'bold',
-        fontSize: 12,
-        color: '#333',
-        textAlign: 'center', 
+        backgroundColor: '#f7f7f7',
+        borderBottomWidth: 1,
+        borderBottomColor: '#e5e5e5',
+        paddingVertical: 12,
+        elevation: 2,
     },
 
-    // --- LINHA DA TABELA (Dados do Paciente) ---
+    cabecalhoTextoContainer: {
+        justifyContent: 'center',
+        paddingLeft: 16,
+    },
+
+    cabecalhoTexto: {
+        fontSize: 13,
+        fontWeight: '700',
+        color: '#333',
+        letterSpacing: 0.3,
+    },
+
+    // LINHA DA TABELA
     linhaTabela: {
         flexDirection: 'row',
-        alignItems: 'center',
         backgroundColor: '#fff',
+        minHeight: 52,
         borderBottomWidth: 1,
-        borderBottomColor: '#eee',
-        // Removendo o paddingHorizontal
+        borderBottomColor: '#f0f0f0',
     },
-    // Removendo paddingVertical da linha e colocando nas células
-    celulaPrincipal: {
-        paddingVertical: 12,
-        paddingLeft: 20, // Padding para alinhar com o cabeçalho
+
+    celula: {
+        justifyContent: 'center',
+        paddingLeft: 16,
     },
-    celulaTexto: {
+
+    textoLinha: {
         fontSize: 14,
-        color: '#555',
-        paddingVertical: 12,
-        textAlign: 'center',
-        
+        color: '#444',
+        fontWeight: '500',
     },
-    celulaTextoBold: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        color: '#0A212F',
-        textAlign: 'left',
-    },
-    celulaSubTexto: {
-        fontSize: 12,
-        color: '#999',
-        textAlign: 'left',
-    },
-    
-    // --- SCROLL HORIZONTAL (Dados Secundários) ---
-    scrollHorizontalContent: {
-        paddingRight: 10, // Espaço extra para o scroll horizontal não encostar na borda
-    },
+
     dadosSecundarios: {
         flexDirection: 'row',
         alignItems: 'center',
     },
 
-    // --- BOTÃO DE AÇÕES ---
-    botaoAcoes: {
-        alignItems: 'center',
-        justifyContent: 'center',
-        paddingRight: 10, // Espaço à direita do ícone
+    scrollHorizontalContent: {
+        paddingRight: 10,
     },
 
-    // --- MODAL (Menu de Ações) ---
+    // AÇÕES
+    celulaAcoes: {
+        width: 45,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+
+    // MODAL
     modalOverlay: {
         flex: 1,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        backgroundColor: 'rgba(0,0,0,0.5)',
         alignItems: 'flex-end',
         justifyContent: 'flex-start',
-        paddingTop: 150, 
+        paddingTop: 150,
         paddingRight: 20,
     },
+
     modalView: {
         width: 150,
-        backgroundColor: 'white',
-        borderRadius: 8,
-        paddingVertical: 5,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        paddingVertical: 8,
         shadowColor: '#000',
-        shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.25,
-        shadowRadius: 4,
-        elevation: 5,
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        elevation: 7,
     },
+
     modalOption: {
-        padding: 12,
+        paddingVertical: 12,
+        paddingHorizontal: 15,
     },
+
     modalText: {
         fontSize: 16,
         color: '#333',

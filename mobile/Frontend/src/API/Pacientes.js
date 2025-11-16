@@ -1,4 +1,4 @@
-export const BASE_URL = "http://localhost:3000/";
+const BASE_URL = "http://localhost:3000/";
 const AUTH_HEADER = {
   "Content-Type": "application/json",
   //"Authorization": `Bearer ${TOKEN}`
@@ -31,7 +31,7 @@ export const CreatePacientesFromAPI = async (paciente) => {
         body: JSON.stringify(paciente)
         });
 
-        if(!res.ok) throw new Error(await res.text());
+        if(!res.ok) throw new Error(await res.text()); // se não for ok, lance um erro
 
         const json = await res.json();
         console.log("Conteudo do JSON: ", json);

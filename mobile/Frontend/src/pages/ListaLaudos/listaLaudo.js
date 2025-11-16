@@ -8,7 +8,7 @@ import { LoadLaudosFromAPI } from '../../API/Laudos';
 
 
 
-export default function ListaLaudos(){ // Adicione 'navigation' se usar o React Navigation
+export default function ListaLaudos({navigation}){ // Adicione 'navigation' se usar o React Navigation
     const [searchText, setSearchText] = useState('');
     const [laudo, setLaudo] = useState([]);
 
@@ -40,13 +40,13 @@ export default function ListaLaudos(){ // Adicione 'navigation' se usar o React 
 
     // --- RENDERIZAÇÃO DA TABELA (Uma linha) ---
     const renderRow = (item) => (
-        console.log("olha", item ),
+        console.log("olha", item),
         // Linha da Tabela
         <View key={String(item.id_laudo)} style={Estilo.linhaTabela}>
             
             {/* ID do Laudo (FIXO à esquerda) */}
             <View style={[Estilo.celulaPrincipal, { width: LARGURA_ID_LAUDO }]}>
-                <Text style={Estilo.celulaTextoBold}>{item.id_Laudo}</Text>
+                <Text style={Estilo.celulaTextoBold}>{item.id_laudo}</Text>
                 <Text style={Estilo.celulaSubTexto}>Paciente: {item.paciente_id}</Text>
             </View>
 
@@ -66,7 +66,7 @@ export default function ListaLaudos(){ // Adicione 'navigation' se usar o React 
                     {/* Valor Absoluto / Resultado */}
                     <Text style={[Estilo.celulaTexto, { width: LARGURA_COLUNA }]}>{item.observacoes}</Text>
                     {/* Status */}
-                    <Text style={[Estilo.celulaTexto, { width: LARGURA_COLUNA }]}>{item.status}</Text>
+                    <Text style={[Estilo.celulaTexto, { width: LARGURA_COLUNA }]}>{item.responsavel_tecnico}</Text>
                 </View>
             </ScrollView>
 
@@ -94,7 +94,7 @@ export default function ListaLaudos(){ // Adicione 'navigation' se usar o React 
                     <View style={Estilo.searchContainer}>
                         <TextInput
                             style={Estilo.searchInput}
-                            placeholder="Pesquisar ID, Paciente, Exame..."
+                            placeholder="Pesquisar ID paciente"
                             placeholderTextColor="#999"
                             value={searchText}
                             onChangeText={setSearchText}
@@ -104,38 +104,60 @@ export default function ListaLaudos(){ // Adicione 'navigation' se usar o React 
                         </TouchableOpacity>
                     </View>
                     {/* Botão para solicitar novo exame (Navega para a tela do seu parceiro) */}
-                    <TouchableOpacity style={Estilo.novoExameButton} onPress={() => alert("Navegar para NovoExame")}>
+                    <TouchableOpacity style={Estilo.novoExameButton} onPress={() => navigation.navigate("SolicitarNovoExame")}>
                          <Text style={Estilo.novoExameText}>+ Novo Exame</Text>
                     </TouchableOpacity>
                 </View>
 
 
                 {/* 2. CARD DA TABELA */}
-                <View style={Estilo.listaCard}> 
-
-                    {/* Títulos da Tabela (Fixo no topo da lista) */}
-                    <View style={Estilo.cabecalhoTabela}>
-                        <View style={[Estilo.cabecalhoTextoContainer, { width: LARGURA_ID_LAUDO }]}>
-                            <Text style={Estilo.cabecalhoTexto}>ID Laudo</Text>
-                        </View>
+                <View style={Estilo.listaCard}>
+    
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                         
-                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={Estilo.scrollHorizontalContent}>
-                            <View style={Estilo.dadosSecundarios}>
-                                <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_NOME_EXAME, textAlign: 'left' }]}>Exame</Text>
+                        <View>
+                            {/* CABEÇALHO */}
+                            <View style={Estilo.cabecalhoTabela}>
+                                <View style={[Estilo.cabecalhoTextoContainer, { width: LARGURA_ID_LAUDO }]}>
+                                    <Text style={Estilo.cabecalhoTexto}>ID Laudo</Text>
+                                </View>
+
                                 <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_COLUNA }]}>Realização</Text>
                                 <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_COLUNA }]}>Observações</Text>
-                                <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_COLUNA }]}>Status</Text>
+                                <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_COLUNA }]}>Responsável</Text>
+
+                                <View style={{ width: LARGURA_ACAO }} />
                             </View>
-                        </ScrollView>
-                        <View style={{ width: LARGURA_ACAO }} /> {/* Espaço para o ícone de Ações */}
-                    </View>
 
-                    {/* Renderiza as Linhas dos Laudos */}
-                    <View style={Estilo.listaConteudo}>
-                        {laudo.map(renderRow)}
-                    </View>
+                            {/* LINHAS */}
+                            {laudo.map(item => (
+                                <View key={item.id_laudo} style={Estilo.linhaTabela}>
+                                    
+                                    <View style={[Estilo.celulaPrincipal, { width: LARGURA_ID_LAUDO }]}>
+                                        <Text style={Estilo.celulaTextoBold}>{item.id_laudo}</Text>
+                                        <Text style={Estilo.celulaSubTexto}>Paciente: {item.paciente_id}</Text>
+                                    </View>
 
-                </View>
+                                    <Text style={[Estilo.celulaTexto, { width: LARGURA_COLUNA }]}> {item.responsavel_tecnico} </Text>
+                                    <Text style={[Estilo.celulaTexto, { width: LARGURA_COLUNA }]}> {item.observacoes} </Text>
+                                    <Text style={[Estilo.celulaTexto, { width: LARGURA_COLUNA }]}> {new Date(item.data_finalizacao).toLocaleDateString('pt-BR')} </Text>
+                                    
+
+                                    <TouchableOpacity 
+                                        style={[Estilo.botaoAcoes, { width: LARGURA_ACAO }]}
+                                        onPress={() => handleViewDetails(item)}
+                                    >
+                                        <Feather name="eye" size={20} color="#0A212F" />
+                                    </TouchableOpacity>
+
+                                </View>
+                            ))}
+
+                        </View>
+
+    </ScrollView>
+
+</View>
 
             </ScrollView>
         </SafeAreaView>
@@ -196,72 +218,91 @@ const Estilo = StyleSheet.create({
     },
 
     // --- ESTILOS DA TABELA (Copiados de ListaPacientes) ---
-    listaCard: {
+     listaCard: {
         backgroundColor: '#fff',
-        borderRadius: 10,
+        borderRadius: 14,
         shadowColor: "#000",
-        shadowOffset: { width: 0, height: 2 },
+        shadowOffset: { width: 0, height: 3 },
         shadowOpacity: 0.1,
-        shadowRadius: 3.84,
-        elevation: 5,
+        shadowRadius: 4.65,
+        elevation: 6,
         overflow: 'hidden',
     },
+
+    /* ---------------- CABEÇALHO DA TABELA ---------------- */
     cabecalhoTabela: {
         flexDirection: 'row',
         alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: '#EAEAEA',
-        paddingVertical: 10,
+        backgroundColor: '#E5EBF1',
+        paddingVertical: 12,
+        paddingHorizontal: 10,
+        borderBottomWidth: 1,
+        borderBottomColor: '#D0D8E0',
     },
+
     cabecalhoTextoContainer: {
         paddingLeft: 20, 
     },
+
     cabecalhoTexto: {
-        fontWeight: 'bold',
-        fontSize: 12,
-        color: '#333',
-        textAlign: 'center', 
+        fontWeight: '700',
+        fontSize: 13,
+        color: '#0A212F',
+        textAlign: 'center',
     },
+
+    /* ---------------- LINHAS ---------------- */
     linhaTabela: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#fff',
+        backgroundColor: '#FFFFFF',
+        paddingVertical: 4,
         borderBottomWidth: 1,
-        borderBottomColor: '#eee',
+        borderBottomColor: '#E9EEF2',
+        minHeight: 55,
     },
+
     celulaPrincipal: {
-        paddingVertical: 12,
+        paddingVertical: 10,
         paddingLeft: 20,
+        justifyContent: 'center',
     },
+
     celulaTexto: {
         fontSize: 14,
-        color: '#555',
-        paddingVertical: 12,
+        color: '#444',
+        paddingVertical: 10,
         textAlign: 'center',
-        
     },
+
     celulaTextoBold: {
-        fontSize: 14,
-        fontWeight: 'bold',
+        fontSize: 15,
+        fontWeight: '700',
         color: '#0A212F',
-        textAlign: 'left',
     },
+
     celulaSubTexto: {
         fontSize: 12,
-        color: '#999',
-        textAlign: 'left',
+        color: '#77838F',
+        marginTop: 2,
     },
-    scrollHorizontalContent: {
-        paddingRight: 10, 
-    },
+
     dadosSecundarios: {
         flexDirection: 'row',
         alignItems: 'center',
+        paddingRight: 8,
     },
+
+    scrollHorizontalContent: {
+        paddingRight: 10, 
+    },
+
+    /* ---------------- BOTÃO AÇÕES ---------------- */
     botaoAcoes: {
         alignItems: 'center',
         justifyContent: 'center',
-        paddingRight: 10,
         height: '100%',
+        paddingRight: 10,
+        paddingLeft: 5,
     },
 });

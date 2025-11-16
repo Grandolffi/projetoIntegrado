@@ -9,8 +9,6 @@ const cors = require("cors");
 app.use(cors());
 app.use(express.json());
 
-
-
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "..", "views"));
 
@@ -28,6 +26,12 @@ const listaExamesRouter = require("./listaExamesRouter");
 const listaLaudosRouter = require("./listaLaudosRouter");
 const listaSolicitacoesRouter = require("./listaSolicitacoesRouter");
 
+
+// IMPORTA O LOGIN
+const { router: loginRouter, auth } = require('./login');
+app.use(loginRouter); // /login funciona
+//app.use(auth); fALAR COM PROFESSOR VERIFICAR COMO USAR NA OUTRA PAGINA PARA ELA RECEBER TOKEN/ OLHAR CODIGO QUE ELE DEIXOU NO BLACKBOARD
+
 // Registra as rotas com prefixos para evitar conflitos
 app.use(pacientesRouter);
 app.use(examesRouter); // Agora as rotas em examesRouter começarão com /exames
@@ -42,3 +46,8 @@ app.use(listaSolicitacoesRouter);
 app.listen(3000, 'localhost', () => {
     console.log("Servidor rodando na porta 3000");
 })
+
+//Rota de saúde da aplicação (health check)
+app.get("/", async (req, res) => {
+    res.status(200).json({ok: true});
+});

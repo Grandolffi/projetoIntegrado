@@ -16,7 +16,7 @@ const AUTH_HEADERS = {
 export const CreateSolicitacaoFromAPI = async (solicitacao) => {
     try {
         console.log("Enviando nova solicitação de exame...");
-        const response = await fetch(`${BASE_URL}solicitacoes`, {
+        const response = await fetch(`${BASE_URL}`, {
             method: "POST",
             headers: AUTH_HEADERS, // Envia o Token de Segurança
             body: JSON.stringify(solicitacao)

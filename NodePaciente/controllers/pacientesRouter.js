@@ -16,7 +16,7 @@ router.get("/pacientes", async (req, res) => { //PessoaDao acessa via json, e li
 
 //inserindo via api (create)
 router.post("/pacientes", async (req, res) =>{
-    const {nome, cpf, dtnasc, email, nomeMae, numCelular, genero} = req.body;
+    const {nome, cpf, dtnasc, email, nomeMae, numCelular, genero} = req.body;   
     console.log(`nome: ${nome} cpf: ${cpf}, dtnasc: ${dtnasc}, nomeMae: ${nomeMae}, numCelular ${numCelular}, genero ${genero}`);
     const result = await insertPaciente(nome, cpf, dtnasc, email, nomeMae, numCelular, genero);
     if(result){

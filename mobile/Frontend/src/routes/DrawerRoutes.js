@@ -12,6 +12,7 @@ import ListaPacientes from '../pages/ListagemPacientes';
 import ResultadoExame from '../pages/ResultadoExame/resultadoExames';
 import ListaSolicitacoes from '../pages/ListaSolicitacoes/solicitacoesPendentes';
 import ListaLaudos from '../pages/ListaLaudos/listaLaudo';
+import LoginUser from '../pages/LoginUser/loginUser'
 
 const Drawer = createDrawerNavigator();
 
@@ -20,7 +21,7 @@ export default function DrawerRoutes() {
     <SafeAreaProvider>
       <NavigationContainer>
         <Drawer.Navigator
-          initialRouteName="Home"
+          initialRouteName="Login"
           screenOptions={{
             headerShown: false,
             drawerActiveTintColor: '#0A212F',
@@ -47,6 +48,15 @@ export default function DrawerRoutes() {
               drawerIcon: ({ color, size }) => (
                 <Feather name="home" color={color} size={size} />
               )
+            }}
+          />
+
+          {/* 1. Home */}
+          <Drawer.Screen
+            name="Login"
+            component={LoginUser}
+            options={{
+              drawerItemStyle: { display: 'none' }
             }}
           />
 
