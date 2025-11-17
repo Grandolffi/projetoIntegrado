@@ -1,96 +1,71 @@
-import React, { useState } from 'react';
-import { View, StyleSheet, Text, ScrollView, TouchableOpacity, TextInput, SafeAreaView } from "react-native";
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Text, ScrollView, TouchableOpacity, Modal, SafeAreaView } from "react-native";
 import { Feather } from '@expo/vector-icons';
 import Header from "../../components/Header";
 import User from "../../components/User";
 import PageAtual from "../../components/PageAtual";
+import { LoadSolicitacoesFromAPI } from '../../API/Solicitacoes';  // API que carrega as solicitações pendentes
 
-// --- DADOS DE TESTE (Baseado em lista_solicitacoes_pendentes.php) ---
-const DADOS_SOLICITACOES = [
-    { 
-        idSolicitacao: 'S-001', 
-        idPaciente: 10, 
-        dataSolicitacao: "2025-10-06", 
-        dataPrevista: "2025-10-08", 
-        solicitante: "Dr. André",
-        status: "Pendente" 
-    },
-    { 
-        idSolicitacao: 'S-002', 
-        idPaciente: 25, 
-        dataSolicitacao: "2025-10-05", 
-        dataPrevista: "2025-10-07", 
-        solicitante: "Dra. Elisa",
-        status: "Pendente" 
-    },
-    { 
-        idSolicitacao: 'S-003', 
-        idPaciente: 33, 
-        dataSolicitacao: "2025-10-04", 
-        dataPrevista: "2025-10-06", 
-        solicitante: "Enf. Carla",
-        status: "Coletado" 
-    },
-];
+export default function ListaSolicitacoes(){
+    const [solicitacoes, setSolicitacoes] = useState([]);
+    const [modalVisible, setModalVisible] = useState(false);
+    const [solicitacaoSelecionada, setSolicitacaoSelecionada] = useState(null);
 
-export default function ListaSolicitacoes({ navigation }){ 
-    const [searchText, setSearchText] = useState('');
-    const [solicitacoesFiltradas, setSolicitacoesFiltradas] = useState(DADOS_SOLICITACOES);
+    useEffect(()=>{
+        getSolicitacoes();
+    }, []);
 
-    // Função de ação: Leva para a tela de preenchimento (cadastroExames.php no seu backend)
-    const handlePreencherResultados = (solicitacao) => {
-        // Exemplo: navigation.navigate('CadastroExames', { solicitacaoId: solicitacao.idSolicitacao });
-        alert(`Abrir formulário de resultados para Solicitação ID: ${solicitacao.idSolicitacao}`);
+    const getSolicitacoes = async () => {
+        const solicitacoes = await LoadSolicitacoesFromAPI(); // Carregar dados da API
+        if (solicitacoes){
+            setSolicitacoes(solicitacoes);
+        } else {
+            setSolicitacoes([]);
+        }
     };
 
-    // Definições de Largura para a Tabela Responsiva
-    const LARGURA_ID_SOL = 80;
-    const LARGURA_PACIENTE_ID = 80;
-    const LARGURA_COLUNA_DATA = 120;
+    const openModal = (solicitacao) => {
+        setSolicitacaoSelecionada(solicitacao);
+        setModalVisible(true);
+    };
+
+    const handleAcao = (acao) => {
+        alert(`${acao} a solicitação ID: ${solicitacaoSelecionada.idSolicitacao}`);
+        setModalVisible(false);
+    };
+
+    // Definições de largura
+    const LARGURA_COLUNA = 120;
+    const LARGURA_ID_SOLICITACAO = 120;
     const LARGURA_SOLICITANTE = 120;
     const LARGURA_STATUS = 100;
-    const LARGURA_ACAO = 140;
+    const LARGURA_ACAO = 50;
 
-
-    // --- RENDERIZAÇÃO DA TABELA (Uma linha) ---
-    const renderRow = (item) => (
-        // Linha da Tabela
-        <View key={item.idSolicitacao} style={Estilo.linhaTabela}>
-            
-            {/* ID da Solicitação e Paciente (FIXO à esquerda) */}
-            <View style={[Estilo.celulaPrincipal, { width: LARGURA_ID_SOL + LARGURA_PACIENTE_ID }]}>
-                <Text style={Estilo.celulaTextoBold}>ID Sol.: {item.idSolicitacao}</Text>
-                <Text style={Estilo.celulaSubTexto}>Paciente: #{item.idPaciente}</Text>
+    // Renderização da Tabela
+    const renderRow = ({ item, index }) => (
+        <View key={index} style={Estilo.linhaTabela}>
+            <View style={[Estilo.celula, { width: LARGURA_ID_SOLICITACAO }]}>
+                <Text style={Estilo.textoLinha}>{item.idSolicitacao}</Text>
             </View>
 
-            {/* O CONTEÚDO SCROLLÁVEL HORIZONTALMENTE */}
             <ScrollView 
-                horizontal={true} 
-                showsHorizontalScrollIndicator={false} 
+                horizontal
+                showsHorizontalScrollIndicator={false}
                 contentContainerStyle={Estilo.scrollHorizontalContent}
             >
                 <View style={Estilo.dadosSecundarios}>
-                    {/* Data Solicitação */}
-                    <Text style={[Estilo.celulaTexto, { width: LARGURA_COLUNA_DATA }]}>
-                        {item.dataSolicitacao}
-                    </Text>
-                    {/* Data Prevista */}
-                    <Text style={[Estilo.celulaTexto, { width: LARGURA_COLUNA_DATA }]}>{item.dataPrevista}</Text>
-                    {/* Solicitante */}
-                    <Text style={[Estilo.celulaTexto, { width: LARGURA_SOLICITANTE }]}>{item.solicitante}</Text>
-                    {/* Status */}
-                    <Text style={[Estilo.celulaTexto, { width: LARGURA_STATUS }]}>{item.status}</Text>
+                    <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>{item.dataSolicitacao}</Text>
+                    <Text style={[Estilo.textoLinha, { width: LARGURA_SOLICITANTE }]}>{item.solicitante}</Text>
+                    <Text style={[Estilo.textoLinha, { width: LARGURA_STATUS }]}>{item.status}</Text>
                 </View>
             </ScrollView>
 
-            {/* Botão de Ações (Fixo à direita) */}
             <TouchableOpacity 
-                style={[Estilo.botaoAcoes, { width: LARGURA_ACAO }]}
-                onPress={() => handlePreencherResultados(item)}
+                style={Estilo.celulaAcoes}
+                onPress={() => openModal(item)}
             >
-                 <Text style={Estilo.textoBotaoAcao}>Preencher Resultados</Text>
+                <Feather name="more-vertical" size={20} color="#666" />
             </TouchableOpacity>
-
         </View>
     );
 
@@ -100,173 +75,135 @@ export default function ListaSolicitacoes({ navigation }){
             <User nomeUsuario="Fernanda" />
             <PageAtual Pageatual="Solicitações Pendentes" />
 
-            <ScrollView contentContainerStyle={Estilo.scrollVerticalContent}>
-                
-                {/* 1. BARRA DE PESQUISA */}
-                <View style={Estilo.headerLista}>
-                    <View style={Estilo.searchContainer}>
-                        <TextInput
-                            style={Estilo.searchInput}
-                            placeholder="Pesquisar ID, Paciente, Solicitante..."
-                            placeholderTextColor="#999"
-                            value={searchText}
-                            onChangeText={setSearchText}
-                        />
-                        <TouchableOpacity style={Estilo.searchButton}>
-                            <Feather name="search" size={20} color="#0A212F" />
-                        </TouchableOpacity>
-                    </View>
-                </View>
-
-
-                {/* 2. CARD DA TABELA */}
-                <View style={Estilo.listaCard}> 
-
-                    {/* Títulos da Tabela (Fixo no topo da lista) */}
-                    <View style={Estilo.cabecalhoTabela}>
-                        <View style={[Estilo.cabecalhoTextoContainer, { width: LARGURA_ID_SOL + LARGURA_PACIENTE_ID }]}>
-                            <Text style={Estilo.cabecalhoTexto}>Solicitação/Paciente</Text>
-                        </View>
-                        
-                        <ScrollView horizontal={true} showsHorizontalScrollIndicator={false} contentContainerStyle={Estilo.scrollHorizontalContent}>
-                            <View style={Estilo.dadosSecundarios}>
-                                <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_COLUNA_DATA }]}>Dt. Solicitação</Text>
-                                <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_COLUNA_DATA }]}>Previsto para</Text>
+            <View style={[Estilo.listaCard, { flex: 1 }]}>
+                <ScrollView showsVerticalScrollIndicator={false}>
+                    <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 16 }}>
+                        <View>
+                            {/* Cabeçalho da Tabela */}
+                            <View style={Estilo.cabecalhoTabela}>
+                                <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_ID_SOLICITACAO }]}>ID Solicitação</Text>
+                                <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_COLUNA }]}>Data Solicitação</Text>
                                 <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_SOLICITANTE }]}>Solicitante</Text>
                                 <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_STATUS }]}>Status</Text>
+                                <View style={{ width: LARGURA_ACAO }} />
                             </View>
-                        </ScrollView>
-                        <View style={{ width: LARGURA_ACAO }} /> {/* Espaço para o botão de Ações */}
+
+                            {/* Linhas de Dados */}
+                            {solicitacoes.map((item, index) => renderRow({ item, index }))}
+                        </View>
+                    </ScrollView>
+                </ScrollView>
+            </View>
+
+            {/* Modal de Ações */}
+            <Modal
+                animationType="fade"
+                transparent={true}
+                visible={modalVisible}
+                onRequestClose={() => setModalVisible(false)}
+            >
+                <TouchableOpacity 
+                    style={Estilo.modalOverlay}
+                    activeOpacity={1}
+                    onPressOut={() => setModalVisible(false)}
+                >
+                    <View style={Estilo.modalView}>
+                        <TouchableOpacity style={Estilo.modalOption} onPress={() => handleAcao('Preencher Resultados')}>
+                            <Text style={Estilo.modalText}>Preencher Resultados</Text>
+                        </TouchableOpacity>
+                        <TouchableOpacity style={Estilo.modalOption} onPress={() => handleAcao('Cancelar Solicitação')}>
+                            <Text style={[Estilo.modalText, { color: '#dc3545' }]}>Cancelar Solicitação</Text>
+                        </TouchableOpacity>
                     </View>
-
-                    {/* Renderiza as Linhas das Solicitações */}
-                    <View style={Estilo.listaConteudo}>
-                        {solicitacoesFiltradas.map(renderRow)}
-                    </View>
-
-                </View>
-
-            </ScrollView>
+                </TouchableOpacity>
+            </Modal>
         </SafeAreaView>
     );
 }
 
 const Estilo = StyleSheet.create({
     container: {
-        flex: 1, 
-        backgroundColor: '#f0f0f0'
-    },
-    scrollVerticalContent: {
-        paddingHorizontal: 20,
-        paddingBottom: 20, 
-    },
-    
-    // --- ESTILOS DE HEADER (Pesquisa) ---
-    headerLista: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginTop: 10,
-        marginBottom: 10,
-    },
-    searchContainer: {
-        flexDirection: 'row',
         flex: 1,
-        backgroundColor: '#fff',
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#ccc',
-        overflow: 'hidden',
-        height: 45,
+        backgroundColor: '#f3f3f3',
     },
-    searchInput: {
-        flex: 1,
-        paddingHorizontal: 15,
-        fontSize: 15,
-    },
-    searchButton: {
-        paddingHorizontal: 12,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#EAEAEA',
-    },
-
-    // --- ESTILOS DA TABELA (Copiados dos outros componentes) ---
     listaCard: {
         backgroundColor: '#fff',
-        borderRadius: 10,
-        shadowColor: "#000",
+        marginTop: 12,
+        borderRadius: 12,
+        paddingBottom: 8,
+        shadowColor: '#000',
         shadowOffset: { width: 0, height: 2 },
-        shadowOpacity: 0.1,
-        shadowRadius: 3.84,
-        elevation: 5,
-        overflow: 'hidden',
+        shadowOpacity: 0.08,
+        shadowRadius: 6,
+        elevation: 4,
     },
     cabecalhoTabela: {
         flexDirection: 'row',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        backgroundColor: '#EAEAEA',
-        paddingVertical: 10,
-    },
-    cabecalhoTextoContainer: {
-        paddingLeft: 20, 
+        backgroundColor: '#f7f7f7',
+        borderBottomWidth: 1,
+        borderBottomColor: '#e5e5e5',
+        paddingVertical: 12,
+        elevation: 2,
     },
     cabecalhoTexto: {
-        fontWeight: 'bold',
-        fontSize: 12,
+        fontSize: 13,
+        fontWeight: '700',
         color: '#333',
-        textAlign: 'center', 
+        letterSpacing: 0.3,
     },
     linhaTabela: {
         flexDirection: 'row',
-        alignItems: 'center',
         backgroundColor: '#fff',
+        minHeight: 52,
         borderBottomWidth: 1,
-        borderBottomColor: '#eee',
+        borderBottomColor: '#f0f0f0',
     },
-    celulaPrincipal: {
-        paddingVertical: 12,
-        paddingLeft: 20,
-        // Garante que a célula principal e a sub-célula fiquem juntas
-        justifyContent: 'center', 
+    celula: {
+        justifyContent: 'center',
+        paddingLeft: 16,
     },
-    celulaTexto: {
+    textoLinha: {
         fontSize: 14,
-        color: '#555',
-        paddingVertical: 12,
-        textAlign: 'center',
-        
-    },
-    celulaTextoBold: {
-        fontSize: 14,
-        fontWeight: 'bold',
-        color: '#0A212F',
-        textAlign: 'left',
-    },
-    celulaSubTexto: {
-        fontSize: 12,
-        color: '#999',
-        textAlign: 'left',
-    },
-    scrollHorizontalContent: {
-        paddingRight: 10, 
+        color: '#444',
+        fontWeight: '500',
     },
     dadosSecundarios: {
         flexDirection: 'row',
         alignItems: 'center',
     },
-    botaoAcoes: {
+    scrollHorizontalContent: {
+        paddingRight: 10,
+    },
+    celulaAcoes: {
+        width: 45,
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: '#0A212F', // Cor escura para destaque
-        paddingHorizontal: 5,
-        height: '100%',
     },
-    textoBotaoAcao: {
-        color: '#fff',
-        fontWeight: 'bold',
-        fontSize: 12,
-        textAlign: 'center',
-    }
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+        alignItems: 'flex-end',
+        justifyContent: 'flex-start',
+        paddingTop: 150,
+        paddingRight: 20,
+    },
+    modalView: {
+        width: 150,
+        backgroundColor: '#fff',
+        borderRadius: 10,
+        paddingVertical: 8,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.2,
+        shadowRadius: 6,
+        elevation: 7,
+    },
+    modalOption: {
+        paddingVertical: 12,
+        paddingHorizontal: 15,
+    },
+    modalText: {
+        fontSize: 16,
+        color: '#333',
+    },
 });

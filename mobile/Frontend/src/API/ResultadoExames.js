@@ -1,5 +1,3 @@
-// NO ARQUIVO API/Resultadosexames.js
-
 const BASE_URL = "http://localhost:3000/"; 
 const VALIDO_TOKEN = "Bearer ABC-123-BIO"; 
 
@@ -8,24 +6,41 @@ const AUTH_HEADERS = {
   "Authorization": VALIDO_TOKEN 
 }
 
-export const LoadExamesFromAPI = async () => {
+export const LoadResultadoExamesFromAPI = async () => {
+ try{
+      console.log("Iniciando a conexão com a API...");
+      const response = await fetch(`${BASE_URL}`, {
+        method: "GET",
+        headers: AUTH_HEADER,
+      });
+      console.log("Conteudo de Response: ", response);
+      
+      const json = await response.json();
+      console.log("Conteudo do JSON: ", json);
+      return json;
+    }catch(error){
+      console.error("Erro ao realizar requisiçaão GET: ", error);
+      return null;
+    }
+}
+
+export const CreateResultadoExamesFromAPI = async (exame) => {
     try {
-        const response = await fetch(`${BASE_URL}exames`, {
-            method: "GET",
-            headers: AUTH_HEADERS // ENVIA O TOKEN DE SEGURANÇA
+       console.log(`nome: ${resultadoExame.nome}`);
+        const res = await fetch(`${BASE_URL}exames`, {
+        method: "POST",
+        headers: AUTH_HEADER,
+        body: JSON.stringify(resultadoExame)
         });
-        
-        if (!response.ok) {
-            const errorText = await response.text();
-            throw new Error(`Erro ${response.status}: ${errorText}`);
-        }
+
+        if(!res.ok) throw new Error(await res.text());
         
         const json = await response.json();
-        // O JSON deve ser um array de objetos
+        console.log("Conteúdo do JSON: ", json);
         return json; 
 
     } catch(error) {
-        console.error("Erro ao realizar requisição GET de Exames: ", error);
-        return [];
+        console.error("Erro ao realizar requisição POST de Resultado Exame: ", error);
+        return { success: false, message: error.message };
     }
 }

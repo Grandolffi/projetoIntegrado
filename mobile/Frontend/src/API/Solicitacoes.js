@@ -1,5 +1,3 @@
-// NO ARQUIVO API/Solicitacoes.js
-
 const BASE_URL = "http://localhost:3000/"; 
 const VALIDO_TOKEN = "Bearer ABC-123-BIO"; 
 
@@ -8,26 +6,37 @@ const AUTH_HEADERS = {
   "Authorization": VALIDO_TOKEN 
 }
 
-/**
- * Rota POST /solicitacoes
- * Utilizada pela tela NovoExame.js para criar uma nova solicitação.
- * * @param {object} solicitacao Objeto contendo pacienteId, dataHora, e array de exames.
- */
-export const CreateSolicitacaoFromAPI = async (solicitacao) => {
+export const LoadPacientesFromAPI = async () => {
+    try{
+      console.log("Iniciando a conexão com a API...");
+      const response = await fetch(`${BASE_URL}`, {
+        method: "GET",
+        headers: AUTH_HEADER,
+      });
+      console.log("Conteudo de Response: ", response);
+      
+      const json = await response.json();
+      console.log("Conteudo do JSON: ", json);
+      return json;
+    }catch(error){
+      console.error("Erro ao realizar requisiçaão GET: ", error);
+      return null;
+    }
+  }
+
+export const CreateSolicitacoesFromAPI = async (solicitacao) => {
     try {
-        console.log("Enviando nova solicitação de exame...");
-        const response = await fetch(`${BASE_URL}`, {
-            method: "POST",
-            headers: AUTH_HEADERS, // Envia o Token de Segurança
-            body: JSON.stringify(solicitacao)
+       console.log(`nome: ${solicitacao.nome}`);
+        const res = await fetch(`${BASE_URL}solicitacoes`, {
+        method: "POST",
+        headers: AUTH_HEADER,
+        body: JSON.stringify(solicitacao)
         });
 
-        if (!response.ok) {
-             const errorText = await response.text();
-             throw new Error(`Erro ao solicitar exame: ${errorText}`);
-        }
+        if(!res.ok) throw new Error(await res.text());
         
         const json = await response.json();
+        console.log("Conteúdo do JSON: ", json);
         return json; 
 
     } catch(error) {

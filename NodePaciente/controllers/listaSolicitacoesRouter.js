@@ -1,24 +1,24 @@
 const express = require("express");
+const cors = require('cors');
 const router = express.Router();
 
-let fetch;
-async function loadFetch() {
-    if (!fetch) {
-        const { default: dynamicFetch } = await import("node-fetch");
-        fetch = dynamicFetch;
-    }
-}
+const app = express();
 
+//Configurando o CORS como middleware nas requisições
+app.use(cors());
+app.use(express.json());
+
+// Rota para exibir a view HTML com a lista de pacientes
 router.get("/lista_solicitacoes", async (req, res) => {
-    try {
-        await loadFetch();
-        const response = await fetch("http://localhost:3000/solicitacoes");
-        const solicitacoes = await response.json();
-        res.render("lista_solicitacoes", { solicitacoes });
-    } catch (error) {
-        console.error("Erro ao buscar solicitações:", error);
-        res.render("lista_solicitacoes", { solicitacoes: [] });
-    }
+  try {
+    const res = await fetch("http://localhost:3000/solicitacoes");
+    const solicitacoes = await res.json();
+    res.render("lista_solicitacoes", { solicitacoes });
+    //res.json(solicitacoes)
+  } catch (error) {
+    console.error("Erro ao buscar solicitações:", error);
+    res.render("lista_solicitacoes", { solicitacoes: [] });
+  }
 });
 
 module.exports = router;
