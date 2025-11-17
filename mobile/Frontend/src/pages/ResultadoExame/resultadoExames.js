@@ -4,21 +4,13 @@ import { Feather } from '@expo/vector-icons';
 import Header from "../../components/Header";
 import User from "../../components/User";
 import PageAtual from "../../components/PageAtual";
-import { CreateResultadoFromAPI } from '../../API/ResultadoExames';
+import CreateResultadoFromAPI from '../../API/ResultadoExames'; // <-- API para SALVAR
 
 const COR_DESTAQUE = '#1ABC9C';
 const COR_FUNDO_ESCURO = '#0A212F';
 
-const SIMULACAO_SOLICITACAO = {
-    idSolicitacao: '12345',
-    pacienteId: 99,
-    solicitanteNome: "Dr. André",
-    exames: [
-        { idSolicitacaoItem: 1, nomeExame: "Glicemia de Jejum", valorReferencia: "70 - 99 mg/dL" },
-        { idSolicitacaoItem: 2, nomeExame: "Colesterol Total", valorReferencia: "< 190 mg/dL" },
-        { idSolicitacaoItem: 3, nomeExame: "Creatinina", valorReferencia: "0.5 - 1.2 mg/dL" },
-    ],
-};
+// DADO SIMULADO FOI REMOVIDO
+// const SIMULACAO_SOLICITACAO = { ... };
 
 export default function ResultadoExame() {
     const [solicitacaoId, setSolicitacaoId] = useState('');
@@ -27,26 +19,49 @@ export default function ResultadoExame() {
     const [valorAbsoluto, setValorAbsoluto] = useState('');
     const [exameSelecionado, setExameSelecionado] = useState(null);
 
+    /**
+     * ATUALIZADO: Esta função agora busca na sua API Node.js
+     */
     const buscarSolicitacao = async (id) => {
         if (!id) return;
 
+        console.log(`Buscando solicitação com ID: ${id}`);
         setIsLoading(true);
         setSolicitacaoAtual(null);
         setExameSelecionado(null);
 
         try {
-            if (id === '12345' || id === '15' || id === '20') {
-                setSolicitacaoAtual(SIMULACAO_SOLICITACAO);
+            // ⚠️ ATENÇÃO AQUI:
+            // Se estiver testando em emulador, 'localhost' funciona.
+            // Se estiver testando em celular físico, use o IP da sua máquina:
+            // Ex: http://192.168.1.10:3000/solicitacoes/${id}
+            const response = await fetch(`http://localhost:3000/solicitacoes/${id}`);
+
+            if (!response.ok) {
+                if (response.status === 404) {
+                    Alert.alert("Erro", "Solicitação não encontrada.");
+                } else {
+                    throw new Error("Falha na resposta do servidor");
+                }
             } else {
-                Alert.alert("Erro", "Solicitação não encontrada.");
+                const data = await response.json();
+                // O DAO que criamos no backend (solicitacaoDAO.js)
+                // já formata o JSON como o frontend precisa.
+                setSolicitacaoAtual(data);
             }
-        } catch {
-            Alert.alert("Erro", "Falha ao buscar solicitação.");
+
+        } catch (error) {
+            console.error("Falha ao buscar solicitação:", error);
+            Alert.alert("Erro", "Não foi possível buscar a solicitação.");
         } finally {
             setIsLoading(false);
         }
     };
 
+    /**
+     * CORRIGIDO: Esta função envia os dados para salvar
+     * no formato 'snake_case' que o backend espera.
+     */
     const handleSalvarResultado = async () => {
         if (!exameSelecionado || !valorAbsoluto) {
             Alert.alert("Atenção", "Selecione um exame e preencha o valor.");
@@ -57,24 +72,35 @@ export default function ResultadoExame() {
             Alert.alert("Enviado!", `Resultado: ${valorAbsoluto}`);
 
             const resultado = {
-                idSolicitacao: solicitacaoAtual.idSolicitacao,
-                pacienteId: solicitacaoAtual.pacienteId,
-                idSolicitacaoItem: exameSelecionado.idSolicitacaoItem,
-                nomeExame: exameSelecionado.nomeExame,
-                valorAbsoluto,
-                valorReferencia: exameSelecionado.valorReferencia,
-                dataHora: new Date().toISOString(),
+                // Campos OBRIGATÓRIOS (NOT NULL)
+                paciente_id_fk: solicitacaoAtual.paciente_id, // Use o nome da API
+                nome_exame: exameSelecionado.nome_exame,
+                tipo_exame: exameSelecionado.tipo_exame_categoria, // Use o nome da API
+                data_hora_exame: new Date().toISOString(),
+
+                // Campos Opcionais (Nullable)
+                valor_absoluto: valorAbsoluto,
+                valor_referencia: exameSelecionado.valor_referencia_solicitacao, // Use o nome da API
+                laudo_id: null,
+                paciente_registro: null
             };
 
             const response = await CreateResultadoFromAPI(resultado);
 
-            if (response.success === false) throw new Error("Falha no servidor");
+            // Se a sua API 'CreateResultadoFromAPI' estiver correta,
+            // ela deve "pegar" o erro 400 do backend e
+            // fazer 'response.success' ser 'false'.
+            if (response.success === false) {
+                throw new Error("Falha no servidor ao salvar");
+            }
 
+            // Se chegou aqui, salvou E vai limpar o form.
             setValorAbsoluto("");
             setExameSelecionado(null);
 
         } catch (e) {
-            Alert.alert("Erro", "Não foi possível enviar o resultado.");
+            console.error("Erro ao salvar:", e.message);
+            Alert.alert("Erro", "Não foi possível enviar o resultado. Verifique os campos.");
         }
     };
 
@@ -92,7 +118,7 @@ export default function ResultadoExame() {
                     <View style={Estilo.inputComBotao}>
                         <TextInput
                             style={[Estilo.input, Estilo.inputBusca]}
-                            placeholder="Ex: 12345"
+                            placeholder="Ex: 20"
                             placeholderTextColor="#999"
                             keyboardType="numeric"
                             value={solicitacaoId}
@@ -118,7 +144,7 @@ export default function ResultadoExame() {
                             <View style={Estilo.checkboxList}>
                                 {solicitacaoAtual.exames.map(item => (
                                     <TouchableOpacity
-                                        key={item.idSolicitacaoItem}
+                                        key={item.id} // 👈 MUDADO (ex: de 'idSolicitacaoItem' para 'id')
                                         style={Estilo.checkboxItem}
                                         onPress={() => {
                                             setExameSelecionado(item);
@@ -126,14 +152,14 @@ export default function ResultadoExame() {
                                         }}
                                     >
                                         <View style={Estilo.radioOuter}>
-                                            {exameSelecionado?.idSolicitacaoItem === item.idSolicitacaoItem && (
+                                            {exameSelecionado?.id === item.id && ( // 👈 MUDADO AQUI TAMBÉM
                                                 <View style={Estilo.radioInner} />
                                             )}
                                         </View>
 
                                         <View>
-                                            <Text style={Estilo.checkboxLabel}>{item.nomeExame}</Text>
-                                            <Text style={Estilo.ref}>{item.valorReferencia}</Text>
+                                            <Text style={Estilo.checkboxLabel}>{item.nome_exame}</Text>
+                                            <Text style={Estilo.ref}>{item.valor_referencia_solicitacao}</Text>
                                         </View>
                                     </TouchableOpacity>
                                 ))}

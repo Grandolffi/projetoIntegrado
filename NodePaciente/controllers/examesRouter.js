@@ -9,9 +9,9 @@ const {getResultadoExame, getResultadoExameById, insertResultadoExame, editResul
 // --- ROTAS DA API (Exames) ---
 // crate
 router.post("/exames", async (req, res) => {
-    const {laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame} = req.body;
+    const {laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, paciente_id_fk, data_hora_exame} = req.body;
     try {
-        const novoExame = await insertResultadoExame(laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame);
+        const novoExame = await insertResultadoExame(laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, paciente_id_fk, data_hora_exame);
         if (novoExame) {
             res.status(201).json({ success: true, message: "Exame inserido com sucesso.", exame: novoExame });
         } else {
