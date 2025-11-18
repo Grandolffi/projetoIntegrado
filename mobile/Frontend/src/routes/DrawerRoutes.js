@@ -108,17 +108,6 @@ export default function DrawerRoutes() {
             }}
           />
 
-          {/* 6. Solicitações Pendentes */}
-          <Drawer.Screen
-            name='SolicitacoesPendentes'
-            component={ListaSolicitacoes}
-            options={{
-              drawerIcon: ({ color, size }) => (
-                <Feather name='inbox' color={color} size={size} />
-              )
-            }}
-          />
-
           {/* 7. Lista de Laudos */}
           <Drawer.Screen
             name='ListaLaudos'

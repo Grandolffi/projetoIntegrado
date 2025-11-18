@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { View, StyleSheet, Text, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
 import Header from "../../components/Header";
-import User from "../../components/User"; 
+import User from "../../components/User";
 import PageAtual from "../../components/PageAtual";
-import { CreateSolicitacaoFromAPI } from '../../API/Solicitacoes'; 
+import { CreateSolicitacaoFromAPI } from '../../API/Solicitacoes';
 
-const COR_DESTAQUE = '#1ABC9C'; 
-const COR_FUNDO_ESCURO = '#0A212F'; 
+// --- CORES PADRONIZADAS ---
+const COR_DESTAQUE = '#1ABC9C';
+const COR_FUNDO_ESCURO = '#0A212F';
 
+// --- DADOS DE EXAMES ---
 const EXAMES_POR_CATEGORIA = {
     Microbiologia: [
         { id: 20, nome: 'Urocultura com antibiograma', tipo: 'Microbiologia' },
@@ -25,7 +27,7 @@ const EXAMES_POR_CATEGORIA = {
         { id: 25, nome: 'Tempo de sangramento', tipo: 'Hematologia' },
         { id: 26, nome: 'Tempo de coagulação', tipo: 'Hematologia' },
     ],
-    Bioquimica: [ 
+    Bioquimica: [
         { id: 1, nome: 'Ácido úrico', tipo: 'Bioquímica' },
         { id: 2, nome: 'Alfa Amilase', tipo: 'Bioquímica' },
         { id: 3, nome: 'Bilirrubina Total', tipo: 'Bioquímica' },
@@ -53,49 +55,49 @@ const EXAMES_POR_CATEGORIA = {
     ],
 };
 
+export default function NovoExame() {
 
-export default function NovoExame(){
     const [nomePaciente, setNomePaciente] = useState('');
     const [pacienteId, setPacienteId] = useState('');
     const [dataHora, setDataHora] = useState('');
-    
-    const [examesSelecionados, setExamesSelecionados] = useState({}); 
-    const [abaAtiva, setAbaAtiva] = useState(null); 
+    const [examesSelecionados, setExamesSelecionados] = useState({});
+    const [abaAtiva, setAbaAtiva] = useState(null);
 
     const toggleExame = (exame) => {
         setExamesSelecionados(prev => {
             const newState = { ...prev };
             if (newState[exame.id]) {
-                delete newState[exame.id]; 
+                delete newState[exame.id];
             } else {
-                newState[exame.id] = exame; 
+                newState[exame.id] = exame;
             }
             return newState;
         });
     };
 
-    // FUNÇÃO DE ENVIO PARA A API (POST /solicitacoes)
     const handleSolicitarExame = async () => {
         const idsExames = Object.keys(examesSelecionados);
+
         if (!pacienteId || idsExames.length === 0 || !dataHora) {
             Alert.alert("Atenção", "Preencha o ID do paciente, a data/hora e selecione pelo menos um exame.");
             return;
         }
 
         const solicitacaoData = {
-            pacienteId: pacienteId, 
+            pacienteId: pacienteId,
             dataPrevista: dataHora,
-            solicitanteNome: 'Fernanda', 
-            exames: Object.values(examesSelecionados).map(ex => ({ 
-                nome: ex.nome, 
-                categoria: ex.tipo, 
+            solicitanteNome: 'Fernanda',
+            exames: Object.values(examesSelecionados).map(ex => ({
+                nome: ex.nome,
+                categoria: ex.tipo,
             }))
         };
 
         try {
             const response = await CreateSolicitacaoFromAPI(solicitacaoData);
+
             if (response.success) {
-                Alert.alert("Sucesso", "Solicitação de Exame enviada com sucesso!");
+                Alert.alert("Sucesso", "Solicitação de Exame enviada!");
                 setNomePaciente('');
                 setPacienteId('');
                 setDataHora('');
@@ -107,23 +109,19 @@ export default function NovoExame(){
             Alert.alert("Erro", `Falha ao solicitar exame: ${error.message}`);
         }
     };
-    
-    // Componente auxiliar para renderizar a lista de Checkboxes nativas
+
     const ExamesCheckboxList = ({ categoria }) => (
         <View style={Estilo.exameListContainer}>
-            {/* Título da seção (Exames de Bioquímica:) */}
-             <Text style={Estilo.secaoTitulo}>Exames de {categoria}:</Text>
+            <Text style={Estilo.secaoTitulo}>Exames de {categoria}:</Text>
+
             {EXAMES_POR_CATEGORIA[categoria]?.map(exame => (
                 <TouchableOpacity
                     key={exame.id}
                     style={Estilo.checkboxItem}
                     onPress={() => toggleExame(exame)}
                 >
-                    {/* Simulação da Checkbox usando Views (Nativo) */}
                     <View style={Estilo.checkboxOuter}>
-                         {examesSelecionados[exame.id] && (
-                            <View style={Estilo.checkboxInner} />
-                        )}
+                        {examesSelecionados[exame.id] && <View style={Estilo.checkboxInner} />}
                     </View>
                     <Text style={Estilo.checkboxLabel}>{exame.nome}</Text>
                 </TouchableOpacity>
@@ -131,76 +129,98 @@ export default function NovoExame(){
         </View>
     );
 
-    return(
+    return (
         <View style={Estilo.container}>
             <Header />
             <User nomeUsuario="Fernanda" />
-            
             <PageAtual Pageatual="Solicitar Novo Exame" />
-            
+
             <ScrollView contentContainerStyle={Estilo.formContent}>
                 <View style={Estilo.campoContainer}>
-                    
-                    {/* CAMPOS BÁSICOS DO PACIENTE */}
-                    <Text style={Estilo.label}>Nome do Paciente</Text>
-                    <TextInput style={Estilo.input} placeholder="Digite o nome..." placeholderTextColor="#999" value={nomePaciente} onChangeText={setNomePaciente} />
-                    
-                    <Text style={Estilo.label}>Id do Paciente</Text>
-                    <TextInput style={Estilo.input} placeholder="Digite o ID do paciente..." placeholderTextColor="#999" keyboardType="numeric" value={pacienteId} onChangeText={setPacienteId} />
-                    
-                    <Text style={Estilo.label}>Data e hora do Exame</Text>
-                    <TextInput style={Estilo.input} placeholder="dd/mm/aaaa --:--" placeholderTextColor="#999" value={dataHora} onChangeText={setDataHora} />
 
-                    
-                    {/* SEÇÃO DINÂMICA DE SELEÇÃO DE LABORATÓRIOS (ABAS) */}
-                    <Text style={[Estilo.label, {marginTop: 10}]}>Laboratórios Solicitados</Text>
-                    
-                    {/* Guias/Tabs */}
-                    <View style={Estilo.tabsContainer}>
+                    {/* Inputs */}
+                    <Text style={Estilo.label}>Nome do Paciente</Text>
+                    <TextInput style={Estilo.input} placeholder="Digite o nome..." value={nomePaciente} onChangeText={setNomePaciente} />
+
+                    <Text style={Estilo.label}>Id do Paciente</Text>
+                    <TextInput style={Estilo.input} placeholder="Digite o ID do paciente..." keyboardType="numeric" value={pacienteId} onChangeText={setPacienteId} />
+
+                    <Text style={Estilo.label}>Data e hora do Exame</Text>
+                    <TextInput style={Estilo.input} placeholder="dd/mm/aaaa --:--" value={dataHora} onChangeText={setDataHora} />
+
+                    {/* Tabs */}
+                    <Text style={[Estilo.label, { marginTop: 10 }]}>Laboratórios Solicitados</Text>
+
+                    <ScrollView
+                        horizontal
+                        showsHorizontalScrollIndicator={false}
+                        contentContainerStyle={Estilo.tabsContainer}
+                    >
                         {Object.keys(EXAMES_POR_CATEGORIA).map(aba => (
                             <TouchableOpacity
                                 key={aba}
-                                style={[Estilo.tabButton, abaAtiva === aba && Estilo.tabButtonActive]}
+                                style={[
+                                    Estilo.tabButton,
+                                    abaAtiva === aba && Estilo.tabButtonActive
+                                ]}
                                 onPress={() => setAbaAtiva(aba)}
                             >
-                                <Text style={[Estilo.tabText, abaAtiva === aba && Estilo.tabTextActive]}>{aba}</Text>
+                                <Text style={[
+                                    Estilo.tabText,
+                                    abaAtiva === aba && Estilo.tabTextActive
+                                ]}>
+                                    {aba}
+                                </Text>
                             </TouchableOpacity>
                         ))}
-                    </View>
-                    
-                    {/* RENDERIZAÇÃO CONDICIONAL: A lista de checkboxes só aparece se uma aba estiver ativa */}
-                    {abaAtiva && (
-                        <ExamesCheckboxList categoria={abaAtiva} />
-                    )}
-                    
-                </View>
-                {/* Aqui está a contagem e a lista de debug que você gosta */}
-                <Text style={Estilo.selecaoTitulo}>Exames Selecionados ({Object.keys(examesSelecionados).length})</Text>
-                {Object.values(examesSelecionados).map(ex => (
-                    <Text key={ex.id} style={Estilo.selecaoItem}>{ex.nome} ({ex.tipo || ex.nome})</Text>
-                ))}
-            </ScrollView>
+                    </ScrollView>
 
-            <View style={Estilo.botaoFixoContainer}>
-                <TouchableOpacity style={Estilo.botao} activeOpacity={0.8} onPress={handleSolicitarExame}>
-                    <Text style={Estilo.textoBotao}>Marcar Exame</Text>
-                </TouchableOpacity>
-            </View>
+                    {/* CHECKBOXES DA ABA ATIVA */}
+                    {abaAtiva && <ExamesCheckboxList categoria={abaAtiva} />}
+
+                    {/* LISTA DOS EXAMES SELECIONADOS */}
+                    {Object.keys(examesSelecionados).length > 0 && (
+                        <View style={{ marginTop: 20 }}>
+                            <Text style={Estilo.selecaoTitulo}>Exames Selecionados:</Text>
+
+                            {Object.values(examesSelecionados).map(ex => (
+                                <Text key={ex.id} style={Estilo.selecaoItem}>• {ex.nome}</Text>
+                            ))}
+                        </View>
+                    )}
+                    {/* Botão fixo */}
+                    <View style={Estilo.botaoFixoContainer}>
+                        <TouchableOpacity style={Estilo.botao} activeOpacity={0.8} onPress={handleSolicitarExame}>
+                            <Text style={Estilo.textoBotao}>Marcar Exame</Text>
+                        </TouchableOpacity>
+                    </View>
+
+                </View>
+
+            </ScrollView>
         </View>
-    )
+    );
 }
 
 const Estilo = StyleSheet.create({
-    container: { flex: 1, backgroundColor: '#f0f0f0' }, 
-    formContent: { paddingHorizontal: 20, paddingBottom: 100 }, 
-    
-    // Estilo de Card para o Formulário 
-    campoContainer: { 
-        backgroundColor: '#fff', padding: 20, borderRadius: 10, marginTop: 10, paddingBottom: 30,
-        shadowColor: "#000", shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 3.84, elevation: 5,
+    container: { flex: 1, backgroundColor: '#f0f0f0' },
+    formContent: { paddingHorizontal: 20, paddingBottom: 100 },
+
+    campoContainer: {
+        backgroundColor: '#fff',
+        padding: 20,
+        borderRadius: 10,
+        marginTop: 10,
+        paddingBottom: 30,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.1,
+        shadowRadius: 3.84,
+        elevation: 5,
     },
+
     label: { fontSize: 16, color: '#333', marginBottom: 5, fontWeight: 'bold' },
-    input: { height: 50, borderBottomWidth: 2, borderBottomColor: '#ccc', borderRadius: 0, paddingTop: 5, paddingBottom: 5, paddingHorizontal: 0, backgroundColor: '#fff', marginBottom: 20, fontSize: 17, }, 
+    input: { height: 50, borderBottomWidth: 2, borderBottomColor: '#ccc', marginBottom: 20, fontSize: 17 },
 
     tabsContainer: {
         flexDirection: 'row',
@@ -209,76 +229,45 @@ const Estilo = StyleSheet.create({
         borderBottomColor: '#eee',
     },
     tabButton: {
-        paddingHorizontal: 15,
         paddingVertical: 10,
+        paddingHorizontal: 18,
         marginRight: 10,
-        borderBottomWidth: 3,
-        borderBottomColor: 'transparent',
+        borderRadius: 8,
+        backgroundColor: '#f1f1f1',
     },
     tabButtonActive: {
-        borderBottomColor: COR_DESTAQUE, 
-    },
-    tabText: {
-        fontSize: 15,
-        color: '#999',
-        fontWeight: '600',
-    },
-    tabTextActive: {
-        color: COR_FUNDO_ESCURO,
-    },
-    exameListContainer: {
-        marginBottom: 20, 
-    },
-    secaoTitulo: {
-        fontSize: 16,
-        fontWeight: 'bold',
-        color: COR_FUNDO_ESCURO,
-        marginTop: 10,
-        marginBottom: 10,
-    },
-    checkboxItem: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        paddingVertical: 8, 
-    },
-    checkboxLabel: {
-        fontSize: 16,
-        color: '#333',
-        marginLeft: 10,
-    },
-    checkboxOuter: {
-        height: 20,
-        width: 20,
-        borderWidth: 2,
-        borderColor: COR_FUNDO_ESCURO,
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginRight: 8,
-    },
-    checkboxInner: {
-        height: 12,
-        width: 12,
         backgroundColor: COR_DESTAQUE,
     },
-    selecaoTitulo: {
+    tabText: {
         fontSize: 14,
+        color: '#999',
+    },
+    tabTextActive: {
+        color: '#fff',
         fontWeight: 'bold',
-        color: COR_FUNDO_ESCURO,
-        marginTop: 15,
-        marginBottom: 5,
-        paddingHorizontal: 20,
     },
-    selecaoItem: {
-        fontSize: 13,
-        color: '#555',
-        paddingHorizontal: 20,
-    },
-    botaoFixoContainer: { 
-        position: 'absolute', bottom: 0, left: 0, right: 0, paddingHorizontal: 20, paddingVertical: 15, alignItems: 'center', backgroundColor: '#f0f0f0', borderTopWidth: 1, borderTopColor: '#eee', zIndex: 10,
+
+    exameListContainer: { marginBottom: 20 },
+    secaoTitulo: { fontSize: 16, fontWeight: 'bold', color: COR_FUNDO_ESCURO, marginTop: 10, marginBottom: 10 },
+    checkboxItem: { flexDirection: 'row', alignItems: 'center', paddingVertical: 8 },
+    checkboxLabel: { fontSize: 16, color: '#333', marginLeft: 10 },
+    checkboxOuter: { height: 20, width: 20, borderWidth: 2, borderColor: COR_FUNDO_ESCURO, alignItems: 'center', justifyContent: 'center' },
+    checkboxInner: { height: 12, width: 12, backgroundColor: COR_DESTAQUE },
+
+    selecaoTitulo: { fontSize: 14, fontWeight: 'bold', color: COR_FUNDO_ESCURO, marginTop: 15, marginBottom: 5 },
+    selecaoItem: { fontSize: 13, color: '#555' },
+
+    botaoFixoContainer: {
+        marginTop: 20,
+        alignItems: 'center',
+        width: '100%',
     },
     botao: {
-        backgroundColor: COR_DESTAQUE, 
-        borderRadius: 12, width: '100%', paddingVertical: 18, alignItems: 'center', shadowColor: "#000", shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.3, shadowRadius: 5.46, elevation: 9,
-    }, 
-    textoBotao: { color: '#fff', fontSize: 18, fontWeight: 'bold', },
+        backgroundColor: COR_DESTAQUE,
+        borderRadius: 12,
+        width: '100%',
+        paddingVertical: 18,
+        alignItems: 'center',
+    },
+    textoBotao: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
 });
