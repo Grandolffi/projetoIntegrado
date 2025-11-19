@@ -4,7 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
-// Importações 
+// Importações
 import Home from '../pages/Home';
 import NovoExame from '../pages/NovoExame';
 import CadastroPaciente from '../pages/CadastroPaciente';
@@ -60,7 +60,7 @@ export default function DrawerRoutes() {
             }}
           />
 
-          {/* 2. Novo Exame */}
+          {/* 2. Novo Exame
           <Drawer.Screen
             name="SolicitarNovoExame"
             component={NovoExame}
@@ -70,7 +70,7 @@ export default function DrawerRoutes() {
                 <Feather name="plus-circle" color={color} size={size} />
               )
             }}
-          />
+          /> */}
 
           {/* 3. Cadastro Paciente */}
           <Drawer.Screen

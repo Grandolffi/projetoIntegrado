@@ -18,6 +18,7 @@
     "@react-navigation/native-stack": "^7.3.27",
     "expo": "54.0.12",
     "expo-status-bar": "~3.0.8",
+    "jsonwebtoken": "^9.0.2",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.4",
