@@ -20,7 +20,7 @@ export const LoadPacientesFromAPI = async () => {
       console.error("Erro ao realizar requisiçaão GET: ", error);
       return null;
     }
-  }
+}
 
 export const CreatePacientesFromAPI = async (paciente) => {
     try{
@@ -39,6 +39,25 @@ export const CreatePacientesFromAPI = async (paciente) => {
     }catch(error){
         console.error("Erro ao realizar requisição POST: ", error);
         return false;
+    }
+}
+export const DeletePacientesFromAPI = async (id) => {
+    try{
+        const res = await fetch(`${BASE_URL}pacientes/${id}`, {
+          method: "DELETE",
+          headers: AUTH_HEADER
+        });
+
+        const json = await res.json();
+
+        if(!res.ok) return { success: false, message: json.message }; // se não for ok, lance um erro
+
+        
+        console.log("Conteudo do JSON: ", json);
+        return json;
+    }catch(error){
+        console.error("Erro ao realizar requisição DELETE: ", error);
+        return { success: false, message: "Erro interno ao excluir." };
     }
 }
   

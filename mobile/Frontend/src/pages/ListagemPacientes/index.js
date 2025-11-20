@@ -4,7 +4,8 @@ import { Feather } from '@expo/vector-icons';
 import Header from "../../components/Header";
 import User from "../../components/User";
 import PageAtual from "../../components/PageAtual";
-import { LoadPacientesFromAPI } from '../../API/Pacientes';
+import { LoadPacientesFromAPI, DeletePacientesFromAPI } from '../../API/Pacientes';
+import Toast from 'react-native-toast-message';
 
 
 export default function ListaPacientes(){
@@ -30,9 +31,26 @@ export default function ListaPacientes(){
         setModalVisible(true);
     };
 
-    const handleAcao = (acao) => {
-        alert(`${acao} o paciente ID: ${pacienteSelecionado.id}`);
+    const handleAcao = async (acao) => {
         setModalVisible(false);
+        if(acao === "Excluir"){
+            const res = await DeletePacientesFromAPI(pacienteSelecionado.id);
+            if (!res.success) {
+                Toast.show({
+                    type: "error",
+                    text1: "Erro ao excluir",
+                    text2: res.message
+                });
+                return;
+            }
+            Toast.show({
+                type: "success",    
+                text1: "Paciente excluído",
+                text2: "Excluído com sucesso!"
+            });
+            await getPacientes()
+        }
+        
     };
 
     // Definições de Largura para COERÊNCIA

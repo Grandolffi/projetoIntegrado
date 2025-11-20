@@ -6,8 +6,10 @@ const{insertPaciente, getPacientes, editPaciente, deletePaciente} = require("../
 
 
 //read
-router.get("/pacientes",  async (req, res) => { //PessoaDao acessa via json, e lista os pacientes do banco
-   //res.status(200).json(Paciente);
+router.get("/pacientes", async (req, res) => { //PessoaDao acessa via json, e lista os pacientes do banco
+   if(!auth){
+    console.error("não temos auth");
+   }
    const paciente = await getPacientes(); // função SELECT * FROM pacientes
    console.log("paciente: ", paciente);
    res.json(paciente);
@@ -46,14 +48,28 @@ router.put("/editarpacientes/:idpaciente", async (req, res) => { //PessoaDao ace
 
 //API PARA REMOVER paciente
 router.delete("/pacientes/:id", async (req, res) => {
-    const id = parseInt(req.params.id);
-    const result = await deletePaciente(id);
-    if(result){
-        return res.status(200).json({success: true});
-    }
+    try{
+        const id = parseInt(req.params.id);
+        const result = await deletePaciente(id);
+        if(result){
+            return res.status(200).json({success: true, message: "Paciente excluído com sucesso!"});
+        }
 
-    return res.status(404).json({success: false});
-})
+        return res.status(404).json({
+            success: false,
+            message: "Paciente não encontrado."
+        });
+    }catch (error) {
+        console.error("Erro ao excluir paciente:", error);
+
+        // Aqui é onde você coloca a mensagem amigável!
+        return res.status(400).json({
+            success: false,
+            message: "Este paciente possui solicitações vinculadas e não pode ser excluído.",
+            error: error.message
+        });
+    }
+});
 
 // Buscar fabricante por ID
 router.get('/pacientes/:id', async (req, res) => {

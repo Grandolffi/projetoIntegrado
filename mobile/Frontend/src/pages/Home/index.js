@@ -1,13 +1,12 @@
 import React from 'react';
 import { View, StyleSheet, Text, SafeAreaView, ScrollView } from 'react-native';
 
+
 import Header from '../../components/Header';
 import User from '../../components/User';
 
-// Componente de botão de menu customizado (Hamburguer)
-
 export default function Home() {
-  // Hook do React Navigation para acessar a navegação
+
   return (
     <SafeAreaView style={Estilo.safeArea}>
         <Header />

@@ -2,7 +2,6 @@ const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
 
-
 //Simulando um banco de dados
 const USERS = [
     {id: 1, login: 'alex', password: '123465', name: 'Alex Nunes'},

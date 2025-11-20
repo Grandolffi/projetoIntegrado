@@ -87,7 +87,7 @@ export default function Login({navigation}) {
                         <Text style={Estilo.sendButtonText}>Login</Text>
                     </TouchableOpacity>
                     <TouchableOpacity style={Estilo.labelForgotContainer}>
-                        <Text style={Estilo.labelForgot}>Cadastrar-se</Text>
+                        <Text style={Estilo.labelForgot}>Sou paciente</Text>
                     </TouchableOpacity>
 
                 </View>
