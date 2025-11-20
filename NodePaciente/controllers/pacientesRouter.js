@@ -1,11 +1,12 @@
 const express = require("express");
 const router = express.Router();
+const { auth } = require('./login');
 
 const{insertPaciente, getPacientes, editPaciente, deletePaciente} = require("../model/DAO/pacienteDAO");
 
 
 //read
-router.get("/pacientes", async (req, res) => { //PessoaDao acessa via json, e lista os pacientes do banco
+router.get("/pacientes",  async (req, res) => { //PessoaDao acessa via json, e lista os pacientes do banco
    //res.status(200).json(Paciente);
    const paciente = await getPacientes(); // função SELECT * FROM pacientes
    console.log("paciente: ", paciente);

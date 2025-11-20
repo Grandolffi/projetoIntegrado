@@ -34,13 +34,18 @@ router.post('/login', (req, res) => {
 });
 
 //Criando um middleware para interceptar as rotas
-function auth(req, res, next){
+async function auth(req, res, next){
     const header = req.headers.authorization || "";
     const [type, token] = header.split(" ");
     if(type !== 'Bearer' || !token) return res.status(401).json({error: true, message: 'Token não informado'});
     try{
         req.user = jwt.verify(token, JWT_SECRET);
-        next();
+        
+        if (req.user){
+            next();
+        }else{
+            console.error("Não logado!")
+        }
     }catch(error){
         console.error("Erro ao validar token: ", error);
         res.status(401).json({error: true, message: 'Erro ao validar Token'});

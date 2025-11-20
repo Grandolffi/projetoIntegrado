@@ -7,9 +7,6 @@ import PageAtual from "../../components/PageAtual";
 import { LoadPacientesFromAPI } from '../../API/Pacientes';
 
 
-
-
-
 export default function ListaPacientes(){
     const [paciente, setPaciente] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
