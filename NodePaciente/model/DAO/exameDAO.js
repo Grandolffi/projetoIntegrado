@@ -17,7 +17,7 @@ class Exame {
 async function insertResultadoExame(client, laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, data_hora_exame, paciente_id_fk){
     // Alterei aqui: Use diretamente o 'client' que foi passado.
     // Isso garante que esta inserção faça parte da transação iniciada pelo laudoDAO.
-    const dbClient = client; 
+    const dbClient = client || pool; // EU ALTEREI ESSE TRECHO E INCLUI O "|| POOL" , POR CAUSA DA REGRA DE NEGOCIO DA VERSAO MOBILE
 
     if (nome_exame && tipo_exame && data_hora_exame && paciente_id_fk) {
         const result = await dbClient.query(` 

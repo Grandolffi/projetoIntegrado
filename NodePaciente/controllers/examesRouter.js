@@ -4,20 +4,44 @@ const router = express.Router(); // AGORA É UM ROUTER, NÃO O APP PRINCIPAL
 
 console.log("--> examesRouter.js foi carregado com sucesso! <-- "); // teste
 
-const {getResultadoExame, getResultadoExameById, insertResultadoExame, editResultadoExame, deleteResultadoExame} = require("../model/DAO/exameDAO");
+const { getResultadoExame, getResultadoExameById, insertResultadoExame, editResultadoExame, deleteResultadoExame } = require("../model/DAO/exameDAO");
 
 // --- ROTAS DA API (Exames) ---
 // crate
 router.post("/exames", async (req, res) => {
-    const {laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, paciente_id_fk, data_hora_exame} = req.body;
+    // 1. Log para ver o que chegou do Frontend
+    console.log("=== POST /exames CHAMADO ===");
+    console.log("Body recebido:", req.body);
+    const { laudo_id, 
+        nome_exame, 
+        tipo_exame, 
+        valor_absoluto, 
+        valor_referencia, 
+        paciente_registro, 
+        paciente_id_fk, 
+        data_hora_exame } = req.body;
     try {
-        const novoExame = await insertResultadoExame(laudo_id, nome_exame, tipo_exame, valor_absoluto, valor_referencia, paciente_registro, paciente_id_fk, data_hora_exame);
+        const novoExame = await insertResultadoExame(
+            null,  // 1. client (IMPORTANTE: manter null aqui)
+            laudo_id,           
+            nome_exame,         
+            tipo_exame,         
+            valor_absoluto,     
+            valor_referencia,   
+            paciente_registro,  
+            data_hora_exame,    
+            paciente_id_fk
+        );
         if (novoExame) {
             res.status(201).json({ success: true, message: "Exame inserido com sucesso.", exame: novoExame });
         } else {
             res.status(400).json({ success: false, message: "Dados inválidos ou erro ao inserir exame." });
         }
     } catch (error) {
+        // 3. Log do erro real do banco/código
+        console.error("!!! ERRO CRÍTICO NO POST EXAME !!!");
+        console.error(error);
+
         console.error("Erro ao inserir exame:", error.message);
         res.status(500).json({ success: false, message: `Erro interno ao inserir exame: ${error.message}` });
     }
@@ -76,10 +100,10 @@ router.put("/exames/:idexame", async (req, res) => {
 router.delete("/exames/:id", async (req, res) => {
     const id_exame = parseInt(req.params.id);
     const result = await deleteResultadoExame(id_exame);
-    if(result){
-        return res.status(200).json({success: true});
+    if (result) {
+        return res.status(200).json({ success: true });
     }
-    return res.status(404).json({success: false});
+    return res.status(404).json({ success: false });
 });
 
 module.exports = router; // EXPORTA O OBJETO ROUTER

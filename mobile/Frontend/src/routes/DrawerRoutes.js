@@ -10,7 +10,6 @@ import NovoExame from '../pages/NovoExame';
 import CadastroPaciente from '../pages/CadastroPaciente';
 import ListaPacientes from '../pages/ListagemPacientes';
 import CadastrarResultadoExame from '../pages/ResultadoExame/resultadoExames';
-import ListaSolicitacoes from '../pages/ListaSolicitacoes/solicitacoesPendentes';
 import ListaLaudos from '../pages/ListaLaudos/listaLaudo';
 import LoginUser from '../pages/LoginUser/loginUser'
 
