@@ -8,7 +8,7 @@ import { LoadPacientesFromAPI, DeletePacientesFromAPI } from '../../API/Paciente
 import Toast from 'react-native-toast-message';
 
 
-export default function ListaPacientes(){
+export default function ListaPacientes({navigation}){
     const [paciente, setPaciente] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [pacienteSelecionado, setPacienteSelecionado] = useState(null);
@@ -49,6 +49,10 @@ export default function ListaPacientes(){
                 text2: "Excluído com sucesso!"
             });
             await getPacientes()
+        }
+
+        if(acao === "Editar"){
+            
         }
         
     };
