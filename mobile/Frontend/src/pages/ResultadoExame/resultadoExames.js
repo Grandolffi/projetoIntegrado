@@ -12,7 +12,7 @@ const COR_FUNDO_ESCURO = '#0A212F';
 // DADO SIMULADO FOI REMOVIDO
 // const SIMULACAO_SOLICITACAO = { ... };
 
-export default function ResultadoExame() {
+export default function CadastrarResultadoExame() {
     const [solicitacaoId, setSolicitacaoId] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [solicitacaoAtual, setSolicitacaoAtual] = useState(null);

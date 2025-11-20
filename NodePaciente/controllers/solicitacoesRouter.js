@@ -9,7 +9,12 @@ const {insertSolicitacao, getSolicitacoes, getSolicitacaoById, updateSolicitacao
 // CREATE (inserir nova solicitação) - Caminho será /solicitacoes/
 router.post("/", async (req, res) => { // Alterei aqui: Removido '/solicitacoes' do caminho da rota
     const { pacienteId, dataSolicitacao, dataPrevistaRealizacao, solicitanteNome, status, observacoes, exames } = req.body;
-    console.log(`ID do paciente: ${pacienteId} Data da solicitação: ${dataSolicitacao}, Data prevista realização: ${dataPrevistaRealizacao}, Nome do solicitante: ${solicitanteNome}, Status: ${status}, Observações: ${observacoes}, Exames: ${exames}`);
+    console.log(
+      `ID do paciente: ${pacienteId}, Data da solicitação: ${dataSolicitacao}, Data prevista realização: ${dataPrevistaRealizacao}, Nome do solicitante: ${solicitanteNome}, Status: ${status}, Observações: ${observacoes}, Exames: ${JSON.stringify(
+        exames
+      )}`
+    );
+
     try {
         const result = await insertSolicitacao(pacienteId, dataSolicitacao, dataPrevistaRealizacao, solicitanteNome, status, observacoes, exames);
         if (result && result.success) {
@@ -23,9 +28,9 @@ router.post("/", async (req, res) => { // Alterei aqui: Removido '/solicitacoes'
 });
 
 // READ ALL (listar todas as solicitações) - Caminho será /solicitacoes/
-router.get("/", async (req, res) => { // Alterei aqui: Removido '/solicitacoes' do caminho da rota
+router.get("/", async (req, res) => {
     try {
-        const solicitacoes = await getSolicitacoes(req.query.status); // Permite filtro por status
+        const solicitacoes = await getSolicitacoes(req.query.status);
         console.log("Solicitação: ", solicitacoes);
         res.status(200).json(solicitacoes);
     } catch (error) {

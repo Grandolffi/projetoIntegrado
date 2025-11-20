@@ -1,14 +1,5 @@
 import React, { useState, useEffect } from "react";
-import {
-  View,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  ScrollView,
-  Alert,
-  Platform,
-} from "react-native";
+import { View, StyleSheet, Text, TextInput, TouchableOpacity, ScrollView, Alert, Platform } from "react-native";
 
 import Header from "../../components/Header";
 import User from "../../components/User";
@@ -18,7 +9,7 @@ import PageAtual from "../../components/PageAtual";
 const COR_DESTAQUE = "#1ABC9C";
 const COR_FUNDO_ESCURO = "#0A212F";
 
-// --- DADOS DE EXAMES (mantidos exatamente como você forneceu) ---
+// --- DADOS DE EXAMES ---
 const EXAMES_POR_CATEGORIA = {
   Microbiologia: [
     {
@@ -162,7 +153,7 @@ export default function NovoExame({ navigation }) {
     });
   };
 
-  // Envio via fetch (mesmo padrão do Login/Pacientes)
+  // Envio via fetch
   const handleSolicitarExame = async () => {
     const idsExames = Object.keys(examesSelecionados);
 
