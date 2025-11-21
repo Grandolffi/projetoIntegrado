@@ -106,7 +106,6 @@ const Estilo = StyleSheet.create({
 
         /* FUNDO IGUAL AO DA WEB */
         backgroundColor: "#e0f2f7",
-        background: "linear-gradient(to right, #e0f2f7, #c1e4f3)"
     },
 
     /* TÍTULO PRINCIPAL */
