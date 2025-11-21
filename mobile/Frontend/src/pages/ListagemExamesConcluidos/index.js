@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { View, StyleSheet, Text, ScrollView, TouchableOpacity, Modal, TextInput, ActivityIndicator, RefreshControl } from "react-native";
+import { View, StyleSheet, Text, ScrollView, TouchableOpacity, Modal, TextInput, ActivityIndicator, RefreshControl, Keyboard } from "react-native";
 import { Feather } from '@expo/vector-icons';
 import Toast from 'react-native-toast-message';
 import { useFocusEffect } from '@react-navigation/native';
@@ -19,8 +19,8 @@ const COR_DESTAQUE = '#1ABC9C';
 const COR_FUNDO_ESCURO = '#0A212F';
 
 export default function ListaResultados() {
-    const [listaExames, setListaExames] = useState([]);
-    const [listaFiltrada, setListaFiltrada] = useState([]);
+    const [listaExames, setListaExames] = useState([]); // Dados brutos (todos)
+    const [listaFiltrada, setListaFiltrada] = useState([]); // Dados visíveis (filtrados)
     const [loading, setLoading] = useState(false);
     const [busca, setBusca] = useState('');
     const [refreshing, setRefreshing] = useState(false);
@@ -30,7 +30,7 @@ export default function ListaResultados() {
     const [exameEdit, setExameEdit] = useState(null);
     const [novoValor, setNovoValor] = useState('');
 
-    // Carregar dados sempre que a tela ganhar foco
+    // Carregar dados (mas não exibir ainda)
     useFocusEffect(
         useCallback(() => {
             carregarDados();
@@ -38,13 +38,18 @@ export default function ListaResultados() {
     );
 
     const carregarDados = async () => {
-        setLoading(true);
+        if (!busca) setLoading(true); // Só mostra loading se não tiver buscando ainda
+        
         const dados = await LoadResultadoExamesFromAPI();
         if (dados && Array.isArray(dados)) {
             // Ordena por ID (mais novos primeiro)
             const dadosOrdenados = dados.sort((a, b) => b.id_exame - a.id_exame);
             setListaExames(dadosOrdenados);
-            setListaFiltrada(dadosOrdenados);
+            
+            // MUDANÇA: Se tiver busca ativa, atualiza a lista filtrada. Se não, deixa vazia.
+            if (busca.trim() !== '') {
+                aplicarFiltro(busca, dadosOrdenados);
+            }
         }
         setLoading(false);
         setRefreshing(false);
@@ -55,18 +60,23 @@ export default function ListaResultados() {
         carregarDados();
     };
 
-    // Filtro: Busca por ID do Paciente ou Nome do Exame
-    const filtrar = (texto) => {
-        setBusca(texto);
-        if (texto === '') {
-            setListaFiltrada(listaExames);
+    // Função separada para filtrar
+    const aplicarFiltro = (texto, dadosOrigem) => {
+        if (texto.trim() === '') {
+            setListaFiltrada([]); // Limpa a lista se a busca estiver vazia
         } else {
-            const filtro = listaExames.filter(item => 
+            const filtro = dadosOrigem.filter(item => 
                 String(item.paciente_id_fk).includes(texto) || 
                 item.nome_exame.toLowerCase().includes(texto.toLowerCase())
             );
             setListaFiltrada(filtro);
         }
+    };
+
+    // Handler do Input
+    const handleBusca = (texto) => {
+        setBusca(texto);
+        aplicarFiltro(texto, listaExames);
     };
 
     // --- AÇÕES ---
@@ -114,62 +124,81 @@ export default function ListaResultados() {
                         style={Estilo.searchInput}
                         placeholder="Pesquise por ID do Paciente ou Exame..."
                         value={busca}
-                        onChangeText={filtrar}
+                        onChangeText={handleBusca}
                         keyboardType="default"
                     />
+                    {busca.length > 0 && (
+                        <TouchableOpacity onPress={() => handleBusca('')}>
+                            <Feather name="x" size={18} color="#999" />
+                        </TouchableOpacity>
+                    )}
                 </View>
 
+                {/* CONTEÚDO DA TELA */}
                 {loading && !refreshing ? (
                     <ActivityIndicator size="large" color={COR_DESTAQUE} style={{ marginTop: 50 }} />
                 ) : (
-                    <ScrollView 
-                        showsVerticalScrollIndicator={false}
-                        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
-                    >
-                        {listaFiltrada.length === 0 ? (
-                            <Text style={Estilo.emptyText}>Nenhum resultado encontrado.</Text>
-                        ) : (
-                            listaFiltrada.map((item) => (
-                                <View key={item.id_exame} style={Estilo.card}>
-                                    
-                                    {/* CABEÇALHO DO CARD: ID DO PACIENTE E DATA */}
-                                    <View style={Estilo.cardHeader}>
-                                        <View style={Estilo.badgeId}>
-                                            <Feather name="user" size={12} color="#004D40" style={{marginRight: 4}} />
-                                            <Text style={Estilo.textId}>ID Paciente: {item.paciente_id_fk}</Text>
-                                        </View>
-                                        <Text style={Estilo.data}>
-                                            {new Date(item.data_hora_exame).toLocaleDateString('pt-BR')}
-                                        </Text>
-                                    </View>
-
-                                    {/* CONTEÚDO DO EXAME */}
-                                    <View style={Estilo.cardBody}>
-                                        <Text style={Estilo.nomeExame}>{item.nome_exame}</Text>
-                                        <Text style={Estilo.tipo}>{item.tipo_exame}</Text>
-                                        
-                                        <View style={Estilo.rowValor}>
-                                            <Text style={Estilo.labelValor}>Resultado:</Text>
-                                            <Text style={Estilo.valor}>{item.valor_absoluto}</Text>
-                                        </View>
-                                    </View>
-
-                                    {/* BOTÕES DE AÇÃO */}
-                                    <View style={Estilo.cardActions}>
-                                        <TouchableOpacity style={Estilo.btnEdit} onPress={() => abrirEdicao(item)}>
-                                            <Feather name="edit-2" size={16} color="#FFF" />
-                                            <Text style={Estilo.btnText}>Corrigir</Text>
-                                        </TouchableOpacity>
-                                        
-                                        <TouchableOpacity style={Estilo.btnDelete} onPress={() => excluirExame(item.id_exame)}>
-                                            <Feather name="trash-2" size={18} color="#dc3545" />
-                                        </TouchableOpacity>
-                                    </View>
+                    <>
+                        {/* CASO 1: BUSCA VAZIA (Mostra instrução) */}
+                        {busca.trim() === '' ? (
+                            <View style={Estilo.emptySearchContainer}>
+                                <View style={Estilo.iconCircle}>
+                                    <Feather name="search" size={40} color={COR_DESTAQUE} />
                                 </View>
-                            ))
+                                <Text style={Estilo.emptySearchTitle}>Comece a pesquisar</Text>
+                                <Text style={Estilo.emptySearchText}>
+                                    Digite o ID do paciente ou o nome do exame para ver o histórico.
+                                </Text>
+                            </View>
+                        ) : (
+                            /* CASO 2: TEM BUSCA (Mostra lista ou "não encontrado") */
+                            <ScrollView 
+                                showsVerticalScrollIndicator={false}
+                                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+                            >
+                                {listaFiltrada.length === 0 ? (
+                                    <Text style={Estilo.emptyText}>Nenhum resultado encontrado para "{busca}".</Text>
+                                ) : (
+                                    listaFiltrada.map((item) => (
+                                        <View key={item.id_exame} style={Estilo.card}>
+                                            
+                                            <View style={Estilo.cardHeader}>
+                                                <View style={Estilo.badgeId}>
+                                                    <Feather name="user" size={12} color="#004D40" style={{marginRight: 4}} />
+                                                    <Text style={Estilo.textId}>ID Paciente: {item.paciente_id_fk}</Text>
+                                                </View>
+                                                <Text style={Estilo.data}>
+                                                    {new Date(item.data_hora_exame).toLocaleDateString('pt-BR')}
+                                                </Text>
+                                            </View>
+
+                                            <View style={Estilo.cardBody}>
+                                                <Text style={Estilo.nomeExame}>{item.nome_exame}</Text>
+                                                <Text style={Estilo.tipo}>{item.tipo_exame}</Text>
+                                                
+                                                <View style={Estilo.rowValor}>
+                                                    <Text style={Estilo.labelValor}>Resultado:</Text>
+                                                    <Text style={Estilo.valor}>{item.valor_absoluto}</Text>
+                                                </View>
+                                            </View>
+
+                                            <View style={Estilo.cardActions}>
+                                                <TouchableOpacity style={Estilo.btnEdit} onPress={() => abrirEdicao(item)}>
+                                                    <Feather name="edit-2" size={16} color="#FFF" />
+                                                    <Text style={Estilo.btnText}>Corrigir</Text>
+                                                </TouchableOpacity>
+                                                
+                                                <TouchableOpacity style={Estilo.btnDelete} onPress={() => excluirExame(item.id_exame)}>
+                                                    <Feather name="trash-2" size={18} color="#dc3545" />
+                                                </TouchableOpacity>
+                                            </View>
+                                        </View>
+                                    ))
+                                )}
+                                <View style={{ height: 50 }} />
+                            </ScrollView>
                         )}
-                        <View style={{ height: 50 }} />
-                    </ScrollView>
+                    </>
                 )}
             </View>
 
@@ -218,13 +247,23 @@ const Estilo = StyleSheet.create({
         paddingHorizontal: 15,
         height: 50,
         alignItems: 'center',
-        marginBottom: 15,
+        marginBottom: 10,
         elevation: 2
     },
     searchInput: { flex: 1, fontSize: 16 },
     emptyText: { textAlign: 'center', color: '#888', marginTop: 50, fontSize: 16 },
 
-    // ESTILOS DO CARD
+    // ESTADO VAZIO INICIAL
+    emptySearchContainer: { alignItems: 'center', justifyContent: 'center', marginTop: 80 },
+    iconCircle: {
+        width: 80, height: 80, borderRadius: 40,
+        backgroundColor: '#E0F2F1', // Verde bem clarinho
+        alignItems: 'center', justifyContent: 'center', marginBottom: 15
+    },
+    emptySearchTitle: { fontSize: 18, fontWeight: 'bold', color: COR_FUNDO_ESCURO },
+    emptySearchText: { fontSize: 14, color: '#666', textAlign: 'center', width: '70%', marginTop: 5 },
+
+    // CARD
     card: {
         backgroundColor: '#FFF',
         borderRadius: 12,
@@ -249,7 +288,7 @@ const Estilo = StyleSheet.create({
     },
     badgeId: { 
         flexDirection: 'row',
-        backgroundColor: '#B2DFDB', // Verde bem clarinho
+        backgroundColor: '#B2DFDB', 
         paddingHorizontal: 8, 
         paddingVertical: 4, 
         borderRadius: 6,
