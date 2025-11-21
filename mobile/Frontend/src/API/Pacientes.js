@@ -60,4 +60,22 @@ export const DeletePacientesFromAPI = async (id) => {
         return { success: false, message: "Erro interno ao excluir." };
     }
 }
-  
+
+export const EditPacientesFromAPI = async (id, data) => {
+    try {
+        const res = await fetch(`${BASE_URL}editarpacientes/${id}`, {
+            method: "PUT",
+            headers: AUTH_HEADER,
+            body: JSON.stringify(data)
+        });
+
+        const json = await res.json();
+
+        if (!res.ok) return { success: false, message: json?.message || "Erro ao editar" };
+
+        return { success: true, message: json?.message || "Paciente editado!" };
+    } catch (error) {
+        console.error("Erro PUT:", error);
+        return { success: false, message: "Erro interno ao editar." };
+    }
+};

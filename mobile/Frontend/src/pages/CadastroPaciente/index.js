@@ -1,11 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, StyleSheet, Text, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
-import { Picker } from '@react-native-picker/picker'; // 👈 Importar o Picker
+import { Picker } from '@react-native-picker/picker'; 
 import { Feather } from '@expo/vector-icons'; // Para o ícone de calendário
 import Header from "../../components/Header";
 import User from "../../components/User";
 import PageAtual from "../../components/PageAtual"; // Vamos usar este componente para o título
-import { CreatePacientesFromAPI } from '../../API/Pacientes';
+import { CreatePacientesFromAPI, LoadPacientesFromAPI, EditPacientesFromAPI } from '../../API/Pacientes';
+import { useRoute } from "@react-navigation/native";
+
+
 
 export default function CadastroPaciente(){
     // 1. Definição dos Estados para os campos de texto e seleção
@@ -17,11 +20,42 @@ export default function CadastroPaciente(){
     const [numCelular, setnumCelular] = useState('');
     const [genero, setGenero] = useState('Masculino'); // Valor inicial
 
+    const route = useRoute(); //Pega os parâmetros enviados pela tela que chamou, no caso aqui listagemPacientes
+    const modoEdicao = route.params?.modo === "editar"; // verifica se esta no modo editar ou n
+    const pacienteEdicao = route.params?.paciente || null; // tenta acessar route.params.paciente com if ternario, se tiver ele guarda, se n retorna null
+    
+
+    useEffect(() => {
+        if (modoEdicao && pacienteEdicao) {
+            setNomeCompleto(pacienteEdicao.nome);
+            setCpf(pacienteEdicao.cpf);
+            setdtnasc(pacienteEdicao.dtnasc);
+            setEmail(pacienteEdicao.email);
+            setNomeMae(pacienteEdicao.nomeMae);
+            setnumCelular(pacienteEdicao.numCelular);
+            setGenero(pacienteEdicao.genero);
+        }
+    }, [modoEdicao]);
+
+    async function handleAtualizar() {
+        try {
+            Alert.alert("Atualizando paciente...");
+            console.log("tteste: ", cpf, "(        e     )", pacienteEdicao.nomeMae)
+            await EditPacientesFromAPI(pacienteEdicao.id, {nome: nomeCompleto, cpf, dtnasc, email, nomeMae, numCelular, genero,});
+
+            Alert.alert("Sucesso", "Paciente atualizado!");
+        } catch (error) {
+            Alert.alert("Erro", "Não foi possível atualizar.");
+        }
+    }
+
+
+
     async function handleCadastro(){
     try{
       Alert.alert('Cadastrando paciente!');
       if(nomeCompleto && cpf && dtnasc && email && nomeMae && numCelular && genero){
-        await CreatePacientesFromAPI({nome: nomeCompleto, cpf: cpf, dtnasc: dtnasc, email: email, nomeMae: nomeMae, numCelular: numCelular, genero:genero });
+        await CreatePacientesFromAPI({nome: nomeCompleto, cpf: cpf, dtnasc: dtnasc, email: email, nomeMae: nomeMae, numCelular: numCelular, genero: genero });
         setNomeCompleto("");
         setCpf("");
         setdtnasc("");
@@ -30,6 +64,7 @@ export default function CadastroPaciente(){
         setnumCelular("");
         Alert.alert("Sucesso", "Paciente cadastrado!");
       }
+      await LoadPacientesFromAPI();
     }catch(error){
       Alert.alert("Erro", "Paciente não inserido!");
     }
@@ -142,8 +177,8 @@ export default function CadastroPaciente(){
 
             {/* Botão Fixo no Rodapé, alinhado ao Estilo NovoExame */}
             <View style={Estilo.botaoFixoContainer}>
-                <TouchableOpacity style={Estilo.botao} activeOpacity={0.8} onPress={handleCadastro}>
-                    <Text style={Estilo.textoBotao}>Enviar</Text>
+                <TouchableOpacity style={Estilo.botao} activeOpacity={0.8} onPress={modoEdicao ? handleAtualizar : handleCadastro}> /
+                    <Text style={Estilo.textoBotao}>{modoEdicao ? "Salvar Edição" : "Enviar"}</Text>
                 </TouchableOpacity>
             </View>
         </View>

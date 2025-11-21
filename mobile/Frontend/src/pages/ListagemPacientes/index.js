@@ -52,7 +52,9 @@ export default function ListaPacientes({navigation}){
         }
 
         if(acao === "Editar"){
-            
+            navigation.navigate("CadastrarPaciente", {modo: "editar", paciente: pacienteSelecionado});
+            setModalVisible(false);
+            return;
         }
         
     };
