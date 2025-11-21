@@ -12,6 +12,7 @@ import ListaPacientes from '../pages/ListagemPacientes';
 import CadastrarResultadoExame from '../pages/ResultadoExame/resultadoExames';
 import ListaLaudos from '../pages/ListaLaudos/listaLaudo';
 import LoginUser from '../pages/LoginUser/loginUser'
+import ListaResultadosExames from '../pages/ListagemExamesConcluidos';
 
 const Drawer = createDrawerNavigator();
 
@@ -103,6 +104,18 @@ export default function DrawerRoutes() {
               drawerLabel: "Cadastrar Resultado de Exame",
               drawerIcon: ({ color, size }) => (
                 <Feather name="clipboard" color={color} size={size} />
+              ),
+            }}
+          />
+
+          {/* 5. Lista Exame Concluido*/}
+          <Drawer.Screen
+            name="ListaResultados" 
+            component={ListaResultadosExames} 
+            options={{
+              drawerLabel: "Exames Concluídos",
+              drawerIcon: ({ color, size }) => (
+                <Feather name="check-square" color={color} size={size} />
               ),
             }}
           />

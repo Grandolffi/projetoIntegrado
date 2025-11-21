@@ -5,19 +5,20 @@ import Header from "../../components/Header";
 import User from "../../components/User";
 import PageAtual from "../../components/PageAtual";
 import { LoadSolicitacoesFromAPI } from '../../API/Solicitacoes';  // API que carrega as solicitações pendentes
+import Toast from 'react-native-toast-message';
 
-export default function ListaSolicitacoes(){
+export default function ListaSolicitacoes() {
     const [solicitacoes, setSolicitacoes] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [solicitacaoSelecionada, setSolicitacaoSelecionada] = useState(null);
 
-    useEffect(()=>{
+    useEffect(() => {
         getSolicitacoes();
     }, []);
 
     const getSolicitacoes = async () => {
         const solicitacoes = await LoadSolicitacoesFromAPI(); // Carregar dados da API
-        if (solicitacoes){
+        if (solicitacoes) {
             setSolicitacoes(solicitacoes);
         } else {
             setSolicitacoes([]);
@@ -29,9 +30,28 @@ export default function ListaSolicitacoes(){
         setModalVisible(true);
     };
 
-    const handleAcao = (acao) => {
-        alert(`${acao} a solicitação ID: ${solicitacaoSelecionada.idSolicitacao}`);
+    const handleAcao = async (acao) => {
         setModalVisible(false);
+        if (acao === "Excluir") {
+            const res = await DeleteSolicitacoesFromAPI(solicitacaoSelecionada.id);
+            if (!res.success) {
+                Toast.show({
+                    type: "error",
+                    text1: "Erro ao excluir",
+                    text2: res.message
+                });
+                return;
+            }
+            Toast.show({
+                type: "success",
+                text1: "Solicitção excluída",
+                text2: "Excluído com sucesso!"
+            });
+            await getSolicitacoes()
+        }
+
+        if (acao === "Editar") {
+        }
     };
 
     // Definições de largura
@@ -39,7 +59,7 @@ export default function ListaSolicitacoes(){
     const LARGURA_ID_SOLICITACAO = 120;
     const LARGURA_SOLICITANTE = 120;
     const LARGURA_STATUS = 100;
-    const LARGURA_ACAO = 50;
+    const LARGURA_ACAO = 40;
 
     // Renderização da Tabela
     const renderRow = ({ item, index }) => (
@@ -48,7 +68,7 @@ export default function ListaSolicitacoes(){
                 <Text style={Estilo.textoLinha}>{item.idSolicitacao}</Text>
             </View>
 
-            <ScrollView 
+            <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={Estilo.scrollHorizontalContent}
@@ -60,7 +80,7 @@ export default function ListaSolicitacoes(){
                 </View>
             </ScrollView>
 
-            <TouchableOpacity 
+            <TouchableOpacity
                 style={Estilo.celulaAcoes}
                 onPress={() => openModal(item)}
             >
@@ -69,7 +89,7 @@ export default function ListaSolicitacoes(){
         </View>
     );
 
-    return(
+    return (
         <SafeAreaView style={Estilo.container}>
             <Header />
             <User nomeUsuario="Fernanda" />
@@ -81,6 +101,10 @@ export default function ListaSolicitacoes(){
                         <View>
                             {/* Cabeçalho da Tabela */}
                             <View style={Estilo.cabecalhoTabela}>
+                                <View style={[Estilo.cabecalhoTextoContainer, { width: LARGURA_NOME }]}>
+                                    <Text style={Estilo.cabecalhoTexto}>Solicitação</Text>
+                                </View>
+
                                 <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_ID_SOLICITACAO }]}>ID Solicitação</Text>
                                 <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_COLUNA }]}>Data Solicitação</Text>
                                 <Text style={[Estilo.cabecalhoTexto, { width: LARGURA_SOLICITANTE }]}>Solicitante</Text>
@@ -89,30 +113,68 @@ export default function ListaSolicitacoes(){
                             </View>
 
                             {/* Linhas de Dados */}
-                            {solicitacoes.map((item, index) => renderRow({ item, index }))}
+                            {solicitacao.map((item, index) => (
+                                <View key={index} style={Estilo.linhaTabela}>
+
+                                    <View style={[Estilo.celula, { width: LARGURA_NOME }]}>
+                                        <Text style={Estilo.textoLinha}>{item.nome}</Text>
+                                    </View>
+
+                                    <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>
+                                        {new Date(item.dtnasc).toLocaleDateString('pt-BR')}
+                                    </Text>
+
+                                    <Text style={[Estilo.textoLinha, { width: LARGURA_EMAIL }]}>
+                                        {item.email}
+                                    </Text>
+
+                                    <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>
+                                        {item.nomemae}
+                                    </Text>
+
+                                    <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>
+                                        {item.numcelular}
+                                    </Text>
+
+                                    <Text style={[Estilo.textoLinha, { width: LARGURA_COLUNA }]}>
+                                        {item.genero}
+                                    </Text>
+
+                                    {/* BOTÃO DE AÇÕES */}
+                                    <TouchableOpacity
+                                        style={[Estilo.celulaAcoes, { width: LARGURA_ACAO }]}
+                                        onPress={() => openModal(item)}
+                                    >
+                                        <Feather name="more-vertical" size={20} color="#666" />
+                                    </TouchableOpacity>
+
+                                </View>
+                            ))}
+
                         </View>
                     </ScrollView>
                 </ScrollView>
             </View>
 
-            {/* Modal de Ações */}
+            {/* Modal de Ações (Editar/Excluir) */}
             <Modal
                 animationType="fade"
                 transparent={true}
                 visible={modalVisible}
                 onRequestClose={() => setModalVisible(false)}
             >
-                <TouchableOpacity 
+                {/* ... (código do Modal mantido) ... */}
+                <TouchableOpacity
                     style={Estilo.modalOverlay}
                     activeOpacity={1}
                     onPressOut={() => setModalVisible(false)}
                 >
                     <View style={Estilo.modalView}>
-                        <TouchableOpacity style={Estilo.modalOption} onPress={() => handleAcao('Preencher Resultados')}>
-                            <Text style={Estilo.modalText}>Preencher Resultados</Text>
+                        <TouchableOpacity style={Estilo.modalOption} onPress={() => handleAcao('Editar')}>
+                            <Text style={Estilo.modalText}>Editar</Text>
                         </TouchableOpacity>
-                        <TouchableOpacity style={Estilo.modalOption} onPress={() => handleAcao('Cancelar Solicitação')}>
-                            <Text style={[Estilo.modalText, { color: '#dc3545' }]}>Cancelar Solicitação</Text>
+                        <TouchableOpacity style={Estilo.modalOption} onPress={() => handleAcao('Excluir')}>
+                            <Text style={[Estilo.modalText, { color: '#dc3545' }]}>Excluir</Text>
                         </TouchableOpacity>
                     </View>
                 </TouchableOpacity>
@@ -121,11 +183,20 @@ export default function ListaSolicitacoes(){
     );
 }
 
+
 const Estilo = StyleSheet.create({
+
     container: {
         flex: 1,
         backgroundColor: '#f3f3f3',
     },
+
+    scrollVerticalContent: {
+        paddingHorizontal: 16,
+        paddingBottom: 30,
+    },
+
+    // CARD PRINCIPAL
     listaCard: {
         backgroundColor: '#fff',
         marginTop: 12,
@@ -137,6 +208,8 @@ const Estilo = StyleSheet.create({
         shadowRadius: 6,
         elevation: 4,
     },
+
+    // CABEÇALHO
     cabecalhoTabela: {
         flexDirection: 'row',
         backgroundColor: '#f7f7f7',
@@ -145,12 +218,20 @@ const Estilo = StyleSheet.create({
         paddingVertical: 12,
         elevation: 2,
     },
+
+    cabecalhoTextoContainer: {
+        justifyContent: 'center',
+        paddingLeft: 16,
+    },
+
     cabecalhoTexto: {
         fontSize: 13,
         fontWeight: '700',
         color: '#333',
         letterSpacing: 0.3,
     },
+
+    // LINHA DA TABELA
     linhaTabela: {
         flexDirection: 'row',
         backgroundColor: '#fff',
@@ -158,27 +239,35 @@ const Estilo = StyleSheet.create({
         borderBottomWidth: 1,
         borderBottomColor: '#f0f0f0',
     },
+
     celula: {
         justifyContent: 'center',
         paddingLeft: 16,
     },
+
     textoLinha: {
         fontSize: 14,
         color: '#444',
         fontWeight: '500',
     },
+
     dadosSecundarios: {
         flexDirection: 'row',
         alignItems: 'center',
     },
+
     scrollHorizontalContent: {
         paddingRight: 10,
     },
+
+    // AÇÕES
     celulaAcoes: {
         width: 45,
         alignItems: 'center',
         justifyContent: 'center',
     },
+
+    // MODAL
     modalOverlay: {
         flex: 1,
         backgroundColor: 'rgba(0,0,0,0.5)',
@@ -187,6 +276,7 @@ const Estilo = StyleSheet.create({
         paddingTop: 150,
         paddingRight: 20,
     },
+
     modalView: {
         width: 150,
         backgroundColor: '#fff',
@@ -198,10 +288,12 @@ const Estilo = StyleSheet.create({
         shadowRadius: 6,
         elevation: 7,
     },
+
     modalOption: {
         paddingVertical: 12,
         paddingHorizontal: 15,
     },
+
     modalText: {
         fontSize: 16,
         color: '#333',
