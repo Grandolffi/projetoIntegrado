@@ -1,46 +1,54 @@
 const BASE_URL = "http://localhost:3000/"; 
-const VALIDO_TOKEN = "Bearer ABC-123-BIO"; 
-
 const AUTH_HEADERS = {
   "Content-Type": "application/json",
-  "Authorization": VALIDO_TOKEN 
-}
+  // "Authorization": `Bearer ${TOKEN}` // Descomente se tiver autenticação
+};
 
-export const LoadPacientesFromAPI = async () => {
-    try{
-      console.log("Iniciando a conexão com a API...");
-      const response = await fetch(`${BASE_URL}`, {
-        method: "GET",
-        headers: AUTH_HEADER,
-      });
-      console.log("Conteudo de Response: ", response);
-      
-      const json = await response.json();
-      console.log("Conteudo do JSON: ", json);
-      return json;
-    }catch(error){
-      console.error("Erro ao realizar requisiçaão GET: ", error);
-      return null;
+// --- CRIA UMA NOVA SOLICITAÇÃO (Usado na tela Novo Exame) ---
+export const CreateSolicitacaoFromAPI = async (solicitacao) => {
+  try {
+    console.log("Enviando solicitação para API:", JSON.stringify(solicitacao));
+
+    const res = await fetch(`${BASE_URL}solicitacoes`, {
+      method: "POST",
+      headers: AUTH_HEADERS,
+      body: JSON.stringify(solicitacao)
+    });
+
+    if (!res.ok) {
+        const text = await res.text();
+        throw new Error(text || "Erro ao salvar solicitação");
     }
-  }
 
-export const CreateSolicitacoesFromAPI = async (solicitacao) => {
+    const json = await res.json();
+    console.log("Resposta da API (Create):", json);
+
+    return json; // Espera-se { success: true, idSolicitacao: 123, ... }
+
+  } catch(error) {
+    console.error("Erro na API CreateSolicitacao:", error);
+    // Retorna objeto de erro para não quebrar o app
+    return { success: false, message: error.message };
+  }
+};
+
+// --- BUSCA SOLICITAÇÃO POR ID (Usado na tela de Preencher Resultados) ---
+export const GetSolicitacaoById = async (id) => {
     try {
-       console.log(`nome: ${solicitacao.nome}`);
-        const res = await fetch(`${BASE_URL}solicitacoes`, {
-        method: "POST",
-        headers: AUTH_HEADER,
-        body: JSON.stringify(solicitacao)
+        const response = await fetch(`${BASE_URL}solicitacoes/${id}`, {
+            method: "GET",
+            headers: AUTH_HEADERS
         });
 
-        if(!res.ok) throw new Error(await res.text());
-        
-        const json = await response.json();
-        console.log("Conteúdo do JSON: ", json);
-        return json; 
+        if (!response.ok) {
+            return null; 
+        }
 
-    } catch(error) {
-        console.error("Erro ao realizar requisição POST de Solicitação: ", error);
-        return { success: false, message: error.message };
+        const json = await response.json();
+        return json;
+        
+    } catch (error) {
+        console.error("Erro GET Solicitação:", error);
+        return null;
     }
-}
+};

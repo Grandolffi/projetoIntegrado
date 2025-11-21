@@ -1,49 +1,50 @@
 const BASE_URL = "http://localhost:3000/";
 const AUTH_HEADER = {
-  "Content-Type": "application/json",
-  //"Authorization": `Bearer ${TOKEN}`
+    "Content-Type": "application/json",
+    //"Authorization": `Bearer ${TOKEN}`
 }
 
 export const LoadResultadoExamesFromAPI = async () => {
-    try{
-      console.log("Iniciando a conexão com a API...");
-      const response = await fetch(`${BASE_URL}exames`, {
-        method: "GET",
-        headers: AUTH_HEADER 
-      });
-      console.log("Conteudo de Response: ", response);
-      
-      const json = await response.json();
-      console.log("Conteudo do JSON: ", json);
-      return json;
-    }catch(error){
-      console.error("Erro ao realizar requisiçaão GET: ", error);
-      return null;
+    try {
+        console.log("Iniciando a conexão com a API...");
+        const response = await fetch(`${BASE_URL}exames`, {
+            method: "GET",
+            headers: AUTH_HEADER
+        });
+        console.log("Conteudo de Response: ", response);
+
+        const json = await response.json();
+        console.log("Conteudo do JSON: ", json);
+        return json;
+    } catch (error) {
+        console.error("Erro ao realizar requisiçaão GET: ", error);
+        return null;
     }
 }
 
 export const CreateResultadoExamesFromAPI = async (exame) => {
-    try{
-        console.log(`nome exame: ${exame.nome_exame}`); 
+    try {
+        console.log(`nome exame: ${exame.nome_exame}`);
         const res = await fetch(`${BASE_URL}exames`, {
-        method: "POST",
-        headers: AUTH_HEADER,
-        body: JSON.stringify(exame)
+            method: "POST",
+            headers: AUTH_HEADER,
+            body: JSON.stringify(exame)
         });
 
-        if(!res.ok) throw new Error(await res.text()); 
+        if (!res.ok) throw new Error(await res.text());
 
         const json = await res.json();
         console.log("Conteudo do JSON: ", json);
         return json;
-    }catch(error){
+    } catch (error) {
         console.error("Erro ao realizar requisição POST: ", error);
         return false;
     }
 }
 
+// --- PUT: Editar resultado existente 
 export const UpdateResultadoExamesFromAPI = async (id, exame) => {
-    try{
+    try {
         console.log(`Atualizando exame ID: ${id}`);
         const res = await fetch(`${BASE_URL}exames/${id}`, {
             method: "PUT",
@@ -51,31 +52,33 @@ export const UpdateResultadoExamesFromAPI = async (id, exame) => {
             body: JSON.stringify(exame)
         });
 
-        if(!res.ok) throw new Error(await res.text());
+        const textResponse = await res.text();
 
-        const json = await res.json();
-        console.log("Conteudo do JSON (Update): ", json);
-        return json;
-    }catch(error){
+        if (!res.ok) throw new Error(textResponse);
+
+        console.log("Conteudo da Resposta (Update): ", textResponse);
+        return { success: true, message: textResponse };
+
+    } catch (error) {
         console.error("Erro ao realizar requisição PUT: ", error);
-        return { success: false, message: "Erro interno ao atualizar." };
+        return false;
     }
 }
 
 export const DeleteResultadoExamesFromAPI = async (id) => {
-    try{
+    try {
         const res = await fetch(`${BASE_URL}exames/${id}`, {
-          method: "DELETE",
-          headers: AUTH_HEADER
+            method: "DELETE",
+            headers: AUTH_HEADER
         });
 
         const json = await res.json();
 
-        if(!res.ok) return { success: false, message: json.message }; // se não for ok, lance um erro
+        if (!res.ok) return { success: false, message: json.message }; // se não for ok, lance um erro
 
         console.log("Conteudo do JSON: ", json);
         return json;
-    }catch(error){
+    } catch (error) {
         console.error("Erro ao realizar requisição DELETE: ", error);
         return { success: false, message: "Erro interno ao excluir." };
     }
