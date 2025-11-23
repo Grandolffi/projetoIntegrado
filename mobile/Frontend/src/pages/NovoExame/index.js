@@ -19,28 +19,62 @@ const COR_FUNDO_ESCURO = "#0A212F";
 
 // --- DADOS DE EXAMES (Mantidos) ---
 const EXAMES_POR_CATEGORIA = {
-  Hematologia: [ //Util para data science pois temos referencia
-    { id: 23, nome_exame: "Hemograma Completo", tipo_exame_categoria: "Hematologia",  },
-    { id: 24, nome_exame: "Reticulócitos", tipo_exame_categoria: "Hematologia" },
-    { id: 25, nome_exame: "Tempo de sangramento", tipo_exame_categoria: "Hematologia" },
-    { id: 26, nome_exame: "Tempo de coagulação", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: null },
-    { id: 31, nome_exame: "Bastonetes", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: "< 840/µL" },
-  ],
   Bioquimica: [ // Verificar pois muda de masculino para feminino (fica por ultimo a se fazer)
-    { id: 1, nome_exame: "Ácido úrico", tipo_exame_categoria: "Bioquímica" },
-    { id: 2, nome_exame: "Alfa Amilase", tipo_exame_categoria: "Bioquímica" },
-    { id: 3, nome_exame: "Bilirrubina Total", tipo_exame_categoria: "Bioquímica" },
-    { id: 4, nome_exame: "Bilirrubina Direta", tipo_exame_categoria: "Bioquímica" },
-    { id: 6, nome_exame: "Colesterol Total", tipo_exame_categoria: "Bioquímica" },
-    { id: 8, nome_exame: "Creatinina", tipo_exame_categoria: "Bioquímica" },
-    { id: 13, nome_exame: "Glicose", tipo_exame_categoria: "Bioquímica" },
-    { id: 18, nome_exame: "Triglicerídeos", tipo_exame_categoria: "Bioquímica" },
-    { id: 19, nome_exame: "Uréia", tipo_exame_categoria: "Bioquímica" },
+    { id: 1, nome_exame: "Bilirrubina Total", tipo_exame_categoria: "Bioquímica", valorReferenciaSolicitacao: "0,2 - 1,2 mg/dL" },
+    { id: 2, nome_exame: "Bilirrubina Direta", tipo_exame_categoria: "Bioquímica", valorReferenciaSolicitacao: "0,0 - 0,2 mg/dL" },
+    { id: 3, nome_exame: "Proteína Total", tipo_exame_categoria: "Bioquímica", valorReferenciaSolicitacao: null },
+    { id: 4, nome_exame: "TGO - Transaminase Glutamico Oxalacética", tipo_exame_categoria: "Bioquímica", valorReferenciaSolicitacao: "5 - 34 U/L" },
+    { id: 5, nome_exame: "TGP - Transaminase Glutamico Piruvica", tipo_exame_categoria: "Bioquímica",
+       valorReferenciaSolicitacao: "Masculino: 21 - 72 U /L \nFeminino: 9 - 52 U / L" },
+    { id: 6, nome_exame: "Gama GT - Glutamiltransferase", tipo_exame_categoria: "Bioquímica", valorReferenciaSolicitacao: "Masculino: 15 - 73 U/L  \nFeminino: 12 - 43 U/L", 
+      valorReferenciaSolicitacao: "Masculino: 15 - 73 U /L \nFeminino: 12 - 43 U / L" },
+    { id: 7, nome_exame: "Fosfatase Alcalina", tipo_exame_categoria: "Bioquímica", valorReferenciaSolicitacao: "38 - 126 U/L" },
+    { id: 8, nome_exame: "Creatinina", tipo_exame_categoria: "Bioquímica", valorReferenciaSolicitacao: "Masculino: 0,70 - 1,25 mg/dL \nFeminino: 0,57 - 1,11 mg/dL",
+       valorReferenciaSolicitacao: "Masculino: 0,70 - 1,25 mg/dL \nFeminino: 0,57 - 1,11 mg/dL" },
+    { id: 10, nome_exame: "Glicose", tipo_exame_categoria: "Bioquímica", valorReferenciaSolicitacao: "75 - 99 mg/dL" },
+    { id: 11, nome_exame: "Colesterol Total", tipo_exame_categoria: "Bioquímica",
+       valorReferenciaSolicitacao: "Adultos (acima de 20 anos): < 190mg / dL \nCrianças e adolescentes ( < 20 anos ): < 170mg/dL" },
+    { id: 12, nome_exame: "Triglicerídeos", tipo_exame_categoria: "Bioquímica",
+       valorReferenciaSolicitacao: "Adultos (acima de 20 anos): < 150mg / dL \nCrianças de 0 a 9 anos: < 75 mg/dL \nCrianças e adolescentes de 10 a 19 anos: < 90mg/dL" },
+    { id: 13, nome_exame: "Uréia", tipo_exame_categoria: "Bioquímica", valorReferenciaSolicitacao: null },
+    { id: 12, nome_exame: "Ácido Úrico", tipo_exame_categoria: "Bioquímica", valorReferenciaSolicitacao: null },
+    { id: 12, nome_exame: "PCR - Proteína C Reativa", tipo_exame_categoria: "Bioquímica", valorReferenciaSolicitacao: "Inferoior a 1,0 mg/dL" },
+    { id: 12, nome_exame: "Calcio", tipo_exame_categoria: "Bioquímica", valorReferenciaSolicitacao: null },
+    { id: 12, nome_exame: "LDH", tipo_exame_categoria: "Bioquímica", valorReferenciaSolicitacao: null },
   ],
+ Hematologia: [
+    // --- Eritrograma (Já existiam, corrigi os IDs) ---
+    { id: 23, nome_exame: "Hemácia", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: "3,9 - 5,0 x106/µL" },
+    { id: 24, nome_exame: "Hemoglobina", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: "12,0 - 15,5 g/dL" },
+    { id: 25, nome_exame: "Hematócrito", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: "35 - 45 %" },
+    { id: 26, nome_exame: "VCM", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: "82 - 98 fL" },
+    { id: 27, nome_exame: "HCM", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: "26 - 34 pg" }, 
+    { id: 28, nome_exame: "CHCM", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: "31 - 36 g/dL" }, 
+    { id: 29, nome_exame: "RDW", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: "11,5 - 16,5 %" }, 
+
+    // --- Leucograma
+    { id: 30, nome_exame: "Leucócitos", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: "3.500 - 10.500 /µL" },
+    { id: 32, nome_exame: "Neutrófilos", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: "1.700 - 8.000 /µL" },
+    { id: 32, nome_exame: "Bastonetes ", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: "0 - 840 /µL" },
+    { id: 32, nome_exame: "Segmentados", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: "1.700 - 8.000 /µL" },
+    { id: 33, nome_exame: "Basófilos", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: "0 - 100 /µL" },
+    { id: 33, nome_exame: "Eosinófilos", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: "50 - 500 /µL" },
+    { id: 34, nome_exame: "Linfócitos", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: "900 - 2.900 /µL" },
+    { id: 35, nome_exame: "Monócitos", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: "300 - 900 /µL" },
+
+    // --- Plaquetas 
+    { id: 36, nome_exame: "Plaquetas", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: "150 - 450 x103 /µL" }
+    { id: 36, nome_exame: "Volume Plaquetário Médio", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: "6,5 - 15,0 fL" }
+ ],
   Urinálise: [ //Util para data science pois temos referencia
-    { id: 30, nome_exame: "Exame físico", tipo_exame_categoria: "Urinálise" },
-    { id: 31, nome_exame: "Exame químico", tipo_exame_categoria: "Urinálise" },
-    { id: 32, nome_exame: "Exame microscópico", tipo_exame_categoria: "Urinálise" },
+    { id: 30, nome_exame: "Densidade", tipo_exame_categoria: "Urinálise", valorReferenciaSolicitacao: "1.015 - 1.035" },
+    { id: 31, nome_exame: "pH", tipo_exame_categoria: "Urinálise", valorReferenciaSolicitacao: "5,5 - 6,5" },
+    { id: 31, nome_exame: "Células Epiteliais", tipo_exame_categoria: "Urinálise", valorReferenciaSolicitacao: "< 31.000 /mL" },
+    { id: 32, nome_exame: "Leucócitos", tipo_exame_categoria: "Urinálise", valorReferenciaSolicitacao: "< 25.000 /mL" },
+    { id: 32, nome_exame: "Hemácias", tipo_exame_categoria: "Urinálise", valorReferenciaSolicitacao: "< 23.000 /mL" },
+    { id: 32, nome_exame: "Cilindros", tipo_exame_categoria: "Urinálise", valorReferenciaSolicitacao: "Ausentes" },
+    { id: 32, nome_exame: "Cristais", tipo_exame_categoria: "Urinálise", valorReferenciaSolicitacao: "Ausentes" },
+    { id: 32, nome_exame: "Leveduras", tipo_exame_categoria: "Urinálise", valorReferenciaSolicitacao: "Ausentes" },
   ],
 };
 
