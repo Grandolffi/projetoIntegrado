@@ -1,69 +1,70 @@
 import pandas as pd
-from db_connection import get_connection
+from sqlalchemy import create_engine
 
-# 1. Criar conexão com o banco
-conn = get_connection()
-if conn is None:
-    exit()
+# ======================
+# 1. Conexão via SQLAlchemy (SEM WARNINGS)
+# ======================
+engine = create_engine("postgresql+psycopg2://postgres:postgres@localhost:5432/projetointegrado")
 
-# 2. Definir as querys 
+# ======================
+# 2. Query: somente exames numéricos
+# ======================
 
-
-# Query 1 — tabela completa (dados brutos)
-query_all = "SELECT * FROM resultados_exames;"
-
-# Query 2 — somente valores numéricos
-query_numeric = """
+query_numeric = r"""
 SELECT *
 FROM resultados_exames
-WHERE absolute_value ~ '^[0-9]';
+WHERE valor_absoluto ~ '^\s*[0-9]';
 """
 
-# Query 3 — histórico de um paciente específico (ex: paciente 5)
-query_paciente = """
-SELECT *
-FROM resultados_exames
-WHERE patient_id_fk = 5
-ORDER BY exam_date_time;
-"""
+df = pd.read_sql(query_numeric, engine)
 
-# Query 4 — pivot (transformar vários exames em 1 linha por paciente)
-query_pivot = """
-SELECT 
-    patient_id_fk AS patient_id,
-    MAX(CASE WHEN exam_name ILIKE '%glucose%' THEN absolute_value END) AS glicose,
-    MAX(CASE WHEN exam_name ILIKE '%cholesterol%' THEN absolute_value END) AS colesterol_total,
-    MAX(CASE WHEN exam_name ILIKE '%triglycer%' THEN absolute_value END) AS triglicerideos,
-    MAX(CASE WHEN exam_name ILIKE '%urea%' THEN absolute_value END) AS ureia,
-    MAX(CASE WHEN exam_name ILIKE '%creatinine%' THEN absolute_value END) AS creatinina,
-    MAX(CASE WHEN exam_name ILIKE '%tsh%' THEN absolute_value END) AS tsh
-FROM resultados_exames
-GROUP BY patient_id_fk
-ORDER BY patient_id_fk;
-"""
+# ======================
+# 3. Separar valor numérico e unidade
+# ======================
+df[['valor_num', 'unidade']] = df['valor_absoluto'].str.extract(
+    r'([0-9]+(?:\.[0-9]+)?)\s*([a-zA-Z\/]+)?'
+)
+df['valor_num'] = df['valor_num'].astype(float)
 
+# ======================
+# 4. Padronizar datas
+# ======================
+df['data_hora_exame'] = (
+    pd.to_datetime(df['data_hora_exame'])
+      .dt.tz_localize(None)
+)
 
-# 3. Ler dados para testar tudo
+df['data_cadastro'] = (
+    pd.to_datetime(df['data_cadastro'])
+      .dt.tz_localize(None)
+)
 
+df['data_exame_fmt'] = df['data_hora_exame'].dt.strftime("%d-%m-%Y %H:%M")
+df['data_cadastro_fmt'] = df['data_cadastro'].dt.strftime("%d-%m-%Y %H:%M")
 
-print("\n=== Teste: lendo dados brutos ===")
-df_all = pd.read_sql(query_all, conn)
-print(df_all.head())
+# ======================
+# 5. Corrigir nomes das colunas
+# ======================
+df = df.rename(columns={
+    "patient_id_fk": "paciente_id",
+    "exam_name": "nome_exame",
+    "exam_type": "tipo_exame"
+})
 
-print("\n=== Teste: lendo apenas exames numéricos ===")
-df_num = pd.read_sql(query_numeric, conn)
-print(df_num.head())
+# ======================
+# 6. Criar PIVOT correto (usando SOMENTE valor_num)
+# ======================
+pivot = df.pivot_table(
+    index="paciente_id_fk",
+    columns="nome_exame",
+    values="valor_num",
+    aggfunc="max"
+).reset_index()
 
-print("\n=== Teste: lendo histórico do paciente 5 ===")
-df_pac = pd.read_sql(query_paciente, conn)
-print(df_pac.head())
+print("\n=== DATAFRAME FINAL (LIMPO, NUMÉRICO) ===")
+print(df.head())
 
-print("\n=== Teste: lendo PIVOT (dataset ideal para DS) ===")
-df_pivot = pd.read_sql(query_pivot, conn)
-print(df_pivot.head())
+print("\n=== DATASET PIVOT PRONTO PARA MACHINE LEARNING ===")
+print(pivot.head())
 
-# --------------------------------------------------------------
-# 4. Fechar conexão
-# --------------------------------------------------------------
-conn.close()
-print("\nConexão encerrada com sucesso.")
+print("\nConcluído.")

@@ -30,19 +30,36 @@ router.post("/pacientes", async (req, res) =>{
 
 //update
 router.put("/editarpacientes/:idpaciente", async (req, res) => { //PessoaDao acessa via json, e editamos paciente
-  const {nome, cpf, dtnasc, email, nomeMae, numCelular, genero} = req.body
-  const id = parseInt(req.params.idpaciente);
-  const pacientes = await getPacientes(); //chamando a função que exibe paciente
-  const paciente = pacientes.find(a => a.id === id); // busca real por id
-    if (!paciente) {
-        return res.status(404).send("paciente não encontrado");
-    }
+    try{
+        const {nome, cpf, dtnasc, email, nomeMae, numCelular, genero} = req.body
+        const id = parseInt(req.params.idpaciente);
+        const pacientes = await getPacientes(); //chamando a função que exibe paciente
+        const paciente = pacientes.find(a => a.id === id); // busca real por id
+            if (!paciente) {
+                return res.status(404).send("paciente não encontrado");
+            }
 
-  const result = await editPaciente(id, nome, cpf, dtnasc, email, nomeMae, numCelular, genero);
-  console.log("abc: ", id, nome, cpf, dtnasc, email, nomeMae, numCelular, genero)
-    if(result){
-        res.status(200).send("paciente Editado");
-    }
+        const result = await editPaciente(id, nome, cpf, dtnasc, email, nomeMae, numCelular, genero);
+        console.log("abc: ", id, nome, cpf, dtnasc, email, nomeMae, numCelular, genero)
+            if(result){
+                return res.status(200).json({
+                    success: true,
+                    message: "Paciente editado com sucesso!",
+                    id_paciente: id
+                });
+            }
+
+            return res.status(500).json({
+                success: false,
+                message: "Erro ao atualizar paciente"
+            });
+        }catch (error) {
+            return res.status(500).json({
+                success: false,
+                message: "Erro interno ao editar paciente",
+                error: error.message
+        });
+  }
 });
 
 

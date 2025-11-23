@@ -1,6 +1,9 @@
 import { StyleSheet, View, Text, Image, TextInput, TouchableOpacity, ScrollView  } from "react-native";
 import { useState } from "react";
 import {AntDesign, Feather} from "@expo/vector-icons";
+import Toast from 'react-native-toast-message';
+import AsyncStorage from '@react-native-async-storage/async-storage'; //AsyncStorage usado para salvar o token o disco do celular. para que outras páginas usem o token (storage)
+import { loginFromAPI } from "../../API/Login";
 
 export default function Login({navigation}) {
     const [login, setLogin] = useState("");
@@ -10,25 +13,34 @@ export default function Login({navigation}) {
 
     async function handleLogin(){
         try{
-            if(!login || !senha){
-                console.error("Login e/ou senha não informados");
+            if(!login || !senha){console.error("Login e/ou senha não informados");}
+
+            const res = await loginFromAPI ({plogin: login, psenha: senha});
+
+            console.log("valor de res", res)
+
+            if (!res.success) {
+                console.log("diferente de sucess")
+                Toast.show({
+                    type: "error",
+                    text1: "Erro ao fazer login",
+                    text2: res.message
+                });
+                return;
             }
 
-            const res = await fetch('http://localhost:3000/login', {
-                method: 'POST', //metodo que vou mandar via post para login
-                headers: {'Content-Type': 'application/json'}, /*avisando que vou mandar um json pro servidor*/
-                body: JSON.stringify({plogin: login, psenha: senha}) //corpo da requisição, parametro pro servidor
-            })
-
-            if(!res.ok) throw new Error(await res.text());
-
-            const data = await res.json();
-
-            if(data.token){
-                setToken(data.token);
-                navigation.navigate("Home", {token: data.token}); //passa token para outra pasta
+            const token = res.json?.token;
+            if(token){
+                await AsyncStorage.setItem('@user_token', token); //salva token como se fosse uma variavel global no disco do celular
+                Toast.show({
+                    type: "success",    
+                    text1: "User Logado",
+                    text2: "Usuario logado com sucesso!"
+                });
+                setToken(token);
+                navigation.navigate("Home"); 
             }else{
-                console.error("Login e/ou senha incorretos!");
+                console.error("Erro interno: Token ausente na resposta da API.");
             }
 
         }catch(error){

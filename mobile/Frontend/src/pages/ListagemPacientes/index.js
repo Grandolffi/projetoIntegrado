@@ -6,16 +6,21 @@ import User from "../../components/User";
 import PageAtual from "../../components/PageAtual";
 import { LoadPacientesFromAPI, DeletePacientesFromAPI } from '../../API/Pacientes';
 import Toast from 'react-native-toast-message';
+import { useIsFocused } from "@react-navigation/native";
 
 
 export default function ListaPacientes({navigation}){
     const [paciente, setPaciente] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [pacienteSelecionado, setPacienteSelecionado] = useState(null);
+    const isFocused = useIsFocused();
 
     useEffect(()=>{
-        getPacientes();
-    }, []);
+        if (isFocused) {
+            getPacientes();
+        }
+        
+    }, [isFocused]);
 
     const getPacientes = async () => {
         const pacientes = await LoadPacientesFromAPI();
@@ -53,6 +58,7 @@ export default function ListaPacientes({navigation}){
 
         if(acao === "Editar"){
             navigation.navigate("CadastrarPaciente", {modo: "editar", paciente: pacienteSelecionado});
+            console.log("aquiiiiiiii", pacienteSelecionado)
             setModalVisible(false);
             return;
         }

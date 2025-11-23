@@ -19,23 +19,14 @@ const COR_FUNDO_ESCURO = "#0A212F";
 
 // --- DADOS DE EXAMES (Mantidos) ---
 const EXAMES_POR_CATEGORIA = {
-  Microbiologia: [
-    { id: 20, nome_exame: "Urocultura com antibiograma", tipo_exame_categoria: "Microbiologia" },
-    { id: 21, nome_exame: "Swab ocular", tipo_exame_categoria: "Microbiologia" },
-    { id: 22, nome_exame: "Escarro para Micobacterium tuberculosis", tipo_exame_categoria: "Microbiologia" },
-  ],
-  Parasitologia: [
-    { id: 27, nome_exame: "Exame de fezes", tipo_exame_categoria: "Parasitologia" },
-    { id: 28, nome_exame: "Pesquisa de hematozoários", tipo_exame_categoria: "Parasitologia" },
-    { id: 29, nome_exame: "Pesquisa de protozoários intestinais", tipo_exame_categoria: "Parasitologia" },
-  ],
-  Hematologia: [
-    { id: 23, nome_exame: "Hemograma Completo", tipo_exame_categoria: "Hematologia" },
+  Hematologia: [ //Util para data science pois temos referencia
+    { id: 23, nome_exame: "Hemograma Completo", tipo_exame_categoria: "Hematologia",  },
     { id: 24, nome_exame: "Reticulócitos", tipo_exame_categoria: "Hematologia" },
     { id: 25, nome_exame: "Tempo de sangramento", tipo_exame_categoria: "Hematologia" },
-    { id: 26, nome_exame: "Tempo de coagulação", tipo_exame_categoria: "Hematologia" },
+    { id: 26, nome_exame: "Tempo de coagulação", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: null },
+    { id: 31, nome_exame: "Bastonetes", tipo_exame_categoria: "Hematologia", valorReferenciaSolicitacao: "< 840/µL" },
   ],
-  Bioquimica: [
+  Bioquimica: [ // Verificar pois muda de masculino para feminino (fica por ultimo a se fazer)
     { id: 1, nome_exame: "Ácido úrico", tipo_exame_categoria: "Bioquímica" },
     { id: 2, nome_exame: "Alfa Amilase", tipo_exame_categoria: "Bioquímica" },
     { id: 3, nome_exame: "Bilirrubina Total", tipo_exame_categoria: "Bioquímica" },
@@ -46,7 +37,7 @@ const EXAMES_POR_CATEGORIA = {
     { id: 18, nome_exame: "Triglicerídeos", tipo_exame_categoria: "Bioquímica" },
     { id: 19, nome_exame: "Uréia", tipo_exame_categoria: "Bioquímica" },
   ],
-  Urinálise: [
+  Urinálise: [ //Util para data science pois temos referencia
     { id: 30, nome_exame: "Exame físico", tipo_exame_categoria: "Urinálise" },
     { id: 31, nome_exame: "Exame químico", tipo_exame_categoria: "Urinálise" },
     { id: 32, nome_exame: "Exame microscópico", tipo_exame_categoria: "Urinálise" },
@@ -61,6 +52,7 @@ export default function NovoExame({ navigation }) {
   const [observacoes, setObservacoes] = useState("");
   const [examesSelecionados, setExamesSelecionados] = useState({});
   const [abaAtiva, setAbaAtiva] = useState(null);
+  const [genero, setGeneroPaciente] = useState("");
 
   // --- ESTADOS PARA O MODAL DE PACIENTES ---
   const [modalVisible, setModalVisible] = useState(false);
@@ -99,6 +91,7 @@ export default function NovoExame({ navigation }) {
     setNomePaciente(paciente.nome);
     setPacienteId(String(paciente.id));
     setModalVisible(false);
+    setGeneroPaciente(paciente.genero)
     setBuscaModal(""); // Limpa busca
     setListaFiltrada(listaPacientes); // Reseta lista
   };
@@ -137,7 +130,7 @@ export default function NovoExame({ navigation }) {
       const examesFormatados = listaExamesParaEnviar.map(item => ({
         nomeExame: item.nome_exame,
         tipoExameCategoria: item.tipo_exame_categoria,
-        valorReferenciaSolicitacao: "",
+        valorReferenciaSolicitacao: item.valorReferenciaSolicitacao,
         statusItem: "Pendente"
       }));
 

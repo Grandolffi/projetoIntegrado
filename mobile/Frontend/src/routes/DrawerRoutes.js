@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { createDrawerNavigator } from '@react-navigation/drawer';
 import { NavigationContainer } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
@@ -12,16 +12,50 @@ import ListaPacientes from '../pages/ListagemPacientes';
 import CadastrarResultadoExame from '../pages/ResultadoExame/resultadoExames';
 import ListaLaudos from '../pages/ListaLaudos/listaLaudo';
 import LoginUser from '../pages/LoginUser/loginUser'
+import { LogoutScreen } from '../pages/LogoutScreen/logout';
 import ListaResultadosExames from '../pages/ListagemExamesConcluidos';
+import AsyncStorage from '@react-native-async-storage/async-storage'; // Importe o AsyncStorage
+import { ActivityIndicator, View, StyleSheet } from 'react-native'; // Para o loading
 
 const Drawer = createDrawerNavigator();
 
 export default function DrawerRoutes() {
+  const [isLoading, setIsLoading] = useState(true);
+  const [userToken, setUserToken] = useState(null);
+
+  useEffect(() => {
+        // Função para carregar o token salvo
+        const loadToken = async () => {
+            try {
+                const token = await AsyncStorage.getItem('@user_token'); //chamando o token que foi salvo na pagina do login
+                setUserToken(token);
+            } catch (error) {
+                console.error("Erro ao carregar token:", error);
+            } finally {
+                setIsLoading(false);
+            }
+        };
+
+        loadToken();
+    }, []);
+
+    //tela de carregamento enquanto valida token 
+    if (isLoading) { 
+        return (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#0A212F" />
+            </View>
+        );
+    }
+
+    //definindo a rota se tiver token home, se não login
+    const initialRouteName = userToken ? "Home" : "Login";
+
   return (
     <SafeAreaProvider>
       <NavigationContainer>
         <Drawer.Navigator
-          initialRouteName="Login"
+          initialRouteName={initialRouteName}
           screenOptions={{
             headerShown: false,
             drawerActiveTintColor: "#0A212F",
@@ -69,6 +103,7 @@ export default function DrawerRoutes() {
               drawerIcon: ({ color, size }) => (
                 <Feather name="user-plus" color={color} size={size} />
               ),
+              unmountOnBlur: true,
             }}
           />
 
@@ -131,8 +166,29 @@ export default function DrawerRoutes() {
               ),
             }}
           />
+
+          <Drawer.Screen
+                name="Logout"
+                component={LogoutScreen} 
+                options={{
+                    drawerLabel: "Sair do Sistema",
+                    drawerIcon: ({ color, size }) => (
+                        <Feather name="log-out" color={color} size={size} />
+                    ),
+                      // Garante que o componente seja desmontado após a ação
+                    unmountOnBlur: true, 
+                }}
+            />
         </Drawer.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>
   );
 }
+
+const styles = StyleSheet.create({
+    loadingContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+    }
+});

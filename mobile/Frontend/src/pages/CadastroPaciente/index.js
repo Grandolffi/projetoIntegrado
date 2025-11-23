@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { View, StyleSheet, Text, TextInput, TouchableOpacity, ScrollView, Alert } from "react-native";
 import { Picker } from '@react-native-picker/picker'; 
 import { Feather } from '@expo/vector-icons'; // Para o ícone de calendário
@@ -6,11 +6,11 @@ import Header from "../../components/Header";
 import User from "../../components/User";
 import PageAtual from "../../components/PageAtual"; // Vamos usar este componente para o título
 import { CreatePacientesFromAPI, LoadPacientesFromAPI, EditPacientesFromAPI } from '../../API/Pacientes';
-import { useRoute } from "@react-navigation/native";
+import { useRoute, useFocusEffect } from "@react-navigation/native";
 
 
 
-export default function CadastroPaciente(){
+export default function CadastroPaciente({navigation}){
     // 1. Definição dos Estados para os campos de texto e seleção
     const [nomeCompleto, setNomeCompleto] = useState('');
     const [cpf, setCpf] = useState('');
@@ -23,27 +23,77 @@ export default function CadastroPaciente(){
     const route = useRoute(); //Pega os parâmetros enviados pela tela que chamou, no caso aqui listagemPacientes
     const modoEdicao = route.params?.modo === "editar"; // verifica se esta no modo editar ou n
     const pacienteEdicao = route.params?.paciente || null; // tenta acessar route.params.paciente com if ternario, se tiver ele guarda, se n retorna null
-    
 
-    useEffect(() => {
-        if (modoEdicao && pacienteEdicao) {
-            setNomeCompleto(pacienteEdicao.nome);
-            setCpf(pacienteEdicao.cpf);
-            setdtnasc(pacienteEdicao.dtnasc);
-            setEmail(pacienteEdicao.email);
-            setNomeMae(pacienteEdicao.nomeMae);
-            setnumCelular(pacienteEdicao.numCelular);
-            setGenero(pacienteEdicao.genero);
-        }
-    }, [modoEdicao]);
+    function formatarDataISOParaBR(isoString) {
+        if (!isoString) return "";
+        const [ano, mes, dia] = isoString.split("T")[0].split("-");
+        return `${dia}/${mes}/${ano}`;
+    }
+
+    const resetFormulario = useCallback(() => {
+        setNomeCompleto('');
+        setCpf('');
+        setdtnasc('');
+        setEmail('');
+        setNomeMae('');
+        setnumCelular('');
+        setGenero('Masculino');
+        console.log("Formulário resetado (estados).");
+    }, []);
+
+    //Ajuda de IA para limpeza do formulario!
+    useFocusEffect(
+        useCallback(() => {
+            const modoAtual = route.params?.modo;
+            const pacienteAtual = route.params?.paciente;
+            
+            // A) Lógica de preenchimento ao focar (SÓ OCORRE NA ENTRADA)
+            if (modoAtual === "editar" && pacienteAtual) {
+                console.log("Focou com dados de edição. Preenchendo formulário.");
+                setNomeCompleto(pacienteAtual.nome);
+                setCpf(pacienteAtual.cpf);
+                setdtnasc(formatarDataISOParaBR(pacienteAtual.dtnasc));
+                setEmail(pacienteAtual.email);
+                setNomeMae(pacienteAtual.nomemae);
+                setnumCelular(pacienteAtual.numcelular);
+                setGenero(pacienteAtual.genero);
+            } else {
+                // B) Se for novo cadastro (ou se os params já vieram limpos), reseta.
+                console.log("Focou em modo Cadastro ou sem parâmetros. Resetando formulário.");
+                resetFormulario();
+            }
+
+            // C) Função de Cleanup (Limpeza)
+            // Isso é executado quando a tela PERDE O FOCO (o usuário navegou para outra tela).
+            return () => {
+                // Se o modo ainda for 'editar' ao sair, significa que a edição NÃO FOI SALVA.
+                // Limpamos os parâmetros da rota para que, ao retornar, o formulário esteja limpo.
+                if (route.params?.modo === "editar") {
+                    console.log("Perdeu o foco em modo edição. Limpando parâmetros de rota para o retorno.");
+                    // Limpamos APENAS os parâmetros da ROTA, deixando os estados locais intactos
+                    // caso o usuário volte rapidamente e o componente não tenha sido desmontado.
+                    // Mas a próxima vez que a tela focar, ela vai cair no ELSE acima e resetar os estados.
+                    navigation.setParams({ modo: undefined, paciente: undefined });
+                }
+            };
+
+        }, [route.params, navigation, resetFormulario]) 
+    );
+
 
     async function handleAtualizar() {
         try {
             Alert.alert("Atualizando paciente...");
-            console.log("tteste: ", cpf, "(        e     )", pacienteEdicao.nomeMae)
             await EditPacientesFromAPI(pacienteEdicao.id, {nome: nomeCompleto, cpf, dtnasc, email, nomeMae, numCelular, genero,});
 
+            navigation.setParams({ modo: undefined, paciente: undefined });
+            console.log("aquiiiiiiii!!!")
             Alert.alert("Sucesso", "Paciente atualizado!");
+            await LoadPacientesFromAPI();
+
+            resetFormulario();
+            navigation.setParams({ modo: undefined, paciente: undefined });
+            navigation.navigate("ListaPacientes")
         } catch (error) {
             Alert.alert("Erro", "Não foi possível atualizar.");
         }
@@ -56,12 +106,7 @@ export default function CadastroPaciente(){
       Alert.alert('Cadastrando paciente!');
       if(nomeCompleto && cpf && dtnasc && email && nomeMae && numCelular && genero){
         await CreatePacientesFromAPI({nome: nomeCompleto, cpf: cpf, dtnasc: dtnasc, email: email, nomeMae: nomeMae, numCelular: numCelular, genero: genero });
-        setNomeCompleto("");
-        setCpf("");
-        setdtnasc("");
-        setEmail("");
-        setNomeMae("");
-        setnumCelular("");
+        resetFormulario();
         Alert.alert("Sucesso", "Paciente cadastrado!");
       }
       await LoadPacientesFromAPI();
@@ -101,7 +146,7 @@ export default function CadastroPaciente(){
                         placeholder="000.000.000-00"
                         placeholderTextColor="#999"
                         keyboardType="numeric" 
-                        maxLength={14} // Incluindo pontos e traço para máscara simples
+                        maxLength={14} 
                         value={cpf}
                         onChangeText={setCpf}
                     />
@@ -110,7 +155,7 @@ export default function CadastroPaciente(){
                     <Text style={Estilo.label}>Data de nascimento</Text>
                     <View style={Estilo.inputComIcone}>
                         <TextInput
-                            style={[Estilo.input, Estilo.inputData]} // Estilo inputData garante o flex
+                            style={[Estilo.input, Estilo.inputData]} 
                             placeholder="dd/mm/aaaa"
                             placeholderTextColor="#999"
                             keyboardType="numeric"
@@ -177,7 +222,7 @@ export default function CadastroPaciente(){
 
             {/* Botão Fixo no Rodapé, alinhado ao Estilo NovoExame */}
             <View style={Estilo.botaoFixoContainer}>
-                <TouchableOpacity style={Estilo.botao} activeOpacity={0.8} onPress={modoEdicao ? handleAtualizar : handleCadastro}> /
+                <TouchableOpacity style={Estilo.botao} activeOpacity={0.8} onPress={modoEdicao ? handleAtualizar : handleCadastro}> 
                     <Text style={Estilo.textoBotao}>{modoEdicao ? "Salvar Edição" : "Enviar"}</Text>
                 </TouchableOpacity>
             </View>
