@@ -1,8 +1,13 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+const fs = require("fs");
 const app = express();
 const path = require("path");
 const cors = require("cors");
+
+const graficosPath = path.join(
+  "C:\\xampp\\htdocs\\projetoIntegrado\\DataSciencie\\outputs\\graficos_pacientes"
+);
 
 
 // Middleware
@@ -43,7 +48,24 @@ app.use(listaLaudosRouter);
 app.use(listaSolicitacoesRouter);
 
 
-app.listen(3000, 'localhost', () => {
+// Deixa a pasta pública ==================
+app.use(
+  "/graficos_pacientes",
+  express.static("C:/xampp/htdocs/projetoIntegrado/DataSciencie/outputs/graficos_pacientes")
+);
+
+app.get("/lista-graficos", (req, res) => {
+  fs.readdir(graficosPath, (err, files) => {
+    if (err) return res.status(500).json({ error: "Erro ao listar arquivos" });
+
+    const imagens = files.filter(f => f.endsWith(".png"));
+
+    res.json(imagens);
+  });
+});
+// parte com ajuda da IA tentando visualizar a img py no front ==========
+
+app.listen(3000, "0.0.0.0", () => {
     console.log("Servidor rodando na porta 3000");
 })
 

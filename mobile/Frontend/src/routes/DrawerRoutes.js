@@ -16,6 +16,9 @@ import { LogoutScreen } from '../pages/LogoutScreen/logout';
 import ListaResultadosExames from '../pages/ListagemExamesConcluidos';
 import AsyncStorage from '@react-native-async-storage/async-storage'; // Importe o AsyncStorage
 import { ActivityIndicator, View, StyleSheet } from 'react-native'; // Para o loading
+import GraficosPacientes from '../pages/GraficosPacientes';
+import VisualizarGrafico from '../pages/VisualizarGrafico';
+
 
 const Drawer = createDrawerNavigator();
 
@@ -166,6 +169,26 @@ export default function DrawerRoutes() {
               ),
             }}
           />
+
+          <Drawer.Screen
+            name="GraficosPacientes"
+            component={GraficosPacientes}
+            options={{
+              drawerLabel: "Gráficos dos Pacientes",
+              drawerIcon: ({ color, size }) => (
+                <Feather name="bar-chart-2" color={color} size={size} />
+              ),
+            }}
+          />
+
+          <Drawer.Screen
+            name="VisualizarGrafico"
+            component={VisualizarGrafico}
+            options={{
+              drawerItemStyle: { display: "none" }, // não aparece no menu
+            }}
+          />
+
 
           <Drawer.Screen
                 name="Logout"
